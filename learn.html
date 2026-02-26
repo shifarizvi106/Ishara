@@ -5,43 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SignPath – Learn</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .node { cursor:default; position:relative; }
+    .node.unlocked { cursor:pointer; }
+    .node.unlocked:hover { transform:scale(1.08); }
+    .node.completed { background:#c0f0d8; box-shadow:0 8px 24px rgba(40,167,69,0.3); opacity:1; }
+    .node.completed .node-check {
+      position:absolute; top:-8px; right:-8px;
+      background:#28a745; color:white; border-radius:50%;
+      width:22px; height:22px; font-size:0.7rem;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900;
+    }
+    .node.locked { opacity:0.35; }
+    .node .lock-icon {
+      position:absolute; top:-8px; right:-8px;
+      background:#c77aa0; color:white; border-radius:50%;
+      width:22px; height:22px; font-size:0.7rem;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .node { transition: transform 0.2s; }
+    .streak-lives { display:flex; justify-content:space-between; padding:18px 22px; font-weight:700; }
+  </style>
 </head>
 <body>
 
 <header class="top-bar">
-  <span>❤️ 5</span>
-  <span>🔥 1</span>
+  <span id="livesDisplay">❤️ 5</span>
+  <span id="streakDisplay">🔥 0</span>
 </header>
 
 <main class="learn">
-
-  <div class="path">
-    <div class="node active">
-      👋
-      <span class="label">Greetings</span>
-    </div>
-
-    <div class="node">
-      👨‍👩‍👧
-      <span class="label">Relations</span>
-    </div>
-
-    <div class="node">
-      😊
-      <span class="label">Emotions</span>
-    </div>
-
-    <div class="node">
-      🌍
-      <span class="label">General</span>
-    </div>
-
-    <div class="node">
-      🔤
-      <span class="label">ABC</span>
-    </div>
-  </div>
-
+  <div class="path" id="path"></div>
 </main>
 
 <nav class="bottom-nav">
@@ -50,5 +45,71 @@
   <div class="nav">Profile</div>
 </nav>
 
+<script>
+const CATEGORIES = [
+  { id:'greetings', label:'Greetings', emoji:'👋' },
+  { id:'relations',  label:'Relations',  emoji:'👨‍👩‍👧' },
+  { id:'emotions',   label:'Emotions',   emoji:'😊' },
+  { id:'general',    label:'General',    emoji:'🌍' },
+  { id:'abc',        label:'ABC',        emoji:'🔤' },
+];
+
+function getCompleted() {
+  try { return JSON.parse(localStorage.getItem('sp_completed') || '[]'); } catch(e) { return []; }
+}
+
+function buildPath() {
+  const completed = getCompleted();
+  const path = document.getElementById('path');
+  path.innerHTML = '';
+
+  CATEGORIES.forEach((cat, i) => {
+    const isDone     = completed.includes(cat.id);
+    const isUnlocked = i === 0 || completed.includes(CATEGORIES[i-1].id);
+
+    const node = document.createElement('div');
+    node.className = 'node' +
+      (isDone ? ' completed' : isUnlocked ? ' active unlocked' : ' locked');
+
+    node.innerHTML = `
+      ${cat.emoji}
+      <span class="label">${cat.label}</span>
+      ${isDone     ? '<div class="node-check">✓</div>' : ''}
+      ${!isUnlocked ? '<div class="lock-icon">🔒</div>' : ''}
+    `;
+
+    if (isUnlocked && !isDone) {
+      node.onclick = () => { window.location.href = `lesson.html?cat=${cat.id}`; };
+    } else if (isDone) {
+      // allow replay
+      node.onclick = () => { window.location.href = `lesson.html?cat=${cat.id}&replay=1`; };
+    } else {
+      node.onclick = () => showToast(`Complete ${CATEGORIES[i-1].label} first!`);
+      node.style.cursor = 'pointer';
+    }
+
+    path.appendChild(node);
+  });
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = `
+      position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+      background:#3a2a33;color:white;padding:10px 22px;border-radius:999px;
+      font-size:0.85rem;font-weight:700;opacity:0;transition:opacity 0.3s;z-index:99;
+    `;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2000);
+}
+
+buildPath();
+</script>
 </body>
 </html>
