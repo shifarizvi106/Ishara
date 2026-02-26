@@ -32,7 +32,7 @@
       border-radius:999px;
       transition:width 0.5s cubic-bezier(.4,2,.6,1);
     }
-    .lives-display { font-size:0.95rem; font-weight:800; flex-shrink:0; }
+    .lives-display { font-size:1.2rem; font-weight:800; flex-shrink:0; letter-spacing:3px; }
 
     /* ── Category badge ── */
     .cat-badge {
@@ -50,7 +50,8 @@
     .card {
       width:100%; max-width:380px;
       display:flex; flex-direction:column;
-      align-items:center; gap:14px;
+      align-items:center; justify-content:center;
+      gap:14px; text-align:center;
       animation:slideIn 0.35s cubic-bezier(.4,2,.6,1);
     }
     @keyframes slideIn {
@@ -305,14 +306,14 @@
 </head>
 <body>
 
-<div class="xp-pop" id="xpPop">+10 XP 🌟</div>
+<div class="xp-pop" id="xpPop">+1 ★</div>
 
 <header class="lesson-header">
   <button class="close-btn" onclick="confirmExit()">✕</button>
   <div class="progress-track">
     <div class="progress-fill" id="progressFill"></div>
   </div>
-  <div class="lives-display" id="livesEl">❤️❤️❤️❤️❤️</div>
+  <div class="lives-display" id="livesEl">♡♡♡</div>
 </header>
 
 <div class="cat-badge" id="catBadge"></div>
@@ -343,7 +344,7 @@ const ALL_LESSONS = {
         img:  'assets/hello.gif',
         anim: '',
         desc: 'Raise your right hand to your forehead in a salute, fingers together and flat.',
-        tip: 'Add a friendly smile'
+        tip: 'Like a military salute — hand to the forehead!'
       },
       {
         word: 'Thank You',
@@ -534,7 +535,7 @@ document.title = `SignPath – ${lesson.label}`;
 // ─────────────────────────────────────────────
 let step     = 0;
 let phase    = 'show';
-let lives    = 5;
+let lives    = 3;
 let correct  = 0;
 let wrong    = 0;
 let answered = false;
@@ -570,12 +571,11 @@ function buildCard(sign, stage) {
 function buildShow(sign, stage) {
   const card = el('div','card');
 
-  // Image or emoji fallback
   const imgHtml = sign.img
     ? `<div class="sign-img-wrap">
          <img class="sign-img ${sign.anim||'anim-fadein'}"
               src="${sign.img}"
-              onerror="this.parentNode.innerHTML='<span class=\\'fallback\\'>${sign.emoji}</span>'"
+              onerror="this.parentNode.innerHTML=''"
               alt="${sign.word}">
        </div>`
     : `<div class="sign-img-wrap"><span class="fallback">${sign.emoji}</span></div>`;
@@ -594,9 +594,16 @@ function buildShow(sign, stage) {
 function buildQuiz(sign, stage) {
   const choices = makeChoices(sign.word);
   const card = el('div','card');
+
+  const imgHtml = sign.img
+    ? `<div class="sign-img-wrap">
+         <img class="sign-img ${sign.anim||'anim-fadein'}" src="${sign.img}" alt="${sign.word}">
+       </div>`
+    : `<div class="sign-img-wrap"><span class="fallback">${sign.emoji}</span></div>`;
+
   card.innerHTML = `
     <div class="phase-label">What sign is this?</div>
-    <div class="quiz-emoji">${sign.emoji}</div>
+    ${imgHtml}
     <p class="quiz-prompt">${sign.desc}</p>
     <div class="choices" id="choices"></div>
   `;
@@ -694,8 +701,9 @@ function updateProgress() {
   document.getElementById('progressFill').style.width = (current/total*100) + '%';
 }
 function updateLives() {
-  document.getElementById('livesEl').textContent =
-    '❤️'.repeat(Math.max(lives,0)) + '🖤'.repeat(Math.max(5-lives,0));
+  document.getElementById('livesEl').innerHTML =
+    '<span style="color:#ff5fa2">♡</span>'.repeat(Math.max(lives,0)) +
+    '<span style="color:#f4b6d2">♡</span>'.repeat(Math.max(3-lives,0));
 }
 
 // ─────────────────────────────────────────────
