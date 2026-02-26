@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignPath – Progress</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { padding-bottom: 80px; }
+
+    .progress-page { padding: 24px 22px; }
+
+    h2 {
+      font-size: 1.4rem; font-weight: 900;
+      color: #d63384; margin-bottom: 20px;
+    }
+
+    /* ── Stat pills ── */
+    .stat-row {
+      display: flex; gap: 10px; margin-bottom: 28px;
+    }
+    .stat-pill {
+      flex: 1; background: white; border-radius: 20px;
+      padding: 14px 10px; text-align: center;
+      box-shadow: 0 4px 16px rgba(255,95,162,0.12);
+    }
+    .stat-pill .num {
+      font-size: 1.6rem; font-weight: 900; color: #d63384;
+      display: block;
+    }
+    .stat-pill .lbl {
+      font-size: 0.68rem; color: #a14a76;
+      font-weight: 600; margin-top: 2px; display: block;
+    }
+
+    /* ── Overall bar ── */
+    .section-title {
+      font-size: 0.72rem; font-weight: 700; color: #c77aa0;
+      text-transform: uppercase; letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .overall-wrap {
+      background: white; border-radius: 20px;
+      padding: 18px; margin-bottom: 28px;
+      box-shadow: 0 4px 16px rgba(255,95,162,0.12);
+    }
+    .overall-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.82rem; font-weight: 700;
+      color: #3a2a33; margin-bottom: 12px;
+    }
+    .overall-label span { color: #a14a76; }
+
+    /* ── Custom ─•──── style bar ── */
+    .track-bar {
+      position: relative; height: 4px;
+      background: #f4b6d2; border-radius: 999px;
+      margin-bottom: 6px;
+    }
+    .track-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, #ff5fa2, #d63384);
+      transition: width 0.8s cubic-bezier(.4,2,.6,1);
+      position: relative;
+    }
+    .track-dot {
+      position: absolute; right: -6px; top: 50%;
+      transform: translateY(-50%);
+      width: 12px; height: 12px;
+      background: #d63384; border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(214,51,132,0.4);
+    }
+    .track-pct {
+      font-size: 0.72rem; color: #a14a76;
+      font-weight: 700; text-align: right;
+    }
+
+    /* ── Category bars ── */
+    .cat-list { display: flex; flex-direction: column; gap: 12px; }
+    .cat-card {
+      background: white; border-radius: 20px;
+      padding: 16px 18px;
+      box-shadow: 0 4px 16px rgba(255,95,162,0.1);
+    }
+    .cat-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 10px;
+    }
+    .cat-name {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.95rem; font-weight: 800; color: #3a2a33;
+    }
+    .cat-name span { font-size: 1.2rem; }
+    .cat-badge {
+      font-size: 0.7rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 999px;
+    }
+    .cat-badge.done    { background: #d4f5e2; color: #155724; }
+    .cat-badge.active  { background: #fff0f6; color: #d63384; }
+    .cat-badge.locked  { background: #f4b6d2; color: #a14a76; }
+    .cat-signs {
+      font-size: 0.72rem; color: #a14a76; font-weight: 600;
+    }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center; padding: 40px 20px;
+      color: #a14a76;
+    }
+    .empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty p { font-size: 0.88rem; line-height: 1.6; }
+    .empty a {
+      display: inline-block; margin-top: 16px;
+      background: linear-gradient(135deg, #ff5fa2, #d63384);
+      color: white; border-radius: 999px;
+      padding: 12px 28px; font-weight: 800;
+      text-decoration: none; font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<header class="top-bar">
+  <span>SignPath</span>
+  <span id="streakEl">🔥 0</span>
+</header>
+
+<div class="progress-page">
+  <h2>Your Progress</h2>
+
+  <!-- Stat pills -->
+  <div class="stat-row">
+    <div class="stat-pill">
+      <span class="num" id="starsEl">0</span>
+      <span class="lbl">★ stars</span>
+    </div>
+    <div class="stat-pill">
+      <span class="num" id="signsEl">0</span>
+      <span class="lbl">signs learned</span>
+    </div>
+    <div class="stat-pill">
+      <span class="num" id="streakNum">0</span>
+      <span class="lbl">🔥 day streak</span>
+    </div>
+  </div>
+
+  <!-- Overall progress -->
+  <div class="section-title">Overall</div>
+  <div class="overall-wrap">
+    <div class="overall-label">
+      <span>All Categories</span>
+      <span id="overallPctLabel">0%</span>
+    </div>
+    <div class="track-bar">
+      <div class="track-fill" id="overallFill" style="width:0%">
+        <div class="track-dot"></div>
+      </div>
+    </div>
+    <div class="track-pct" id="overallFrac">0 / 5 categories</div>
+  </div>
+
+  <!-- Per category -->
+  <div class="section-title">By Category</div>
+  <div class="cat-list" id="catList"></div>
+
+</div>
+
+<nav class="bottom-nav">
+  <div class="nav" onclick="location.href='learn.html'">Learn</div>
+  <div class="nav active">Progress</div>
+  <div class="nav">Profile</div>
+</nav>
+
+<script>
+const CATEGORIES = [
+  { id:'greetings', label:'Greetings', emoji:'👋', signs:4 },
+  { id:'relations',  label:'Relations',  emoji:'👨‍👩‍👧', signs:5 },
+  { id:'emotions',   label:'Emotions',   emoji:'😊', signs:5 },
+  { id:'general',    label:'General',    emoji:'🌍', signs:5 },
+  { id:'abc',        label:'ABC',        emoji:'🔤', signs:26 },
+];
+
+const TOTAL_SIGNS = CATEGORIES.reduce((s,c) => s+c.signs, 0);
+
+function getCompleted() {
+  try { return JSON.parse(localStorage.getItem('sp_completed') || '[]'); } catch(e) { return []; }
+}
+function getStars() {
+  try { return parseInt(localStorage.getItem('sp_stars') || '0'); } catch(e) { return 0; }
+}
+function getStreak() {
+  try { return parseInt(localStorage.getItem('sp_streak') || '0'); } catch(e) { return 0; }
+}
+
+function build() {
+  const completed = getCompleted();
+  const stars     = getStars();
+  const streak    = getStreak();
+
+  // Stats
+  document.getElementById('starsEl').textContent  = stars;
+  document.getElementById('streakEl').textContent  = `🔥 ${streak}`;
+  document.getElementById('streakNum').textContent = streak;
+
+  // Signs learned = sum of signs in completed categories
+  const signsLearned = CATEGORIES
+    .filter(c => completed.includes(c.id))
+    .reduce((s,c) => s+c.signs, 0);
+  document.getElementById('signsEl').textContent = signsLearned;
+
+  // Overall bar
+  const doneCats = completed.length;
+  const pct = Math.round(doneCats / CATEGORIES.length * 100);
+  document.getElementById('overallFill').style.width = pct + '%';
+  document.getElementById('overallPctLabel').textContent = pct + '%';
+  document.getElementById('overallFrac').textContent = `${doneCats} / ${CATEGORIES.length} categories`;
+
+  // Category list
+  const list = document.getElementById('catList');
+  list.innerHTML = '';
+
+  CATEGORIES.forEach((cat, i) => {
+    const isDone     = completed.includes(cat.id);
+    const isUnlocked = i === 0 || completed.includes(CATEGORIES[i-1].id);
+    const catPct     = isDone ? 100 : 0;
+
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+
+    const badgeClass = isDone ? 'done' : isUnlocked ? 'active' : 'locked';
+    const badgeText  = isDone ? '✓ Complete' : isUnlocked ? 'In progress' : '🔒 Locked';
+
+    card.innerHTML = `
+      <div class="cat-header">
+        <div class="cat-name">
+          <span>${cat.emoji}</span>
+          ${cat.label}
+        </div>
+        <div class="cat-badge ${badgeClass}">${badgeText}</div>
+      </div>
+      <div class="track-bar">
+        <div class="track-fill" style="width:${catPct}%">
+          ${catPct > 0 ? '<div class="track-dot"></div>' : ''}
+        </div>
+      </div>
+      <div class="track-pct" style="margin-top:6px">
+        <span class="cat-signs">${isDone ? cat.signs : 0} / ${cat.signs} signs</span>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  // Empty state
+  if (completed.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.innerHTML = `
+      <div class="empty-icon">📖</div>
+      <p>You haven't completed any lessons yet.<br>Start learning to track your progress!</p>
+      <a href="learn.html">Start Learning →</a>
+    `;
+    list.appendChild(empty);
+  }
+}
+
+build();
+</script>
+</body>
+</html>
