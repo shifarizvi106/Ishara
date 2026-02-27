@@ -39,21 +39,22 @@
   <div class="path" id="path"></div>
 </main>
 
+
 <nav class="bottom-nav">
   <div class="nav active">Learn</div>
-  <div class="nav">Progress</div>
+  <div class="nav" onclick="location.href='progress.html'">Progress</div>
   <div class="nav">Profile</div>
 </nav>
 
+
 <script>
 const CATEGORIES = [
-  { id:'greetings', label:'Greetings', emoji:'👋' },
-  { id:'relations',  label:'Relations',  emoji:'👨‍👩‍👧' },
-  { id:'emotions',   label:'Emotions',   emoji:'😊' },
-  { id:'general',    label:'General',    emoji:'🌍' },
-  { id:'abc',        label:'ABC',        emoji:'🔤' },
+  { id:'greetings', label:'Greetings', emoji:'(^.^)/' },
+  { id:'relations',  label:'Relations',  emoji:'જ⁀➴ ♡' },
+  { id:'emotions',   label:'Emotions',   emoji:'(  •̀ - •́  )' },
+  { id:'general',    label:'General',    emoji:'➤' },
+  { id:'abc',        label:'ABC',        emoji:'ABC' },
 ];
-
 function getCompleted() {
   try { return JSON.parse(localStorage.getItem('sp_completed') || '[]'); } catch(e) { return []; }
 }
