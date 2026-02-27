@@ -7,43 +7,29 @@
   <link rel="stylesheet" href="style.css">
   <style>
     body { padding-bottom: 80px; }
-
     .profile-page { padding: 24px 22px; }
 
-    /* ── Avatar + name ── */
     .profile-hero {
       display: flex; flex-direction: column;
-      align-items: center; gap: 12px;
+      align-items: center; gap: 10px;
       margin-bottom: 28px; text-align: center;
     }
-    .avatar-wrap { position: relative; }
     .avatar {
-      width: 90px; height: 90px; border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #ff5fa2;
-      box-shadow: 0 6px 20px rgba(255,95,162,0.25);
-    }
-    .avatar-fallback {
-      width: 90px; height: 90px; border-radius: 50%;
+      width: 88px; height: 88px; border-radius: 50%;
       background: linear-gradient(135deg, #ff5fa2, #d63384);
       display: flex; align-items: center; justify-content: center;
-      font-size: 2.2rem; color: white; font-weight: 900;
+      font-size: 2rem; color: white; font-weight: 900;
       border: 3px solid #ff5fa2;
       box-shadow: 0 6px 20px rgba(255,95,162,0.25);
     }
-    .display-name {
-      font-size: 1.3rem; font-weight: 900; color: #3a2a33;
-    }
-    .display-email {
-      font-size: 0.78rem; color: #a14a76;
-    }
+    .display-name  { font-size: 1.3rem; font-weight: 900; color: #3a2a33; }
+    .display-email { font-size: 0.78rem; color: #a14a76; }
     .guest-tag {
       background: #fff0f6; color: #d63384;
       border-radius: 999px; padding: 3px 12px;
       font-size: 0.72rem; font-weight: 700;
     }
 
-    /* ── Stats ── */
     .stat-row {
       display: flex; gap: 10px; margin-bottom: 28px;
     }
@@ -52,26 +38,16 @@
       padding: 14px 10px; text-align: center;
       box-shadow: 0 4px 16px rgba(255,95,162,0.12);
     }
-    .stat-pill .num {
-      font-size: 1.6rem; font-weight: 900; color: #d63384;
-      display: block;
-    }
-    .stat-pill .lbl {
-      font-size: 0.68rem; color: #a14a76;
-      font-weight: 600; margin-top: 2px; display: block;
-    }
+    .stat-pill .num { font-size: 1.6rem; font-weight: 900; color: #d63384; display: block; }
+    .stat-pill .lbl { font-size: 0.68rem; color: #a14a76; font-weight: 600; display: block; }
 
-    /* ── Buttons ── */
     .section-title {
       font-size: 0.72rem; font-weight: 700; color: #c77aa0;
-      text-transform: uppercase; letter-spacing: 2px;
-      margin-bottom: 12px;
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px;
     }
     .action-list {
-      background: white; border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px rgba(255,95,162,0.1);
-      margin-bottom: 16px;
+      background: white; border-radius: 20px; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(255,95,162,0.1); margin-bottom: 16px;
     }
     .action-item {
       display: flex; align-items: center; justify-content: space-between;
@@ -82,11 +58,11 @@
     }
     .action-item:last-child { border-bottom: none; }
     .action-item:hover { background: #fff0f6; }
-    .action-item .arrow { color: #f4b6d2; font-size: 1rem; }
     .action-item.danger { color: #dc3545; }
 
     .signin-btn {
-      width: 100%; background: linear-gradient(135deg, #ff5fa2, #d63384);
+      width: 100%;
+      background: linear-gradient(135deg, #ff5fa2, #d63384);
       color: white; border: none; border-radius: 999px;
       padding: 15px; font-size: 1rem; font-weight: 800;
       cursor: pointer; box-shadow: 0 8px 24px rgba(255,95,162,0.3);
@@ -102,17 +78,13 @@
 
 <div class="profile-page">
 
-  <!-- Hero -->
   <div class="profile-hero">
-    <div class="avatar-wrap" id="avatarWrap">
-      <div class="avatar-fallback" id="avatarFallback">?</div>
-    </div>
+    <div class="avatar" id="avatarEl">?</div>
     <div class="display-name" id="displayName">Guest</div>
     <div class="display-email" id="displayEmail"></div>
     <div class="guest-tag" id="guestTag" style="display:none">Guest mode</div>
   </div>
 
-  <!-- Stats -->
   <div class="stat-row">
     <div class="stat-pill">
       <span class="num" id="starsEl">0</span>
@@ -128,19 +100,17 @@
     </div>
   </div>
 
-  <!-- Guest: prompt to sign in -->
   <div id="guestSection" style="display:none">
     <button class="signin-btn" onclick="location.href='login.html'">
       Sign in to save progress
     </button>
   </div>
 
-  <!-- Signed in: account options -->
   <div id="accountSection" style="display:none">
     <div class="section-title">Account</div>
     <div class="action-list">
       <div class="action-item danger" onclick="signOut()">
-        Sign out <span class="arrow">→</span>
+        Sign out <span>→</span>
       </div>
     </div>
   </div>
@@ -154,80 +124,46 @@
 </nav>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut as fbSignOut }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAAR8k7CscuvbbIGAhkCtvNSXDN3Cf1M6k",
-    authDomain: "signpath-85bd3.firebaseapp.com",
-    projectId: "signpath-85bd3",
-    storageBucket: "signpath-85bd3.firebasestorage.app",
-    messagingSenderId: "619265262922",
-    appId: "1:619265262922:web:8c294ff2799a8067012db3"
-  };
+  const supabase = createClient(
+    'https://xxijjaiytnqrdbqjegjr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8'
+  );
 
-  const app  = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // Stats from localStorage
   function getStats() {
+    const completed = JSON.parse(localStorage.getItem('sp_completed') || '[]');
+    const counts = { greetings:4, relations:5, emotions:5, general:5, abc:26 };
     return {
       stars:  parseInt(localStorage.getItem('sp_stars')  || '0'),
       streak: parseInt(localStorage.getItem('sp_streak') || '0'),
-      signs:  (() => {
-        const completed = JSON.parse(localStorage.getItem('sp_completed') || '[]');
-        const counts = { greetings:4, relations:5, emotions:5, general:5, abc:26 };
-        return completed.reduce((s,c) => s + (counts[c]||0), 0);
-      })(),
+      signs:  completed.reduce((s,c) => s + (counts[c]||0), 0),
     };
   }
 
-  function renderStats() {
-    const s = getStats();
-    document.getElementById('starsEl').textContent  = s.stars;
-    document.getElementById('streakEl').textContent = s.streak;
-    document.getElementById('signsEl').textContent  = s.signs;
+  const { data: { session } } = await supabase.auth.getSession();
+  const stats = getStats();
+
+  document.getElementById('starsEl').textContent  = stats.stars;
+  document.getElementById('streakEl').textContent = stats.streak;
+  document.getElementById('signsEl').textContent  = stats.signs;
+
+  if (session) {
+    const user = session.user;
+    const name = user.user_metadata?.full_name || user.email.split('@')[0];
+    document.getElementById('displayName').textContent  = name;
+    document.getElementById('displayEmail').textContent = user.email;
+    document.getElementById('avatarEl').textContent     = name[0].toUpperCase();
+    document.getElementById('accountSection').style.display = 'block';
+  } else {
+    document.getElementById('guestTag').style.display     = 'block';
+    document.getElementById('guestSection').style.display = 'block';
+    document.getElementById('avatarEl').textContent = '(^.^)';
   }
-
-  onAuthStateChanged(auth, user => {
-    renderStats();
-    const isGuest = !user && localStorage.getItem('sp_guest') === '1';
-
-    if (user) {
-      // Signed in
-      document.getElementById('displayName').textContent  = user.displayName || 'User';
-      document.getElementById('displayEmail').textContent = user.email || '';
-
-      // Avatar
-      if (user.photoURL) {
-        const img = document.createElement('img');
-        img.className = 'avatar';
-        img.src = user.photoURL;
-        img.alt = 'avatar';
-        document.getElementById('avatarFallback').replaceWith(img);
-      } else {
-        document.getElementById('avatarFallback').textContent =
-          (user.displayName || 'U')[0].toUpperCase();
-      }
-
-      document.getElementById('accountSection').style.display = 'block';
-      document.getElementById('guestSection').style.display   = 'none';
-      document.getElementById('guestTag').style.display       = 'none';
-
-    } else {
-      // Guest
-      document.getElementById('displayName').textContent = 'Guest';
-      document.getElementById('avatarFallback').textContent = '(^.^)/';
-      document.getElementById('guestTag').style.display   = 'block';
-      document.getElementById('guestSection').style.display   = 'block';
-      document.getElementById('accountSection').style.display = 'none';
-    }
-  });
 
   window.signOut = async () => {
     if (confirm('Sign out of SignPath?')) {
-      await fbSignOut(auth);
+      await supabase.auth.signOut();
       localStorage.removeItem('sp_guest');
       window.location.href = 'login.html';
     }
