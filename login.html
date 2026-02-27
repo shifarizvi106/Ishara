@@ -14,29 +14,56 @@
     }
     .login-card {
       background: white; border-radius: 28px;
-      padding: 40px 28px; width: 100%; max-width: 360px;
+      padding: 36px 28px; width: 100%; max-width: 360px;
       box-shadow: 0 12px 40px rgba(255,95,162,0.15);
       display: flex; flex-direction: column;
-      align-items: center; gap: 20px; text-align: center;
+      align-items: center; gap: 16px; text-align: center;
     }
-    .login-logo { font-size: 2.2rem; font-weight: 900; color: #d63384; }
-    .login-sub  { font-size: 0.88rem; color: #a14a76; line-height: 1.6; }
-    .login-emoji { font-size: 4rem; }
+    .login-emoticon { font-size: 2.5rem; }
+    .login-logo { font-size: 2rem; font-weight: 900; color: #d63384; }
+    .login-sub  { font-size: 0.85rem; color: #a14a76; line-height: 1.6; margin-bottom: 4px; }
 
-    .google-btn {
-      display: flex; align-items: center; justify-content: center;
-      gap: 10px; width: 100%;
-      background: white; border: 2.5px solid #f4b6d2;
-      border-radius: 999px; padding: 14px 20px;
-      font-size: 0.95rem; font-weight: 700; color: #3a2a33;
-      cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+    .tabs {
+      display: flex; width: 100%;
+      background: #fff0f6; border-radius: 999px; padding: 4px;
     }
-    .google-btn:hover {
-      border-color: #ff5fa2;
-      box-shadow: 0 4px 16px rgba(255,95,162,0.2);
+    .tab {
+      flex: 1; padding: 8px; border-radius: 999px;
+      font-size: 0.85rem; font-weight: 700; color: #a14a76;
+      cursor: pointer; transition: all 0.2s;
     }
-    .google-btn img { width: 20px; height: 20px; }
+    .tab.active { background: white; color: #d63384; box-shadow: 0 2px 8px rgba(255,95,162,0.15); }
 
+    .form { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .input {
+      width: 100%; padding: 13px 16px;
+      border: 2px solid #f4b6d2; border-radius: 999px;
+      font-size: 0.9rem; color: #3a2a33; outline: none;
+      transition: border-color 0.15s;
+    }
+    .input:focus { border-color: #ff5fa2; }
+    .input::placeholder { color: #c77aa0; }
+
+    .submit-btn {
+      width: 100%; background: linear-gradient(135deg, #ff5fa2, #d63384);
+      color: white; border: none; border-radius: 999px;
+      padding: 14px; font-size: 0.95rem; font-weight: 800;
+      cursor: pointer; box-shadow: 0 6px 20px rgba(255,95,162,0.3);
+      transition: transform 0.12s;
+    }
+    .submit-btn:active { transform: scale(0.97); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .error-msg {
+      font-size: 0.78rem; color: #dc3545; font-weight: 600;
+      display: none; background: #fde8ec; padding: 8px 14px;
+      border-radius: 12px; width: 100%;
+    }
+    .success-msg {
+      font-size: 0.78rem; color: #155724; font-weight: 600;
+      display: none; background: #d4f5e2; padding: 8px 14px;
+      border-radius: 12px; width: 100%;
+    }
     .divider {
       width: 100%; display: flex; align-items: center; gap: 10px;
       font-size: 0.75rem; color: #c77aa0;
@@ -44,68 +71,110 @@
     .divider::before, .divider::after {
       content: ''; flex: 1; height: 1px; background: #f4b6d2;
     }
-
     .skip-btn {
       font-size: 0.82rem; color: #c77aa0; cursor: pointer;
       background: none; border: none; font-weight: 600;
     }
     .skip-btn:hover { color: #d63384; }
-
-    .loading {
-      display: none; font-size: 0.88rem; color: #a14a76; font-weight: 600;
-    }
   </style>
 </head>
 <body>
 
 <div class="login-card">
-  
+  <div class="login-emoticon">(^.^)/</div>
   <div class="login-logo">SignPath</div>
-  <p class="login-sub">Learn Indian Sign Language.<br>Sign in to save your progress across devices!</p>
+  <p class="login-sub">Learn Indian Sign Language.</p>
 
-  <button class="google-btn" onclick="signInWithGoogle()">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-    Continue with Google
-  </button>
+  <div class="tabs">
+    <div class="tab active" id="tabLogin" onclick="switchTab('login')">Sign In</div>
+    <div class="tab" id="tabSignup" onclick="switchTab('signup')">Sign Up</div>
+  </div>
+
+  <div class="form" id="loginForm">
+    <input class="input" id="loginEmail" type="email" placeholder="Email">
+    <input class="input" id="loginPassword" type="password" placeholder="Password">
+    <div class="error-msg" id="loginError"></div>
+    <button class="submit-btn" onclick="signIn()">Sign In</button>
+  </div>
+
+  <div class="form" id="signupForm" style="display:none">
+    <input class="input" id="signupName" type="text" placeholder="Your name">
+    <input class="input" id="signupEmail" type="email" placeholder="Email">
+    <input class="input" id="signupPassword" type="password" placeholder="Password (min 6 chars)">
+    <div class="error-msg" id="signupError"></div>
+    <div class="success-msg" id="signupSuccess">Account created! Signing you in...</div>
+    <button class="submit-btn" onclick="signUp()">Create Account</button>
+  </div>
 
   <div class="divider">or</div>
-
   <button class="skip-btn" onclick="skipLogin()">Continue without signing in</button>
-
-  <div class="loading" id="loading">Signing in...</div>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAAR8k7CscuvbbIGAhkCtvNSXDN3Cf1M6k",
-    authDomain: "signpath-85bd3.firebaseapp.com",
-    projectId: "signpath-85bd3",
-    storageBucket: "signpath-85bd3.firebasestorage.app",
-    messagingSenderId: "619265262922",
-    appId: "1:619265262922:web:8c294ff2799a8067012db3"
+  const supabase = createClient(
+    'https://xxijjaiytnqrdbqjegjr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8'
+  );
+
+  // Already logged in → skip to learn
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) window.location.href = 'learn.html';
+
+  window.switchTab = (tab) => {
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
+    document.getElementById('loginForm').style.display  = tab === 'login'  ? 'flex' : 'none';
+    document.getElementById('signupForm').style.display = tab === 'signup' ? 'flex' : 'none';
   };
 
-  const app      = initializeApp(firebaseConfig);
-  const auth     = getAuth(app);
-  const provider = new GoogleAuthProvider();
+  window.signIn = async () => {
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errEl    = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    if (!email || !password) { showErr(errEl, 'Please fill in all fields.'); return; }
 
-  // If already logged in, skip straight to learn
-  onAuthStateChanged(auth, user => {
-    if (user) window.location.href = 'learn.html';
-  });
+    const btn = document.querySelector('#loginForm .submit-btn');
+    btn.disabled = true; btn.textContent = 'Signing in...';
 
-  window.signInWithGoogle = async () => {
-    document.getElementById('loading').style.display = 'block';
-    try {
-      await signInWithPopup(auth, provider);
-      // onAuthStateChanged will redirect
-    } catch (e) {
-      document.getElementById('loading').style.display = 'none';
-      alert('Sign in failed: ' + e.message);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      showErr(errEl, error.message);
+      btn.disabled = false; btn.textContent = 'Sign In';
+    } else {
+      window.location.href = 'learn.html';
+    }
+  };
+
+  window.signUp = async () => {
+    const name     = document.getElementById('signupName').value.trim();
+    const email    = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const errEl    = document.getElementById('signupError');
+    const sucEl    = document.getElementById('signupSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+
+    if (!name || !email || !password) { showErr(errEl, 'Please fill in all fields.'); return; }
+    if (password.length < 6) { showErr(errEl, 'Password must be at least 6 characters.'); return; }
+
+    const btn = document.querySelector('#signupForm .submit-btn');
+    btn.disabled = true; btn.textContent = 'Creating account...';
+
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { full_name: name } }
+    });
+
+    if (error) {
+      showErr(errEl, error.message);
+      btn.disabled = false; btn.textContent = 'Create Account';
+    } else {
+      sucEl.style.display = 'block';
+      // Auto sign in after signup
+      setTimeout(() => window.location.href = 'learn.html', 1500);
     }
   };
 
@@ -113,6 +182,11 @@
     localStorage.setItem('sp_guest', '1');
     window.location.href = 'learn.html';
   };
+
+  function showErr(el, msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
 </script>
 </body>
 </html>
