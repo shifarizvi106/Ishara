@@ -6,39 +6,165 @@
   <title>SignPath – Learn</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .node { cursor:default; position:relative; }
-    .node.unlocked { cursor:pointer; }
-    .node.unlocked:hover { transform:scale(1.08); }
-    .node.completed { background:#c0f0d8; box-shadow:0 8px 24px rgba(40,167,69,0.3); opacity:1; }
-    .node.completed .node-check {
-      position:absolute; top:-8px; right:-8px;
-      background:#28a745; color:white; border-radius:50%;
-      width:22px; height:22px; font-size:0.7rem;
-      display:flex; align-items:center; justify-content:center;
-      font-weight:900;
+    body { padding-bottom: 80px; }
+
+    .learn-header {
+      padding: 22px 22px 0;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .node.locked { opacity:0.35; }
-    .node .lock-icon {
-      position:absolute; top:-8px; right:-8px;
-      background:#c77aa0; color:white; border-radius:50%;
-      width:22px; height:22px; font-size:0.7rem;
-      display:flex; align-items:center; justify-content:center;
+    .learn-logo { font-size: 1.4rem; font-weight: 900; color: #d63384; }
+    .learn-stats { font-size: 0.85rem; font-weight: 700; color: #a14a76; display: flex; gap: 12px; }
+
+    /* ── Big centre folder ── */
+    .big-folder-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: calc(100vh - 160px);
+      gap: 16px;
+      padding: 20px;
+      position: relative;
     }
-    .node { transition: transform 0.2s; }
-    .streak-lives { display:flex; justify-content:space-between; padding:18px 22px; font-weight:700; }
+
+    .big-folder {
+      position: relative;
+      width: 180px; height: 144px;
+      cursor: pointer;
+      transition: transform 0.22s ease;
+    }
+    .big-folder:hover { transform: translateY(-8px); }
+    .big-folder-wrap.open .big-folder { transform: translateY(-8px); }
+
+    .big-folder .folder-back {
+      position: absolute; inset: 0;
+      background: #e8629a;
+      border-radius: 0 16px 16px 16px;
+    }
+    .big-folder .folder-back::before {
+      content: '';
+      position: absolute;
+      bottom: 100%; left: 0;
+      width: 52px; height: 16px;
+      background: #e8629a;
+      border-radius: 8px 8px 0 0;
+    }
+    .big-folder .folder-front {
+      position: absolute; inset: 0;
+      background: #ff5fa2;
+      border-radius: 8px 16px 16px 16px;
+      z-index: 3;
+      transform-origin: bottom;
+      transition: all 0.3s ease-in-out;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+    }
+    .big-folder .folder-front.right { display: block; background: #ff5fa2; }
+
+    /* ── Category papers fanned out ── */
+    .cat-paper {
+      position: absolute;
+      width: 88px; height: 110px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(255,95,162,0.2);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 6px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(.4,2,.4,1);
+      z-index: 4;
+      /* start hidden inside folder */
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.4);
+      left: 50%; top: 30%;
+      pointer-events: none;
+      border: 2px solid #f4b6d2;
+    }
+    .cat-paper .cat-name {
+      font-size: 0.65rem; font-weight: 800;
+      color: #d63384; text-align: center;
+      line-height: 1.2;
+    }
+    .cat-paper.done { background: #fff0f6; border-color: #ff5fa2; }
+    .cat-paper.locked { opacity: 0.4 !important; cursor: default; }
+
+    /* Fanned positions when open */
+    .big-folder-wrap.open .cat-paper { pointer-events: all; }
+
+    .big-folder-wrap.open .cat-paper:nth-child(1) {
+      opacity: 1;
+      transform: translate(calc(-50% - 160px), calc(-50% - 60px)) rotateZ(-18deg);
+    }
+    .big-folder-wrap.open .cat-paper:nth-child(2) {
+      opacity: 1;
+      transform: translate(calc(-50% - 80px), calc(-50% - 110px)) rotateZ(-8deg);
+    }
+    .big-folder-wrap.open .cat-paper:nth-child(3) {
+      opacity: 1;
+      transform: translate(-50%, calc(-50% - 130px)) rotateZ(0deg);
+    }
+    .big-folder-wrap.open .cat-paper:nth-child(4) {
+      opacity: 1;
+      transform: translate(calc(-50% + 80px), calc(-50% - 110px)) rotateZ(8deg);
+    }
+    .big-folder-wrap.open .cat-paper:nth-child(5) {
+      opacity: 1;
+      transform: translate(calc(-50% + 160px), calc(-50% - 60px)) rotateZ(18deg);
+    }
+
+    /* Hover on individual paper */
+    .big-folder-wrap.open .cat-paper:nth-child(1):hover { transform: translate(calc(-50% - 160px), calc(-50% - 75px)) rotateZ(-18deg) scale(1.08); }
+    .big-folder-wrap.open .cat-paper:nth-child(2):hover { transform: translate(calc(-50% - 80px), calc(-50% - 125px)) rotateZ(-8deg) scale(1.08); }
+    .big-folder-wrap.open .cat-paper:nth-child(3):hover { transform: translate(-50%, calc(-50% - 145px)) rotateZ(0deg) scale(1.08); }
+    .big-folder-wrap.open .cat-paper:nth-child(4):hover { transform: translate(calc(-50% + 80px), calc(-50% - 125px)) rotateZ(8deg) scale(1.08); }
+    .big-folder-wrap.open .cat-paper:nth-child(5):hover { transform: translate(calc(-50% + 160px), calc(-50% - 75px)) rotateZ(18deg) scale(1.08); }
+
+    /* Open folder front flap */
+    .big-folder-wrap.open .big-folder .folder-front      { transform: skew(15deg) scaleY(0.6); }
+    .big-folder-wrap.open .big-folder .folder-front.right { transform: skew(-15deg) scaleY(0.6); }
+
+    .folder-hint {
+      font-size: 0.78rem; font-weight: 700; color: #c77aa0;
+    }
+    .big-folder-wrap.open .folder-hint { opacity: 0; }
+
+    #toast {
+      position: fixed; bottom: 90px; left: 50%;
+      transform: translateX(-50%);
+      background: #3a2a33; color: white;
+      padding: 10px 22px; border-radius: 999px;
+      font-size: 0.85rem; font-weight: 700;
+      opacity: 0; transition: opacity 0.3s; z-index: 99;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
 
-<header class="top-bar">
-  <span id="livesDisplay"> ♥︎ 5</span>
-  <span id="streakDisplay"> ⚡︎ 0</span>
-</header>
+<div class="learn-header">
+  <div class="learn-logo">SignPath</div>
+  <div class="learn-stats">
+    <span id="starsDisplay">★ 0</span>
+    <span id="streakDisplay"> ϟ 0</span>
+  </div>
+</div>
 
-<main class="learn">
-  <div class="path" id="path"></div>
-</main>
+<div class="big-folder-wrap" id="folderWrap">
 
+  <!-- Category papers (hidden until open) -->
+  <!-- built by JS -->
+
+  <!-- The big folder -->
+  <div class="big-folder" id="bigFolder" onclick="toggleFolder()">
+    <div class="folder-back"></div>
+    <div class="folder-front">📚</div>
+    <div class="folder-front right"></div>
+  </div>
+
+  <div class="folder-hint">Tap to open lessons</div>
+</div>
+
+<div id="toast"></div>
 
 <nav class="bottom-nav">
   <div class="nav active">Learn</div>
@@ -46,71 +172,79 @@
   <div class="nav" onclick="location.href='profile.html'">Profile</div>
 </nav>
 
-
 <script>
 const CATEGORIES = [
-  { id:'greetings', label:'Greetings', emoji:'(^.^)/' },
-  { id:'relations',  label:'Relations',  emoji:'જ⁀➴ ♡' },
-  { id:'emotions',   label:'Emotions',   emoji:'(  •̀ - •́  )' },
-  { id:'general',    label:'General',    emoji:'➤' },
-  { id:'abc',        label:'ABC',        emoji:'ABC' },
+  { id:'greetings', label:'Greetings',  emoji:'(^.^)/' },
+  { id:'relations', label:'Relations',  emoji:'જ⁀➴ ♡' },
+  { id:'emotions',  label:'Emotions',   emoji:'( •̀ - •́ )' },
+  { id:'general',   label:'General',    emoji:'➤' },
+  { id:'abc',       label:'ABC',        emoji:'ABC' },
 ];
+
 function getCompleted() {
   try { return JSON.parse(localStorage.getItem('sp_completed') || '[]'); } catch(e) { return []; }
 }
 
-function buildPath() {
-  const completed = getCompleted();
-  const path = document.getElementById('path');
-  path.innerHTML = '';
+let isOpen = false;
+const wrap = document.getElementById('folderWrap');
+const bigFolder = document.getElementById('bigFolder');
 
-  CATEGORIES.forEach((cat, i) => {
-    const isDone     = completed.includes(cat.id);
-    const isUnlocked = i === 0 || completed.includes(CATEGORIES[i-1].id);
+// Update stats
+document.getElementById('starsDisplay').textContent  = '★ ' + (localStorage.getItem('sp_stars')  || 0);
+document.getElementById('streakDisplay').textContent = 'ϟ ' + (localStorage.getItem('sp_streak') || 0);
 
-    const node = document.createElement('div');
-    node.className = 'node' +
-      (isDone ? ' completed' : isUnlocked ? ' active unlocked' : ' locked');
+// Build category papers
+const completed = getCompleted();
+CATEGORIES.forEach((cat, i) => {
+  const isDone     = completed.includes(cat.id);
+  const isUnlocked = i === 0 || completed.includes(CATEGORIES[i-1].id);
 
-    node.innerHTML = `
-      ${cat.emoji}
-      <span class="label">${cat.label}</span>
-      ${isDone     ? '<div class="node-check">✓</div>' : ''}
-      ${!isUnlocked ? '<div class="lock-icon"> ꗃꄗ </div>' : ''}
-    `;
+  const paper = document.createElement('div');
+  paper.className = 'cat-paper' + (isDone ? ' done' : '') + (!isUnlocked ? ' locked' : '');
+  paper.innerHTML = `
+    <span>${cat.emoji}</span>
+    <span class="cat-name">${cat.label}</span>
+    ${isDone ? '<span style="font-size:0.6rem;color:#ff5fa2">✓ done</span>' : ''}
+  `;
 
-    if (isUnlocked && !isDone) {
-      node.onclick = () => { window.location.href = `lesson.html?cat=${cat.id}`; };
-    } else if (isDone) {
-      // allow replay
-      node.onclick = () => { window.location.href = `lesson.html?cat=${cat.id}&replay=1`; };
-    } else {
-      node.onclick = () => showToast(`Complete ${CATEGORIES[i-1].label} first!`);
-      node.style.cursor = 'pointer';
-    }
+  if (isUnlocked) {
+    paper.onclick = (e) => {
+      e.stopPropagation();
+      paper.style.transform = paper.style.transform + ' scale(0.92)';
+      setTimeout(() => {
+        window.location.href = `lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}`;
+      }, 150);
+    };
+  } else {
+    paper.onclick = (e) => {
+      e.stopPropagation();
+      showToast(`Complete ${CATEGORIES[i-1].label} first!`);
+    };
+  }
 
-    path.appendChild(node);
-  });
+  // Insert before the big folder element
+  wrap.insertBefore(paper, bigFolder);
+});
+
+function toggleFolder() {
+  isOpen = !isOpen;
+  wrap.classList.toggle('open', isOpen);
 }
 
-function showToast(msg) {
-  let t = document.getElementById('toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast';
-    t.style.cssText = `
-      position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-      background:#3a2a33;color:white;padding:10px 22px;border-radius:999px;
-      font-size:0.85rem;font-weight:700;opacity:0;transition:opacity 0.3s;z-index:99;
-    `;
-    document.body.appendChild(t);
+// Close if clicking outside
+document.addEventListener('click', e => {
+  if (isOpen && !wrap.contains(e.target)) {
+    isOpen = false;
+    wrap.classList.remove('open');
   }
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.opacity = '1';
   setTimeout(() => t.style.opacity = '0', 2000);
 }
-
-buildPath();
 </script>
 </body>
 </html>
