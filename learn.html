@@ -27,10 +27,8 @@
       position: relative;
       width: 180px; height: 144px;
       cursor: pointer;
-      transition: transform 0.22s ease;
       flex-shrink: 0;
     }
-    .big-folder-wrap.open .big-folder { transform: translateY(-8px); }
 
     .big-folder .folder-back {
       position: absolute; inset: 0;
@@ -72,6 +70,7 @@
       transition: all 0.4s cubic-bezier(.4,2,.4,1);
       z-index: 4;
       opacity: 0;
+      visibility: hidden;
       transform: translate(-50%, -50%) scale(0.4);
       left: 50%; top: 50%;
       pointer-events: none;
@@ -86,7 +85,10 @@
     .cat-paper.locked { opacity: 0.4 !important; cursor: default; }
 
     /* Fanned positions when open */
-    .big-folder-wrap.open .cat-paper { pointer-events: all; }
+    .big-folder-wrap.open .cat-paper {
+      pointer-events: all;
+      visibility: visible;
+    }
 
     .big-folder-wrap.open .cat-paper:nth-child(1) {
       opacity: 1;
@@ -116,9 +118,7 @@
     .big-folder-wrap.open .cat-paper:nth-child(4):hover { transform: translate(calc(-50% + 80px), calc(-50% - 125px)) rotateZ(8deg) scale(1.08); }
     .big-folder-wrap.open .cat-paper:nth-child(5):hover { transform: translate(calc(-50% + 160px), calc(-50% - 75px)) rotateZ(18deg) scale(1.08); }
 
-    /* Open folder front flap */
-    .big-folder-wrap.open .big-folder .folder-front      { transform: skew(15deg) scaleY(0.6); }
-    .big-folder-wrap.open .big-folder .folder-front.right { transform: skew(-15deg) scaleY(0.6); }
+    /* Open folder front flap - REMOVED, folder is static */
 
     .folder-hint {
       position: absolute;
