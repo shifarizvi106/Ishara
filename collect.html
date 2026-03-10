@@ -1,1 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignPath – Practice</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #ffe3f1, #fde6f2);
+      font-family: system-ui, sans-serif;
+      display: flex; flex-direction: column;
+      color: #3a2a33;
+    }
 
+    /* ── Header ── */
+    .practice-header {
+      display: flex; align-items: center;
+      padding: 18px 22px 12px;
+      gap: 12px;
+    }
+    .back-btn {
+      background: white; border: 2px solid #f4b6d2;
+      border-radius: 999px; padding: 8px 16px;
+      font-size: 0.82rem; font-weight: 700;
+      color: #a14a76; cursor: pointer;
+      text-decoration: none;
+    }
+    .practice-title {
+      flex: 1; text-align: center;
+      font-size: 1rem; font-weight: 900; color: #d63384;
+    }
+    .sign-counter {
+      font-size: 0.78rem; font-weight: 700; color: #c77aa0;
+    }
+
+    /* ── Main layout ── */
+    .practice-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 16px;
+      padding: 8px 16px 24px;
+    }
+
+    /* ── Reference window ── */
+    .reference-card {
+      background: white; border-radius: 24px;
+      padding: 16px; width: 100%; max-width: 340px;
+      box-shadow: 0 8px 28px rgba(255,95,162,0.15);
+      display: flex; align-items: center; gap: 14px;
+      border: 2px solid #fde6f2;
+    }
+    .sign-preview {
+      width: 80px; height: 80px; flex-shrink: 0;
+      background: #fff0f6; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem; overflow: hidden;
+    }
+    .sign-preview img {
+      width: 100%; height: 100%; object-fit: contain; padding: 4px;
+    }
+    .sign-info { flex: 1; }
+    .sign-word {
+      font-size: 1.3rem; font-weight: 900; color: #d63384;
+      display: block; margin-bottom: 4px;
+    }
+    .sign-desc {
+      font-size: 0.72rem; color: #a14a76; line-height: 1.5;
+    }
+    .sign-tip {
+      font-size: 0.68rem; color: #c77aa0;
+      font-style: italic; margin-top: 4px;
+      display: block;
+    }
+
+    /* ── Camera window ── */
+    .camera-wrap {
+      position: relative;
+      width: 100%; max-width: 340px;
+      aspect-ratio: 4/3;
+      border-radius: 24px; overflow: hidden;
+      background: #2a1a22;
+      box-shadow: 0 8px 32px rgba(255,95,162,0.2);
+      border: 3px solid #f4b6d2;
+    }
+    .camera-wrap.detecting { border-color: #ff5fa2; }
+    .camera-wrap.success   { border-color: #ff5fa2; box-shadow: 0 0 0 4px rgba(255,95,162,0.3); }
+
+    video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* mirror */
+      display: block;
+    }
+    canvas#overlay {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      transform: scaleX(-1);
+    }
+
+    /* ── Status pill ── */
+    .status-pill {
+      position: absolute; bottom: 12px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(42,26,34,0.75);
+      color: white; border-radius: 999px;
+      padding: 6px 16px; font-size: 0.75rem; font-weight: 700;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .status-pill.ok { background: rgba(255,95,162,0.85); }
+
+    /* ── Camera permission prompt ── */
+    .cam-prompt {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; background: #2a1a22; z-index: 10;
+    }
+    .cam-prompt p { color: #f4b6d2; font-size: 0.85rem; text-align: center; padding: 0 20px; }
+    .cam-start-btn {
+      background: linear-gradient(135deg, #ff5fa2, #d63384);
+      color: white; border: none; border-radius: 999px;
+      padding: 10px 24px; font-size: 0.88rem; font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* ── Navigation row ── */
+    .nav-row {
+      display: flex; gap: 10px;
+      width: 100%; max-width: 340px;
+    }
+    .nav-btn {
+      flex: 1; background: white;
+      border: 2px solid #f4b6d2; border-radius: 999px;
+      padding: 12px; font-size: 0.85rem; font-weight: 800;
+      color: #a14a76; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { border-color: #ff5fa2; color: #d63384; }
+    .nav-btn.primary {
+      background: linear-gradient(135deg, #ff5fa2, #d63384);
+      color: white; border-color: transparent;
+      box-shadow: 0 6px 20px rgba(255,95,162,0.3);
+    }
+
+    /* ── Coming soon overlay for detection ── */
+    .model-notice {
+      background: white; border-radius: 20px;
+      padding: 14px 18px; width: 100%; max-width: 340px;
+      box-shadow: 0 4px 16px rgba(255,95,162,0.1);
+      border: 2px solid #fde6f2;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.78rem; color: #a14a76;
+    }
+    .model-notice span { font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+
+<div class="practice-header">
+  <a href="learn.html" class="back-btn">← Home</a>
+  <div class="practice-title">Practice Mode</div>
+  <div class="sign-counter" id="signCounter">1 / 5</div>
+</div>
+
+<div class="practice-body">
+
+  <!-- Reference card -->
+  <div class="reference-card">
+    <div class="sign-preview" id="signPreview">👋</div>
+    <div class="sign-info">
+      <span class="sign-word" id="signWord">Hello</span>
+      <div class="sign-desc" id="signDesc">Raise your right hand to your forehead in a salute, fingers together and flat.</div>
+      <span class="sign-tip" id="signTip">💡 Like a military salute</span>
+    </div>
+  </div>
+
+  <!-- Camera -->
+  <div class="camera-wrap" id="cameraWrap">
+    <video id="video" playsinline autoplay muted></video>
+    <canvas id="overlay"></canvas>
+    <div class="status-pill" id="statusPill">👋 Show your hand</div>
+    <div class="cam-prompt" id="camPrompt">
+      <p>Camera access needed to detect your signs</p>
+      <button class="cam-start-btn" onclick="startCamera()">Enable Camera</button>
+    </div>
+  </div>
+
+  <!-- Coming soon notice -->
+  <div class="model-notice">
+    <span>🤖</span>
+    <div>Auto-detection coming soon! For now, self-assess and tap <strong>Got it</strong> when ready.</div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-row">
+    <button class="nav-btn" onclick="prevSign()">← Prev</button>
+    <button class="nav-btn primary" onclick="nextSign()">Got it ✓</button>
+    <button class="nav-btn" onclick="nextSign()">Next →</button>
+  </div>
+
+</div>
+
+<script>
+// ── Sign data (subset for now) ──
+const SIGNS = [
+  { word:'Hello',    emoji:'👋', img:'assets/hello.gif',    desc:'Raise your right hand to your forehead in a salute, fingers together and flat.', tip:'Like a military salute' },
+  { word:'Thank You',emoji:'🤲', img:'assets/thankyou.gif', desc:'Touch your chin with flat fingers, then sweep your hand forward and down.',       tip:'Like blowing a kiss from your chin' },
+  { word:'Mother',   emoji:'👩', img:null,                  desc:'Touch your chin with the thumb of your open right hand, fingers spread.',          tip:'Thumb on chin — female signs are near the chin' },
+  { word:'Father',   emoji:'👨', img:null,                  desc:'Touch your forehead with the thumb of your open right hand, fingers spread.',       tip:'Same as Mother but at the forehead' },
+  { word:'Happy',    emoji:'😊', img:null,                  desc:'Place both open hands on your chest and brush them upward twice.',                  tip:'Upward motion shows positive feelings' },
+  { word:'Yes',      emoji:'✅', img:null,                  desc:'Make a fist and nod it forward and downward, like a head nodding yes.',             tip:'Your fist nods just like your head' },
+  { word:'A',        emoji:'🅰️', img:'assets/a.png',        desc:'Make a fist with thumb resting on the side.',                                      tip:'Compact and clean — like the letter A' },
+  { word:'B',        emoji:'🅱️', img:'assets/b.png',        desc:'Hold four fingers up together, thumb tucked across palm.',                          tip:'Flat fingers — like the straight lines of B' },
+];
+
+let current = 0;
+
+function render() {
+  const sign = SIGNS[current];
+  document.getElementById('signCounter').textContent = `${current+1} / ${SIGNS.length}`;
+  document.getElementById('signWord').textContent    = sign.word;
+  document.getElementById('signDesc').textContent    = sign.desc;
+  document.getElementById('signTip').textContent     = '💡 ' + sign.tip;
+
+  const preview = document.getElementById('signPreview');
+  if (sign.img) {
+    preview.innerHTML = `<img src="${sign.img}" alt="${sign.word}" onerror="this.parentElement.textContent='${sign.emoji}'">`;
+  } else {
+    preview.textContent = sign.emoji;
+  }
+}
+
+function nextSign() {
+  if (current < SIGNS.length - 1) { current++; render(); }
+  else {
+    document.getElementById('statusPill').textContent = '🎉 All signs done!';
+    document.getElementById('statusPill').classList.add('ok');
+  }
+}
+
+function prevSign() {
+  if (current > 0) { current--; render(); }
+}
+
+// ── Camera ──
+function startCamera() {
+  navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' }, audio: false })
+    .then(stream => {
+      const video = document.getElementById('video');
+      video.srcObject = stream;
+      document.getElementById('camPrompt').style.display = 'none';
+      initMediaPipe();
+    })
+    .catch(() => {
+      document.getElementById('camPrompt').querySelector('p').textContent =
+        'Camera access denied. Please allow camera access in your browser settings.';
+    });
+}
+
+// ── MediaPipe (skeleton only — detection plugged in later) ──
+function initMediaPipe() {
+  const video   = document.getElementById('video');
+  const canvas  = document.getElementById('overlay');
+  const ctx     = canvas.getContext('2d');
+  const pill    = document.getElementById('statusPill');
+  const wrap    = document.getElementById('cameraWrap');
+
+  const hands = new Hands({ locateFile: f =>
+    `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+  });
+  hands.setOptions({ maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.7, minTrackingConfidence:0.5 });
+
+  hands.onResults(results => {
+    canvas.width  = video.videoWidth  || canvas.offsetWidth;
+    canvas.height = video.videoHeight || canvas.offsetHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (results.multiHandLandmarks?.length) {
+      for (const landmarks of results.multiHandLandmarks) {
+        drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color:'#ff5fa2', lineWidth:2 });
+        drawLandmarks(ctx, landmarks, { color:'#d63384', lineWidth:1, radius:3 });
+      }
+      pill.textContent = '✋ Hand detected';
+      pill.classList.add('ok');
+      wrap.classList.add('detecting');
+    } else {
+      pill.textContent = '👋 Show your hand';
+      pill.classList.remove('ok');
+      wrap.classList.remove('detecting');
+    }
+    // 🔌 Detection model will be wired here
+  });
+
+  const cam = new Camera(video, {
+    onFrame: async () => { await hands.send({ image: video }); },
+    width: 640, height: 480
+  });
+  cam.start();
+}
+
+render();
+</script>
+</body>
+</html>
