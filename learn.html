@@ -17,11 +17,9 @@
 
     /* ── Big centre folder ── */
     .big-folder-wrap {
-      display: flex; flex-direction: column;
+      display: flex;
       align-items: center; justify-content: center;
       min-height: calc(100vh - 160px);
-      gap: 16px;
-      padding: 20px;
       position: relative;
     }
 
@@ -30,8 +28,8 @@
       width: 180px; height: 144px;
       cursor: pointer;
       transition: transform 0.22s ease;
+      flex-shrink: 0;
     }
-    .big-folder:hover { transform: translateY(-8px); }
     .big-folder-wrap.open .big-folder { transform: translateY(-8px); }
 
     .big-folder .folder-back {
@@ -73,10 +71,9 @@
       cursor: pointer;
       transition: all 0.4s cubic-bezier(.4,2,.4,1);
       z-index: 4;
-      /* start hidden inside folder */
       opacity: 0;
       transform: translate(-50%, -50%) scale(0.4);
-      left: 50%; top: 30%;
+      left: 50%; top: 50%;
       pointer-events: none;
       border: 2px solid #f4b6d2;
     }
@@ -124,7 +121,11 @@
     .big-folder-wrap.open .big-folder .folder-front.right { transform: skew(-15deg) scaleY(0.6); }
 
     .folder-hint {
+      position: absolute;
+      bottom: calc(50% - 110px);
       font-size: 0.78rem; font-weight: 700; color: #c77aa0;
+      transition: opacity 0.2s;
+      pointer-events: none;
     }
     .big-folder-wrap.open .folder-hint { opacity: 0; }
 
