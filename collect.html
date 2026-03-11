@@ -21,40 +21,49 @@
 
     .practice-header {
       display: flex; align-items: center;
-      padding: 18px 22px 12px;
-      gap: 12px;
+      padding: 18px 22px 12px; gap: 12px;
     }
     .back-btn {
       background: white; border: 2px solid #f4b6d2;
       border-radius: 999px; padding: 8px 16px;
       font-size: 0.82rem; font-weight: 700;
-      color: #a14a76; cursor: pointer;
-      text-decoration: none;
+      color: #a14a76; cursor: pointer; text-decoration: none;
     }
     .practice-title {
       flex: 1; text-align: center;
       font-size: 1rem; font-weight: 900; color: #d63384;
     }
-    .sign-counter {
-      font-size: 0.78rem; font-weight: 700; color: #c77aa0;
-    }
+    .sign-counter { font-size: 0.78rem; font-weight: 700; color: #c77aa0; }
 
     .practice-body {
       flex: 1; display: flex; flex-direction: column;
-      align-items: center; gap: 16px;
+      align-items: center; gap: 14px;
       padding: 8px 16px 24px;
+    }
+
+    .mode-toggle {
+      display: flex; gap: 8px;
+      width: 100%; max-width: 480px;
+    }
+    .mode-btn {
+      flex: 1; padding: 9px; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 800; cursor: pointer;
+      border: 2px solid #f4b6d2; background: white; color: #a14a76;
+      transition: all 0.15s;
+    }
+    .mode-btn.active {
+      background: linear-gradient(135deg, #ff5fa2, #d63384);
+      color: white; border-color: transparent;
     }
 
     .reference-card {
       background: white; border-radius: 24px;
-      padding: 16px; width: 100%; max-width: 400px;
+      padding: 16px; width: 100%; max-width: 480px;
       box-shadow: 0 8px 28px rgba(255,95,162,0.15);
       display: flex; align-items: center; gap: 14px;
-      border: 2px solid #fde6f2;
-      transition: border-color 0.3s;
+      border: 2px solid #fde6f2; transition: all 0.3s;
     }
     .reference-card.success { border-color: #ff5fa2; box-shadow: 0 8px 28px rgba(255,95,162,0.35); }
-
     .sign-preview {
       width: 80px; height: 80px; flex-shrink: 0;
       background: #fff0f6; border-radius: 16px;
@@ -69,7 +78,7 @@
 
     .camera-wrap {
       position: relative;
-      width: 100%; max-width: 960px;
+      width: 100%; max-width: 480px;
       aspect-ratio: 4/3;
       border-radius: 24px; overflow: hidden;
       background: #2a1a22;
@@ -82,58 +91,35 @@
       border-color: #ff5fa2;
       box-shadow: 0 0 0 4px rgba(255,95,162,0.4), 0 8px 32px rgba(255,95,162,0.3);
     }
-
     video {
       width: 100%; height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1);
-      display: block;
+      object-fit: cover; transform: scaleX(-1); display: block;
     }
     canvas#overlay {
       position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      transform: scaleX(-1);
+      width: 100%; height: 100%; transform: scaleX(-1);
     }
-
     .status-pill {
       position: absolute; bottom: 12px; left: 50%;
       transform: translateX(-50%);
       background: rgba(42,26,34,0.75);
       color: white; border-radius: 999px;
       padding: 6px 16px; font-size: 0.75rem; font-weight: 700;
-      backdrop-filter: blur(4px);
-      transition: all 0.3s;
-      white-space: nowrap;
+      backdrop-filter: blur(4px); transition: all 0.3s; white-space: nowrap;
     }
     .status-pill.ok      { background: rgba(255,95,162,0.85); }
     .status-pill.success { background: rgba(214,51,132,0.9); }
 
-    /* Confidence bar */
-    .confidence-bar-wrap {
-      width: 100%; max-width: 500px;
-      background: white; border-radius: 16px;
-      padding: 12px 16px;
-      box-shadow: 0 4px 16px rgba(255,95,162,0.1);
-      border: 2px solid #fde6f2;
+    /* Hold progress ring */
+    .hold-ring {
+      position: absolute; top: 12px; right: 12px;
+      width: 48px; height: 48px;
     }
-    .confidence-label {
-      display: flex; justify-content: space-between;
-      font-size: 0.72rem; font-weight: 700; color: #a14a76;
-      margin-bottom: 6px;
-    }
-    .confidence-track {
-      height: 8px; background: #f4b6d2;
-      border-radius: 999px; overflow: hidden;
-    }
-    .confidence-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #ff5fa2, #d63384);
-      border-radius: 999px;
-      transition: width 0.2s;
-    }
-    .detected-label {
-      margin-top: 6px; font-size: 0.78rem;
-      font-weight: 800; color: #d63384; text-align: center;
+    .hold-ring svg { transform: rotate(-90deg); }
+    .ring-label {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 900; color: white;
     }
 
     .cam-prompt {
@@ -146,20 +132,65 @@
     .cam-start-btn {
       background: linear-gradient(135deg, #ff5fa2, #d63384);
       color: white; border: none; border-radius: 999px;
-      padding: 10px 24px; font-size: 0.88rem; font-weight: 800;
-      cursor: pointer;
+      padding: 10px 24px; font-size: 0.88rem; font-weight: 800; cursor: pointer;
     }
 
+    .confidence-bar-wrap {
+      width: 100%; max-width: 480px;
+      background: white; border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 16px rgba(255,95,162,0.1);
+      border: 2px solid #fde6f2;
+    }
+    .confidence-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.72rem; font-weight: 700; color: #a14a76; margin-bottom: 6px;
+    }
+    .confidence-track { height: 8px; background: #f4b6d2; border-radius: 999px; overflow: hidden; }
+    .confidence-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #ff5fa2, #d63384);
+      border-radius: 999px; transition: width 0.15s;
+    }
+    .detected-label { margin-top: 6px; font-size: 0.78rem; font-weight: 800; color: #d63384; text-align: center; }
+
+    /* Finger spelling */
+    .fingerspell-wrap {
+      width: 100%; max-width: 480px;
+      background: white; border-radius: 20px;
+      padding: 16px; border: 2px solid #fde6f2;
+      box-shadow: 0 4px 16px rgba(255,95,162,0.1);
+    }
+    .fingerspell-label {
+      font-size: 0.7rem; font-weight: 800; color: #c77aa0;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+    }
+    .fingerspell-sentence {
+      font-size: 1.8rem; font-weight: 900; color: #d63384;
+      min-height: 48px; letter-spacing: 0.1em;
+      word-break: break-all; line-height: 1.3; margin-bottom: 12px;
+    }
+    .cursor {
+      display: inline-block;
+      animation: blink 1s step-end infinite; color: #ff5fa2;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .fs-actions { display: flex; gap: 8px; }
+    .fs-btn {
+      flex: 1; background: white; border: 2px solid #f4b6d2;
+      border-radius: 999px; padding: 8px;
+      font-size: 0.78rem; font-weight: 800; color: #a14a76; cursor: pointer;
+    }
+    .fs-btn:hover { border-color: #ff5fa2; color: #d63384; }
+
     .nav-row {
-      display: flex; gap: 10px;
-      width: 100%; max-width: 340px;
+      display: flex; gap: 10px; width: 100%; max-width: 480px;
     }
     .nav-btn {
       flex: 1; background: white;
       border: 2px solid #f4b6d2; border-radius: 999px;
       padding: 12px; font-size: 0.85rem; font-weight: 800;
-      color: #a14a76; cursor: pointer;
-      transition: all 0.15s;
+      color: #a14a76; cursor: pointer; transition: all 0.15s;
     }
     .nav-btn:hover { border-color: #ff5fa2; color: #d63384; }
     .nav-btn.primary {
@@ -168,7 +199,6 @@
       box-shadow: 0 6px 20px rgba(255,95,162,0.3);
     }
 
-    /* Success flash overlay */
     .success-flash {
       position: fixed; inset: 0;
       background: rgba(255,95,162,0.15);
@@ -190,10 +220,15 @@
 
 <div class="practice-body">
 
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btnPractice" onclick="setMode('practice')">📖 Practice Signs</button>
+    <button class="mode-btn" id="btnSpell" onclick="setMode('spell')">✍️ Finger Spell</button>
+  </div>
+
   <div class="reference-card" id="referenceCard">
     <div class="sign-preview" id="signPreview">👋</div>
     <div class="sign-info">
-      <span class="sign-word" id="signWord">Hello</span>
+      <span class="sign-word" id="signWord">A</span>
       <div class="sign-desc" id="signDesc"></div>
       <span class="sign-tip" id="signTip"></span>
     </div>
@@ -203,13 +238,21 @@
     <video id="video" playsinline autoplay muted></video>
     <canvas id="overlay"></canvas>
     <div class="status-pill" id="statusPill">👋 Show your hand</div>
+    <div class="hold-ring" id="holdRing" style="display:none">
+      <svg width="48" height="48" viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4"/>
+        <circle id="ringFill" cx="24" cy="24" r="20" fill="none"
+          stroke="#ff2d8a" stroke-width="4" stroke-linecap="round"
+          stroke-dasharray="125.6" stroke-dashoffset="125.6"/>
+      </svg>
+      <div class="ring-label" id="ringLabel">—</div>
+    </div>
     <div class="cam-prompt" id="camPrompt">
       <p>Camera needed to detect your signs</p>
       <button class="cam-start-btn" onclick="startCamera()">Enable Camera</button>
     </div>
   </div>
 
-  <!-- Live detection readout -->
   <div class="confidence-bar-wrap" id="confWrap" style="display:none">
     <div class="confidence-label">
       <span>Detection confidence</span>
@@ -221,7 +264,17 @@
     <div class="detected-label" id="detectedLabel">—</div>
   </div>
 
-  <div class="nav-row">
+  <div class="fingerspell-wrap" id="fingerspellWrap" style="display:none">
+    <div class="fingerspell-label">✍️ Finger Spelling</div>
+    <div class="fingerspell-sentence" id="fsText"><span class="cursor">|</span></div>
+    <div class="fs-actions">
+      <button class="fs-btn" onclick="fsBackspace()">⌫ Delete</button>
+      <button class="fs-btn" onclick="fsSpace()">␣ Space</button>
+      <button class="fs-btn" onclick="fsClear()">✕ Clear</button>
+    </div>
+  </div>
+
+  <div class="nav-row" id="navRow">
     <button class="nav-btn" onclick="prevSign()">← Prev</button>
     <button class="nav-btn primary" onclick="nextSign()">Next →</button>
   </div>
@@ -230,50 +283,75 @@
 
 <script>
 const SIGNS = [
-  { word:'A', emoji:'🅰️', img:'assets/a.png',        desc:'Make a fist with thumb resting on the side.',                tip:'Compact and clean — like the letter A' },
-  { word:'B', emoji:'🅱️', img:'assets/b.png',        desc:'Hold four fingers up together, thumb tucked across palm.',   tip:'Flat fingers — like the straight lines of B' },
-  { word:'C', emoji:'©️',  img:'assets/c.png',        desc:'Curve your hand into a C shape.',                           tip:'Your hand literally makes a C!' },
-  { word:'D', emoji:'🔵', img:'assets/d.png',        desc:'Index finger points up, other fingers form a circle.',       tip:'The circle is the round belly of D' },
-  { word:'0', emoji:'0️⃣', img:null,                  desc:'Curve all fingers and thumb to touch, forming an O.',       tip:'Like the letter O — zero looks the same!' },
-  { word:'1', emoji:'1️⃣', img:null,                  desc:'Hold up your index finger, all other fingers closed.',      tip:'Just one finger up!' },
-  { word:'Y', emoji:'🤙', img:null,                  desc:'Thumb and pinky extended, other fingers closed.',            tip:'Shaka / hang loose!' },
-  { word:'V', emoji:'✌️', img:null,                  desc:'Index and middle fingers up and spread in a V.',             tip:'Peace sign!' },
+  { word:'A', emoji:'🅰️', img:'assets/a.png', desc:'Make a fist with thumb resting on the side.',              tip:'Compact and clean — like the letter A' },
+  { word:'B', emoji:'🅱️', img:'assets/b.png', desc:'Hold four fingers up together, thumb tucked across palm.', tip:'Flat fingers — like the straight lines of B' },
+  { word:'C', emoji:'©️',  img:'assets/c.png', desc:'Curve your hand into a C shape.',                         tip:'Your hand literally makes a C!' },
+  { word:'D', emoji:'🔵', img:'assets/d.png', desc:'Index finger points up, other fingers form a circle.',     tip:'The circle is the round belly of D' },
+  { word:'0', emoji:'0️⃣', img:null,           desc:'Curve all fingers and thumb to touch, forming an O.',     tip:'Like the letter O — zero looks the same!' },
+  { word:'1', emoji:'1️⃣', img:null,           desc:'Hold up your index finger, all other fingers closed.',    tip:'Just one finger up!' },
+  { word:'Y', emoji:'🤙', img:null,           desc:'Thumb and pinky extended, other fingers closed.',          tip:'Shaka / hang loose!' },
+  { word:'V', emoji:'✌️', img:null,           desc:'Index and middle fingers up and spread in a V.',           tip:'Peace sign!' },
 ];
 
-let current = 0;
-let holdTimer = null;
-let holdCount = 0;
-const HOLD_FRAMES = 12; // frames to hold before auto-advance
-const CONFIDENCE_THRESHOLD = 0.75;
+const CIRC           = 125.6;
+const SMOOTH_WINDOW  = 10;
+const CONF_THRESHOLD = 0.68;
+const HOLD_FRAMES    = 18;
+const SPELL_HOLD     = 22;
 
+let current      = 0;
+let holdCount    = 0;
+let mode         = 'practice';
+let fsWord       = '';
+let spellCooldown = 0;
+const recentPreds = [];
+
+// ── Mode switch ──
+function setMode(m) {
+  mode = m;
+  holdCount = 0; recentPreds.length = 0;
+  document.getElementById('btnPractice').classList.toggle('active', m === 'practice');
+  document.getElementById('btnSpell').classList.toggle('active',    m === 'spell');
+  document.getElementById('referenceCard').style.display    = m === 'practice' ? '' : 'none';
+  document.getElementById('navRow').style.display           = m === 'practice' ? '' : 'none';
+  document.getElementById('fingerspellWrap').style.display  = m === 'spell'    ? '' : 'none';
+  document.getElementById('holdRing').style.display         = m === 'spell'    ? '' : 'none';
+  document.getElementById('signCounter').style.display      = m === 'practice' ? '' : 'none';
+}
+
+// ── Finger spell ──
+function renderFs() {
+  document.getElementById('fsText').innerHTML =
+    (fsWord.length ? fsWord : '') + '<span class="cursor">|</span>';
+}
+function fsAppend(ch) { fsWord += ch; renderFs(); }
+function fsBackspace() { fsWord = fsWord.slice(0,-1); renderFs(); }
+function fsSpace()    { fsWord += ' '; renderFs(); }
+function fsClear()    { fsWord = ''; renderFs(); }
+
+// ── Practice render ──
 function render() {
-  const sign = SIGNS[current];
+  const s = SIGNS[current];
   document.getElementById('signCounter').textContent = `${current+1} / ${SIGNS.length}`;
-  document.getElementById('signWord').textContent    = sign.word;
-  document.getElementById('signDesc').textContent    = sign.desc;
-  document.getElementById('signTip').textContent     = '💡 ' + sign.tip;
+  document.getElementById('signWord').textContent    = s.word;
+  document.getElementById('signDesc').textContent    = s.desc;
+  document.getElementById('signTip').textContent     = '💡 ' + s.tip;
   document.getElementById('referenceCard').classList.remove('success');
   document.getElementById('cameraWrap').classList.remove('success');
-  holdCount = 0;
-
+  holdCount = 0; recentPreds.length = 0;
   const preview = document.getElementById('signPreview');
-  if (sign.img) {
-    preview.innerHTML = `<img src="${sign.img}" alt="${sign.word}" onerror="this.parentElement.textContent='${sign.emoji}'">`;
-  } else {
-    preview.textContent = sign.emoji;
-  }
+  if (s.img) {
+    preview.innerHTML = `<img src="${s.img}" alt="${s.word}" onerror="this.parentElement.textContent='${s.emoji}'">`;
+  } else { preview.textContent = s.emoji; }
 }
-
 function nextSign() {
-  if (current < SIGNS.length - 1) { current++; render(); }
+  if (current < SIGNS.length-1) { current++; render(); }
   else {
-    document.getElementById('statusPill').textContent = '🎉 All done!';
-    document.getElementById('statusPill').classList.add('success');
+    const pill = document.getElementById('statusPill');
+    pill.textContent = '🎉 All done!'; pill.classList.add('success');
   }
 }
-function prevSign() {
-  if (current > 0) { current--; render(); }
-}
+function prevSign() { if (current > 0) { current--; render(); } }
 
 function flashSuccess() {
   const flash = document.getElementById('successFlash');
@@ -284,14 +362,26 @@ function flashSuccess() {
   setTimeout(() => nextSign(), 900);
 }
 
+// ── Majority vote smoothing ──
+function smoothed() {
+  if (!recentPreds.length) return null;
+  const counts = {};
+  let best = null, bestN = 0;
+  for (const p of recentPreds) {
+    counts[p] = (counts[p]||0)+1;
+    if (counts[p] > bestN) { bestN = counts[p]; best = p; }
+  }
+  return { label: best, votes: bestN, total: recentPreds.length };
+}
+
 // ── Camera ──
 function startCamera() {
   navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' }, audio: false })
     .then(stream => {
-      const video = document.getElementById('video');
-      video.srcObject = stream;
+      document.getElementById('video').srcObject = stream;
       document.getElementById('camPrompt').style.display = 'none';
       document.getElementById('confWrap').style.display  = 'block';
+      if (mode === 'spell') document.getElementById('holdRing').style.display = '';
       initMediaPipe();
     })
     .catch(() => {
@@ -300,7 +390,7 @@ function startCamera() {
     });
 }
 
-// ── MediaPipe + Model ──
+// ── MediaPipe ──
 function initMediaPipe() {
   const video  = document.getElementById('video');
   const canvas = document.getElementById('overlay');
@@ -311,56 +401,123 @@ function initMediaPipe() {
   const hands = new Hands({ locateFile: f =>
     `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
   });
-  hands.setOptions({ maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.7, minTrackingConfidence:0.5 });
+  hands.setOptions({
+    maxNumHands: 2,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.5
+  });
 
   hands.onResults(results => {
     canvas.width  = video.videoWidth  || canvas.offsetWidth;
     canvas.height = video.videoHeight || canvas.offsetHeight;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (spellCooldown > 0) spellCooldown--;
 
     if (results.multiHandLandmarks?.length) {
-      const landmarks = results.multiHandLandmarks[0];
 
-      // Draw skeleton
-      drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color:'#ff5fa2', lineWidth:2 });
-      drawLandmarks(ctx, landmarks,  { color:'#d63384', lineWidth:1, radius:3 });
+      // ── Draw ALL detected hands ──
+      for (const lm of results.multiHandLandmarks) {
+        // Connectors
+        drawConnectors(ctx, lm, HAND_CONNECTIONS, { color:'#ff2d8a', lineWidth: 3 });
+        // Neon joints
+        for (const pt of lm) {
+          const x = pt.x * canvas.width;
+          const y = pt.y * canvas.height;
+          // Glow halo
+          ctx.beginPath();
+          ctx.arc(x, y, 9, 0, 2*Math.PI);
+          ctx.fillStyle = 'rgba(255,45,138,0.22)';
+          ctx.fill();
+          // Bright core
+          ctx.beginPath();
+          ctx.arc(x, y, 4.5, 0, 2*Math.PI);
+          ctx.fillStyle = '#ff2d8a';
+          ctx.shadowColor = '#ff2d8a';
+          ctx.shadowBlur  = 12;
+          ctx.fill();
+          ctx.shadowBlur  = 0;
+        }
+      }
 
       wrap.classList.add('detecting');
       pill.classList.add('ok');
 
-      // ── Run model ──
-      const prediction = predictSign(landmarks);
-      const conf = Math.round(prediction.confidence * 100);
-      const label = prediction.label;
+      // ── Predict on primary hand ──
+      const pred = predictSign(results.multiHandLandmarks[0]);
+      const conf  = pred.confidence;
+      const label = pred.label;
 
-      document.getElementById('confFill').style.width  = conf + '%';
-      document.getElementById('confPct').textContent   = conf + '%';
-      document.getElementById('detectedLabel').textContent = `Detected: ${label} (${conf}%)`;
-
-      const target = SIGNS[current].word;
-      if (label === target && prediction.confidence >= CONFIDENCE_THRESHOLD) {
-        pill.textContent = `✓ ${label} — hold it!`;
-        pill.classList.add('success');
-        holdCount++;
-        if (holdCount >= HOLD_FRAMES) {
-          holdCount = 0;
-          flashSuccess();
-        }
+      if (conf >= CONF_THRESHOLD) {
+        recentPreds.push(label);
+        if (recentPreds.length > SMOOTH_WINDOW) recentPreds.shift();
       } else {
-        pill.textContent = `✋ Detecting...`;
-        pill.classList.remove('success');
-        holdCount = 0;
+        recentPreds.length = 0;
+      }
+
+      const sm = smoothed();
+      const dispLabel = sm?.label || label;
+      const dispConf  = sm ? Math.round((sm.votes/sm.total)*100) : Math.round(conf*100);
+
+      document.getElementById('confFill').style.width      = dispConf + '%';
+      document.getElementById('confPct').textContent       = dispConf + '%';
+      document.getElementById('detectedLabel').textContent = `Detected: ${dispLabel} (${dispConf}% agreement)`;
+
+      if (mode === 'practice') {
+        const target = SIGNS[current].word;
+        const locked = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * 0.6) && sm.label === target;
+        if (locked) {
+          pill.textContent = `✓ ${target} — hold it!`;
+          pill.classList.add('success');
+          holdCount++;
+          if (holdCount >= HOLD_FRAMES) { holdCount = 0; flashSuccess(); }
+        } else {
+          pill.textContent = '✋ Keep going...';
+          pill.classList.remove('success');
+          holdCount = 0;
+        }
+
+      } else {
+        // Spell mode
+        const ringFill  = document.getElementById('ringFill');
+        const ringLabel = document.getElementById('ringLabel');
+        const stable = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * 0.65);
+
+        if (stable && spellCooldown === 0) {
+          holdCount++;
+          ringFill.style.strokeDashoffset = CIRC * (1 - holdCount/SPELL_HOLD);
+          ringLabel.textContent = sm.label;
+          pill.textContent = `Signing: ${sm.label} — hold`;
+          pill.classList.add('success');
+
+          if (holdCount >= SPELL_HOLD) {
+            fsAppend(sm.label);
+            holdCount = 0;
+            spellCooldown = 28;
+            ringFill.style.strokeDashoffset = CIRC;
+            const flash = document.getElementById('successFlash');
+            flash.classList.add('show');
+            setTimeout(() => flash.classList.remove('show'), 200);
+          }
+        } else if (spellCooldown === 0) {
+          holdCount = 0;
+          ringFill.style.strokeDashoffset = CIRC;
+          ringLabel.textContent = sm?.label || '—';
+          pill.textContent = '✋ Hold to spell letter';
+          pill.classList.remove('success');
+        }
       }
 
     } else {
       pill.textContent = '👋 Show your hand';
-      pill.classList.remove('ok');
-      pill.classList.remove('success');
-      wrap.classList.remove('detecting');
-      wrap.classList.remove('success');
-      document.getElementById('confFill').style.width = '0%';
-      document.getElementById('confPct').textContent  = '0%';
+      pill.classList.remove('ok','success');
+      wrap.classList.remove('detecting','success');
+      document.getElementById('confFill').style.width      = '0%';
+      document.getElementById('confPct').textContent       = '0%';
       document.getElementById('detectedLabel').textContent = '—';
+      document.getElementById('ringFill').style.strokeDashoffset = CIRC;
+      document.getElementById('ringLabel').textContent     = '—';
+      recentPreds.length = 0;
       holdCount = 0;
     }
   });
