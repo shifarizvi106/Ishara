@@ -78,7 +78,7 @@
 
     .camera-wrap {
       position: relative;
-      width: 100%; max-width: 900px;
+      width: 100%; max-width: 480px;
       aspect-ratio: 4/3;
       border-radius: 24px; overflow: hidden;
       background: #2a1a22;
@@ -136,7 +136,7 @@
     }
 
     .confidence-bar-wrap {
-      width: 100%; max-width: 700px;
+      width: 100%; max-width: 480px;
       background: white; border-radius: 16px;
       padding: 12px 16px;
       box-shadow: 0 4px 16px rgba(255,95,162,0.1);
@@ -146,7 +146,7 @@
       display: flex; justify-content: space-between;
       font-size: 0.72rem; font-weight: 700; color: #a14a76; margin-bottom: 6px;
     }
-    .confidence-track { height: 32px; background: #f4b6d2; border-radius: 999px; overflow: hidden; }
+    .confidence-track { height: 8px; background: #f4b6d2; border-radius: 999px; overflow: hidden; }
     .confidence-fill {
       height: 100%; width: 0%;
       background: linear-gradient(90deg, #ff5fa2, #d63384);
@@ -156,7 +156,7 @@
 
     /* Finger spelling */
     .fingerspell-wrap {
-      width: 100%; max-width: 900px;
+      width: 100%; max-width: 480px;
       background: white; border-radius: 20px;
       padding: 16px; border: 2px solid #fde6f2;
       box-shadow: 0 4px 16px rgba(255,95,162,0.1);
@@ -222,11 +222,11 @@
 
   <div class="mode-toggle">
     <button class="mode-btn active" id="btnPractice" onclick="setMode('practice')">📖 Practice Signs</button>
-    <button class="mode-btn" id="btnSpell" onclick="setMode('spell')">✍️ Finger Spell</button>
+    <button class="mode-btn" id="btnSpell" onclick="setMode('spell')">Finger Spell</button>
   </div>
 
   <div class="reference-card" id="referenceCard">
-    <div class="sign-preview" id="signPreview">👋</div>
+    <div class="sign-preview" id="signPreview"></div>
     <div class="sign-info">
       <span class="sign-word" id="signWord">A</span>
       <div class="sign-desc" id="signDesc"></div>
@@ -237,7 +237,7 @@
   <div class="camera-wrap" id="cameraWrap">
     <video id="video" playsinline autoplay muted></video>
     <canvas id="overlay"></canvas>
-    <div class="status-pill" id="statusPill">👋 Show your hand</div>
+    <div class="status-pill" id="statusPill"> Show your hand</div>
     <div class="hold-ring" id="holdRing" style="display:none">
       <svg width="48" height="48" viewBox="0 0 48 48">
         <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4"/>
@@ -456,23 +456,28 @@ function initMediaPipe() {
       }
 
       const sm = smoothed();
-      const dispLabel = sm?.label || label;
-      const dispConf  = sm ? Math.round((sm.votes/sm.total)*100) : Math.round(conf*100);
+      // Only commit to a label if confidence + vote agreement is strong
+      const DISPLAY_THRESHOLD = 0.72;
+      const strongEnough = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * 0.7) && conf >= DISPLAY_THRESHOLD;
+      const dispLabel = strongEnough ? sm.label : null;
+      const dispConf  = strongEnough ? Math.round((sm.votes/sm.total)*100) : 0;
 
       document.getElementById('confFill').style.width      = dispConf + '%';
-      document.getElementById('confPct').textContent       = dispConf + '%';
-      document.getElementById('detectedLabel').textContent = `Detected: ${dispLabel} (${dispConf}% agreement)`;
+      document.getElementById('confPct').textContent       = strongEnough ? dispConf + '%' : '—';
+      document.getElementById('detectedLabel').textContent = strongEnough
+        ? `Detected: ${dispLabel} (${dispConf}% agreement)`
+        : 'No sign detected';
 
       if (mode === 'practice') {
         const target = SIGNS[current].word;
-        const locked = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * 0.6) && sm.label === target;
+        const locked = strongEnough && dispLabel === target;
         if (locked) {
           pill.textContent = `✓ ${target} — hold it!`;
           pill.classList.add('success');
           holdCount++;
           if (holdCount >= HOLD_FRAMES) { holdCount = 0; flashSuccess(); }
         } else {
-          pill.textContent = '✋ Keep going...';
+          pill.textContent = strongEnough ? `Seeing: ${dispLabel}` : ' Keep going...';
           pill.classList.remove('success');
           holdCount = 0;
         }
@@ -481,7 +486,7 @@ function initMediaPipe() {
         // Spell mode
         const ringFill  = document.getElementById('ringFill');
         const ringLabel = document.getElementById('ringLabel');
-        const stable = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * 0.65);
+        const stable = strongEnough;
 
         if (stable && spellCooldown === 0) {
           holdCount++;
@@ -509,7 +514,7 @@ function initMediaPipe() {
       }
 
     } else {
-      pill.textContent = '👋 Show your hand';
+      pill.textContent = ' Show your hand';
       pill.classList.remove('ok','success');
       wrap.classList.remove('detecting','success');
       document.getElementById('confFill').style.width      = '0%';
