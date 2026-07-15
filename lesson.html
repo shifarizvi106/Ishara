@@ -340,7 +340,6 @@ const ALL_LESSONS = {
     signs: [
       {
         word: 'Hello',
-        emoji: '👋',
         img:  'assets/hello.gif',
         anim: '',
         desc: 'Raise your right hand to your forehead in a salute, fingers together and flat.',
@@ -348,7 +347,6 @@ const ALL_LESSONS = {
       },
       {
         word: 'Thank You',
-        emoji: '🤲',
         img:  'assets/thankyou.gif',
         anim: '',
         desc: 'Touch your chin with flat fingers, then sweep your hand forward and down.',
@@ -356,7 +354,7 @@ const ALL_LESSONS = {
       },
       {
         word: 'How Are You',
-        emoji: '🤔',
+        emoji: '😹',
         img:  null,
         anim: 'anim-pulse',
         desc: 'Point both index fingers toward each other at chest level, then move them up and down alternately.',
@@ -364,7 +362,7 @@ const ALL_LESSONS = {
       },
       {
         word: "I'm Fine",
-        emoji: '😌',
+        emoji: '😨',
         img:  null,
         anim: 'anim-pulse',
         desc: 'Place your right hand flat on your chest, then move it forward with a slight downward arc.',
@@ -585,7 +583,7 @@ function buildShow(sign, stage) {
     ${imgHtml}
     <div class="sign-name">${sign.word}</div>
     <div class="sign-desc">${sign.desc}</div>
-    <p class="sign-tip">💡 ${sign.tip}</p>
+    <p class="sign-tip"> ${sign.tip}</p>
   `;
   stage.appendChild(card);
   showAction('Got it! ✓', () => { phase='quiz'; renderStep(); });
@@ -749,7 +747,7 @@ function showFinish(failed=false) {
 
   if (failed) {
     fin.innerHTML = `
-      <div class="finish-emoji">😢</div>
+      <div class="finish-emoji"></div>
       <div class="finish-title">Out of hearts!</div>
       <p class="finish-sub">Don't give up — you're learning!</p>
       <button class="retry-btn" onclick="location.reload()">↺ Try Again</button>
