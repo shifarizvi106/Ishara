@@ -89,7 +89,7 @@
       color: #be185d;
     }
 
-    /* Main Area */
+    /* Main Content */
     .main-content {
       flex: 1;
       padding: 32px;
@@ -174,20 +174,6 @@
 
     .btn-action:hover {
       background: #d63384;
-    }
-
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #1f2937;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-weight: 700;
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
     }
   </style>
 </head>
@@ -288,9 +274,7 @@
 
   </main>
 
-  <div id="toast"></div>
-
-  <!-- REALTIME SUPABASE SCRIPT -->
+  <!-- REALTIME SUPABASE & LOGIC SCRIPT -->
   <script>
     const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
@@ -305,13 +289,6 @@
     ];
 
     let realtimeChannel = null;
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.style.opacity = '1';
-      setTimeout(() => t.style.opacity = '0', 2500);
-    }
 
     async function fetchAndRenderData() {
       const { data: { session } } = await _supabase.auth.getSession();
@@ -330,7 +307,7 @@
           .from('profiles')
           .select('streak')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (profile) streak = profile.streak ?? 0;
 
@@ -347,7 +324,7 @@
         document.getElementById('userAvatar').textContent = '?';
       }
 
-      // Update UI Metrics
+      // Update Dashboard Metrics
       document.getElementById('totalSignsValue').textContent = completedCategories.length * 10;
       const percent = Math.round((completedCategories.length / CATEGORIES.length) * 100);
       document.getElementById('completionRateText').textContent = `${percent}% core curriculum completed`;
@@ -384,15 +361,16 @@
       });
     }
 
-    // ENABLE REAL-TIME SUPABASE LISTENER
-    async function setupRealtimeListener() {
+    async function initRealtimeListener() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) return;
 
-      if (realtimeChannel) _supabase.removeChannel(realtimeChannel);
+      if (realtimeChannel) {
+        _supabase.removeChannel(realtimeChannel);
+      }
 
       realtimeChannel = _supabase
-        .channel('db-progress-changes')
+        .channel('dashboard-realtime-changes')
         .on(
           'postgres_changes',
           {
@@ -402,16 +380,16 @@
             filter: `user_id=eq.${session.user.id}`
           },
           () => {
-            fetchAndRenderData(); // Re-render instantly whenever a progress row is added/updated!
+            fetchAndRenderData();
           }
         )
         .subscribe();
     }
 
-    // Auth Change Handlers
-    _supabase.auth.onAuthStateChange((event, session) => {
-      fetchAndRenderData();
-      if (session) setupRealtimeListener();
+    // Auto-update on tab focus
+    window.addEventListener('focus', fetchAndRenderData);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) fetchAndRenderData();
     });
 
     // Logout Handling
@@ -421,9 +399,10 @@
       window.location.href = 'login.html';
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchAndRenderData();
-      setupRealtimeListener();
+    // Init on Load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await fetchAndRenderData();
+      await initRealtimeListener();
     });
   </script>
 </body>
