@@ -3,262 +3,250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Learn</title>
+  <title>Ishara - Learn</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
+
   <style>
-    body { padding-bottom: 80px; }
-
-    .learn-header {
-      padding: 22px 22px 0;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .learn-logo { font-size: 1.4rem; font-weight: 900; color: #d63384; }
-    .learn-stats { font-size: 0.85rem; font-weight: 700; color: #a14a76; display: flex; gap: 12px; }
-
-    /* ── Big centre folder ── */
-    .big-folder-wrap {
-  display: flex;
-  min-height: calc(100vh - 160px);
-  position: relative;
-}
-
-.big-folder {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 180px;
-  height: 144px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-    .big-folder .folder-back {
-      position: absolute; inset: 0;
-      background: #e8629a;
-      border-radius: 0 16px 16px 16px;
-    }
-    .big-folder .folder-back::before {
-      content: '';
-      position: absolute;
-      bottom: 100%; left: 0;
-      width: 52px; height: 16px;
-      background: #e8629a;
-      border-radius: 8px 8px 0 0;
-    }
-    .big-folder .folder-front {
-      position: absolute; inset: 0;
-      background: #ff5fa2;
-      border-radius: 8px 16px 16px 16px;
-      z-index: 3;
-      transform-origin: bottom;
-      transition: all 0.3s ease-in-out;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem;
-    }
-    .big-folder .folder-front.right { display: block; background: #ff5fa2; }
-
-    /* ── Category papers fanned out ── */
-    .cat-paper {
-      position: absolute;
-      width: 88px; height: 110px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(255,95,162,0.2);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 6px;
-      font-size: 1.4rem;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(.4,2,.4,1);
-      z-index: 4;
-      opacity: 0;
-      visibility: hidden;
-      transform: translate(-50%, -50%) scale(0.4);
-      left: 50%; top: 50%;
-      pointer-events: none;
-      border: 2px solid #f4b6d2;
-    }
-    .cat-paper .cat-name {
-      font-size: 0.65rem; font-weight: 800;
-      color: #d63384; text-align: center;
-      line-height: 1.2;
-    }
-    .cat-paper.done { background: #fff0f6; border-color: #ff5fa2; }
-    .cat-paper.locked { opacity: 0.4 !important; cursor: default; }
-
-    /* Fanned positions when open */
-    .big-folder-wrap.open .cat-paper {
-      pointer-events: all;
-      visibility: visible;
-    }
-
-    .big-folder-wrap.open .cat-paper:nth-child(1) {
-      opacity: 1;
-      transform: translate(calc(-50% - 160px), calc(-50% - 60px)) rotateZ(-18deg);
-    }
-    .big-folder-wrap.open .cat-paper:nth-child(2) {
-      opacity: 1;
-      transform: translate(calc(-50% - 80px), calc(-50% - 110px)) rotateZ(-8deg);
-    }
-    .big-folder-wrap.open .cat-paper:nth-child(3) {
-      opacity: 1;
-      transform: translate(-50%, calc(-50% - 130px)) rotateZ(0deg);
-    }
-    .big-folder-wrap.open .cat-paper:nth-child(4) {
-      opacity: 1;
-      transform: translate(calc(-50% + 80px), calc(-50% - 110px)) rotateZ(8deg);
-    }
-    .big-folder-wrap.open .cat-paper:nth-child(5) {
-      opacity: 1;
-      transform: translate(calc(-50% + 160px), calc(-50% - 60px)) rotateZ(18deg);
-    }
-
-    /* Hover on individual paper */
-    .big-folder-wrap.open .cat-paper:nth-child(1):hover { transform: translate(calc(-50% - 160px), calc(-50% - 75px)) rotateZ(-18deg) scale(1.08); }
-    .big-folder-wrap.open .cat-paper:nth-child(2):hover { transform: translate(calc(-50% - 80px), calc(-50% - 125px)) rotateZ(-8deg) scale(1.08); }
-    .big-folder-wrap.open .cat-paper:nth-child(3):hover { transform: translate(-50%, calc(-50% - 145px)) rotateZ(0deg) scale(1.08); }
-    .big-folder-wrap.open .cat-paper:nth-child(4):hover { transform: translate(calc(-50% + 80px), calc(-50% - 125px)) rotateZ(8deg) scale(1.08); }
-    .big-folder-wrap.open .cat-paper:nth-child(5):hover { transform: translate(calc(-50% + 160px), calc(-50% - 75px)) rotateZ(18deg) scale(1.08); }
-
-    /* Open folder front flap - REMOVED, folder is static */
-
-    .folder-hint {
-      position: absolute;
-      bottom: calc(50% - 110px);
-      font-size: 0.78rem; font-weight: 700; color: #c77aa0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-    }
-    .big-folder-wrap.open .folder-hint { opacity: 0; }
-
+    /* Toast Alert Message */
     #toast {
-      position: fixed; bottom: 90px; left: 50%;
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
       transform: translateX(-50%);
-      background: #3a2a33; color: white;
-      padding: 10px 22px; border-radius: 999px;
-      font-size: 0.85rem; font-weight: 700;
-      opacity: 0; transition: opacity 0.3s; z-index: 99;
+      background: #3a2a33;
+      color: white;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 999;
+      pointer-events: none;
       white-space: nowrap;
     }
   </style>
+
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<div class="learn-header">
-  <div class="learn-logo">SignPath</div>
-  <div class="learn-stats">
-    <span id="starsDisplay">★ 0</span>
-    <span id="streakDisplay">ϟ 0</span>
+  <div class="dashboard-container">
+    
+    <!-- ====== USER PROFILE & STATS HEADER ====== -->
+    <header class="dashboard-header">
+      <div class="user-profile">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=IsharaLearner" alt="User Avatar" class="avatar" id="user-avatar">
+        <div class="user-meta">
+          <h2 class="username" id="user-name">Loading...</h2>
+          <span class="user-rank" id="user-rank">Beginner</span>
+        </div>
+      </div>
+
+      <div class="stats-group">
+        <div class="stat-badge streak-badge" title="Daily Streak">
+          <span class="stat-label">STREAK</span>
+          <span class="stat-value" id="streakDisplay">0</span>
+        </div>
+        <div class="stat-badge star-badge" title="Stars Collected">
+          <span class="stat-label">STARS</span>
+          <span class="stat-value" id="starsDisplay">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ====== COURSE DROPDOWN SELECTOR ====== -->
+    <section class="course-selector-card">
+      <label for="course-select" class="course-label">Select Course</label>
+      <select id="course-select" class="course-dropdown">
+        <option value="greetings">#1 : Greetings</option>
+        <option value="relations">#2 : Relationships</option>
+        <option value="emotions">#3 : Emotions</option>
+        <option value="general">#4 : General</option>
+        <option value="abc">#5 : ABC Basics</option>
+      </select>
+    </section>
+
+    <!-- ====== OVERALL COURSE PROGRESS CARD ====== -->
+    <section class="progress-card">
+      <div class="progress-info">
+        <span class="progress-title">Overall Progress</span>
+        <span class="progress-percentage" id="progress-text">0%</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+      </div>
+    </section>
+
+    <!-- ====== PRACTICE MODE CARD ====== -->
+    <section class="practice-mode-card">
+      <div class="practice-text">
+        <h3>Practice Mode</h3>
+        <p>Review learned signs.</p>
+      </div>
+      <a href="collect.html" class="practice-btn">Start Practice</a>
+    </section>
+
+    <!-- ====== DYNAMIC LESSON PATH GRID ====== -->
+    <main class="learn">
+      <div class="path" id="lessonPath">
+        <!-- Built Dynamically via JavaScript -->
+      </div>
+    </main>
+
   </div>
-</div>
 
-<div class="big-folder-wrap" id="folderWrap">
+  <!-- Toast Container -->
+  <div id="toast"></div>
 
-  <!-- Category papers (hidden until open) -->
-  <!-- built by JS -->
+  <!-- ====== BOTTOM NAVIGATION ====== -->
+  <nav class="bottom-nav">
+    <a href="learn.html" class="nav active">Learn</a>
+    <a href="progress.html" class="nav">Progress</a>
+    <a href="profile.html" class="nav">Profile</a>
+  </nav>
 
-  <!-- The big folder -->
-  <div class="big-folder" id="bigFolder" onclick="toggleFolder()">
-    <div class="folder-back"></div>
-    <div class="folder-front"></div>
-    <div class="folder-front right"></div>
-  </div>
+  <!-- ====== DASHBOARD & SUPABASE LOGIC ====== -->
+  <script>
+    // 1. Initialize Supabase Client
+    const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
 
-  <div class="folder-hint">Tap to open lessons</div>
-</div>
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<div id="toast"></div>
+    // 2. Categories Definition
+    const CATEGORIES = [
+      { id: 'greetings', label: '#1 : Greetings',   name: 'Greetings' },
+      { id: 'relations', label: '#2 : Relations',   name: 'Relationships' },
+      { id: 'emotions',  label: '#3 : Emotions',    name: 'Emotions' },
+      { id: 'general',   label: '#4 : General',     name: 'General' },
+      { id: 'abc',       label: '#5 : ABC',         name: 'ABC Basics' },
+    ];
 
-<div style="display:flex; justify-content:center; padding: 0 22px 16px;">
-  <a href="collect.html" style="
-    display:block; width:100%; max-width:340px; text-align:center;
-    background: linear-gradient(135deg, #ff5fa2, #d63384);
-    color:white; font-size:0.9rem; font-weight:800;
-    padding:14px; border-radius:999px; text-decoration:none;
-    box-shadow: 0 6px 20px rgba(255,95,162,0.3);
-  "> Practice Mode</a>
-</div>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.opacity = '1';
+      setTimeout(() => t.style.opacity = '0', 2000);
+    }
 
-<nav class="bottom-nav">
-  <div class="nav active">Learn</div>
-  <div class="nav" onclick="location.href='progress.html'">Progress</div>
-  <div class="nav" onclick="location.href='profile.html'">Profile</div>
-</nav>
+    // 3. Main Data Loading & Syncing Logic
+    async function initDashboard() {
+      // Check for logged-in user session
+      const { data: { session } } = await _supabase.auth.getSession();
+      
+      if (!session) {
+        // Redirect to login if user isn't authenticated
+        window.location.href = 'login.html';
+        return;
+      }
 
-<script>
-const CATEGORIES = [
-  { id:'greetings', label:'Greetings',  emoji:'(^.^)/' },
-  { id:'relations', label:'Relations',  emoji:'જ⁀➴ ♡' },
-  { id:'emotions',  label:'Emotions',   emoji:'( •̀ - •́ )' },
-  { id:'general',   label:'General',    emoji:'➤' },
-  { id:'abc',       label:'ABC',        emoji:'ABC' },
-];
+      const user = session.user;
+      
+      // Set User Display Name
+      const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Learner';
+      document.getElementById('user-name').textContent = displayName;
 
-function getCompleted() {
-  try { return JSON.parse(localStorage.getItem('sp_completed') || '[]'); } catch(e) { return []; }
-}
+      // --- A. Fetch Profile Stats (Stars & Streak) from Supabase ---
+      const { data: profile } = await _supabase
+        .from('profiles')
+        .select('stars, streak')
+        .eq('id', user.id)
+        .single();
 
-let isOpen = false;
-const wrap = document.getElementById('folderWrap');
-const bigFolder = document.getElementById('bigFolder');
+      const stars = profile?.stars ?? 0;
+      const streak = profile?.streak ?? 0;
 
-// Update stats
-document.getElementById('starsDisplay').textContent  = '★ ' + (localStorage.getItem('sp_stars')  || 0);
-document.getElementById('streakDisplay').textContent = 'ϟ ' + (localStorage.getItem('sp_streak') || 0);
+      document.getElementById('starsDisplay').textContent = stars;
+      document.getElementById('streakDisplay').textContent = streak;
 
-// Build category papers
-const completed = getCompleted();
-CATEGORIES.forEach((cat, i) => {
-  const isDone     = completed.includes(cat.id);
-  const isUnlocked = i === 0 || completed.includes(CATEGORIES[i-1].id);
+      // --- B. Fetch User Progress from Supabase ---
+      const { data: progressData, error } = await _supabase
+        .from('user_progress')
+        .select('category_id')
+        .eq('user_id', user.id);
 
-  const paper = document.createElement('div');
-  paper.className = 'cat-paper' + (isDone ? ' done' : '') + (!isUnlocked ? ' locked' : '');
-  paper.innerHTML = `
-    <span>${cat.emoji}</span>
-    <span class="cat-name">${cat.label}</span>
-    ${isDone ? '<span style="font-size:0.6rem;color:#ff5fa2">✓ done</span>' : ''}
-  `;
+      let completedCategories = [];
+      if (!error && progressData) {
+        completedCategories = progressData.map(item => item.category_id);
+      }
 
-  if (isUnlocked) {
-    paper.onclick = (e) => {
-      e.stopPropagation();
-      paper.style.transform = paper.style.transform + ' scale(0.92)';
-      setTimeout(() => {
-        window.location.href = `lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}`;
-      }, 150);
-    };
-  } else {
-    paper.onclick = (e) => {
-      e.stopPropagation();
-      showToast(`Complete ${CATEGORIES[i-1].label} first!`);
-    };
-  }
+      // --- C. Calculate and Render Progress Bar ---
+      const percent = Math.round((completedCategories.length / CATEGORIES.length) * 100);
+      document.getElementById('progress-text').textContent = `${percent}%`;
+      document.getElementById('progress-fill').style.width = `${percent}%`;
 
-  // Insert before the big folder element
-  wrap.insertBefore(paper, bigFolder);
-});
+      // --- D. Dynamically Render Path Nodes ---
+      renderNodes(completedCategories);
+    }
 
-function toggleFolder() {
-  isOpen = !isOpen;
-  wrap.classList.toggle('open', isOpen);
-}
+    // Render path nodes based on Supabase progress data
+    function renderNodes(completed) {
+      const pathContainer = document.getElementById('lessonPath');
+      pathContainer.innerHTML = '';
 
-// Close if clicking outside
-document.addEventListener('click', e => {
-  if (isOpen && !wrap.contains(e.target)) {
-    isOpen = false;
-    wrap.classList.remove('open');
-  }
-});
+      CATEGORIES.forEach((cat, index) => {
+        const isDone = completed.includes(cat.id);
+        const isUnlocked = index === 0 || completed.includes(CATEGORIES[index - 1].id);
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.opacity = '1';
-  setTimeout(() => t.style.opacity = '0', 2000);
-}
-</script>
+        const node = document.createElement('div');
+
+        if (isUnlocked) {
+          node.className = `node active ${isDone ? 'done' : ''}`;
+          node.innerHTML = `
+            <span class="node-number">${index + 1}</span>
+            <span class="label">${cat.name} ${isDone ? '(Done)' : ''}</span>
+          `;
+          node.onclick = () => {
+            window.location.href = `lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}`;
+          };
+        } else {
+          node.className = 'node locked';
+          node.innerHTML = `
+            <span class="node-number">${index + 1}</span>
+            <span class="label">${cat.name}</span>
+          `;
+          node.onclick = () => {
+            showToast(`Complete ${CATEGORIES[index - 1].name} first!`);
+          };
+        }
+
+        pathContainer.appendChild(node);
+      });
+    }
+
+    // Handle Dropdown Selection
+    document.getElementById('course-select').addEventListener('change', async (e) => {
+      const catId = e.target.value;
+      const { data: { user } } = await _supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await _supabase
+        .from('user_progress')
+        .select('category_id')
+        .eq('user_id', user.id);
+
+      const completed = data ? data.map(item => item.category_id) : [];
+      const index = CATEGORIES.findIndex(c => c.id === catId);
+      const isUnlocked = index === 0 || completed.includes(CATEGORIES[index - 1].id);
+      const isDone = completed.includes(catId);
+
+      if (isUnlocked) {
+        window.location.href = `lesson.html?cat=${catId}${isDone ? '&replay=1' : ''}`;
+      } else {
+        showToast(`Complete ${CATEGORIES[index - 1].name} first!`);
+      }
+    });
+
+    // Run when DOM loads
+    document.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
 </body>
 </html>
