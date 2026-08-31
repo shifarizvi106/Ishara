@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ishara - Accessible Dashboard</title>
+  <title>Ishara - Dashboard</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,29 +14,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    :root {
-      --bg-main: #fff0f6;
-      --card-bg: #ffffff;
-      --text-dark: #1f2937;
-      --text-muted: #833a5c;
-      --pink-primary: #d63384;
-      --pink-bright: #ff5fa2;
-      --border-color: #fbcfe8;
-      --focus-ring: #9333ea;
-    }
-
-    /* High Contrast Accessibility Mode */
-    body.high-contrast {
-      --bg-main: #ffffff;
-      --card-bg: #000000;
-      --text-dark: #ffffff;
-      --text-muted: #ffea00;
-      --pink-primary: #ff007f;
-      --pink-bright: #ffff00;
-      --border-color: #ffffff;
-      --focus-ring: #ffff00;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -44,35 +21,29 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Accessibility Focus Visible outline */
-    *:focus-visible {
-      outline: 3px solid var(--focus-ring);
-      outline-offset: 2px;
-    }
-
     body {
-      background-color: var(--bg-main);
-      color: var(--text-dark);
+      background-color: #fff0f6;
+      color: #1f2937;
       display: flex;
       min-height: 100vh;
     }
 
     /* Sidebar Navigation */
     .sidebar {
-      width: 250px;
-      background-color: var(--card-bg);
+      width: 240px;
+      background-color: #ffffff;
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      border-right: 2px solid var(--border-color);
+      border-right: 1px solid #fbcfe8;
       flex-shrink: 0;
     }
 
     .brand {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 800;
-      color: var(--pink-primary);
+      color: #d63384;
       margin-bottom: 24px;
       padding-left: 8px;
     }
@@ -88,39 +59,34 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 14px 16px;
+      padding: 12px 16px;
       border-radius: 12px;
-      color: var(--text-muted);
+      color: #833a5c;
       text-decoration: none;
       font-weight: 700;
       font-size: 0.95rem;
     }
 
     .nav-item.active a {
-      background-color: var(--pink-bright);
+      background-color: #ff5fa2;
       color: #ffffff;
     }
 
-    /* Accessibility Controls */
-    .a11y-controls {
-      background: var(--bg-main);
-      padding: 12px;
+    .logout-btn {
+      color: #833a5c;
+      background: none;
+      border: none;
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
       border-radius: 12px;
-      margin-top: 16px;
-      border: 1px solid var(--border-color);
     }
 
-    .a11y-btn {
-      width: 100%;
-      background: var(--pink-primary);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 0.85rem;
-      min-height: 44px; /* Accessible Touch Target */
+    .logout-btn:hover {
+      background: #ffe6f2;
+      color: #be185d;
     }
 
     /* Main Area */
@@ -151,14 +117,15 @@
     }
 
     .card {
-      background-color: var(--card-bg);
+      background-color: #ffffff;
       border-radius: 20px;
       padding: 24px;
-      border: 2px solid var(--border-color);
+      border: 1px solid #fbcfe8;
+      box-shadow: 0 4px 12px rgba(255, 95, 162, 0.05);
     }
 
     .highlight-card {
-      background: linear-gradient(135deg, var(--pink-bright), var(--pink-primary));
+      background: linear-gradient(135deg, #ff5fa2, #d63384);
       color: white;
       display: flex;
       flex-direction: column;
@@ -175,10 +142,10 @@
     }
 
     .progress-bar-fill {
-      background: var(--pink-primary);
+      background: #ff5fa2;
       height: 100%;
       width: 0%;
-      transition: width 0.5s ease-in-out;
+      transition: width 0.4s ease-in-out;
     }
 
     /* Lessons Table */
@@ -191,20 +158,22 @@
     .lessons-table th, .lessons-table td {
       padding: 14px 8px;
       text-align: left;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid #fbcfe8;
     }
 
     .btn-action {
-      background: var(--pink-primary);
+      background: #ff5fa2;
       color: white;
       text-decoration: none;
-      padding: 10px 18px;
+      padding: 8px 16px;
       border-radius: 8px;
       font-weight: 700;
       font-size: 0.85rem;
       display: inline-block;
-      min-height: 44px;
-      line-height: 24px;
+    }
+
+    .btn-action:hover {
+      background: #d63384;
     }
 
     #toast {
@@ -225,26 +194,19 @@
 <body>
 
   <!-- SIDEBAR NAVIGATION -->
-  <aside class="sidebar" aria-label="Main Navigation">
+  <aside class="sidebar">
     <div>
-      <div class="brand">ISHARA 🤟</div>
+      <div class="brand">ISHARA</div>
       <nav>
         <ul class="nav-menu">
-          <li class="nav-item active"><a href="learn.html" aria-current="page">Dashboard</a></li>
+          <li class="nav-item active"><a href="learn.html">Dashboard</a></li>
           <li class="nav-item"><a href="collect.html">Practice Mode</a></li>
           <li class="nav-item"><a href="profile.html">Profile Settings</a></li>
         </ul>
       </nav>
     </div>
 
-    <div>
-      <!-- ACCESSIBILITY TOOLKIT -->
-      <div class="a11y-controls">
-        <span style="font-size:0.75rem; font-weight:800; display:block; margin-bottom:8px;">ACCESSIBILITY</span>
-        <button class="a11y-btn" id="contrastToggleBtn" aria-label="Toggle High Contrast Mode">High Contrast Mode</button>
-      </div>
-      <button class="logout-btn" id="logoutBtn" style="margin-top:16px; cursor:pointer;" aria-label="Log out of account">Log out</button>
-    </div>
+    <button class="logout-btn" id="logoutBtn">Log out</button>
   </aside>
 
   <!-- MAIN CONTENT AREA -->
@@ -253,13 +215,13 @@
     <header class="dashboard-header">
       <h1 style="font-size: 1.8rem; font-weight: 800;">Learn & Overview</h1>
       <div style="display:flex; align-items:center; gap:12px;">
-        <div id="userAvatar" style="width:40px; height:40px; background:var(--pink-primary); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">?</div>
+        <div id="userAvatar" style="width:40px; height:40px; background:#ff5fa2; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">?</div>
         <span id="userName" style="font-weight:800;">Guest</span>
       </div>
     </header>
 
     <!-- METRICS GRID -->
-    <section class="dashboard-grid" aria-label="Key Performance Indicators">
+    <section class="dashboard-grid">
       
       <div class="card highlight-card">
         <div>
@@ -273,21 +235,21 @@
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <h2 style="font-size:1.1rem; font-weight:800;">Curriculum Progress</h2>
-          <span id="modulePercentText" style="font-weight:800; color:var(--pink-primary);">0%</span>
+          <span id="modulePercentText" style="font-weight:800; color:#d63384;">0%</span>
         </div>
-        <div class="progress-bar-container" role="progressbar" id="progressBarRole" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar-container">
           <div class="progress-bar-fill" id="moduleProgressFill"></div>
         </div>
-        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:16px; font-weight:600;">
-          Real-time tracking of unlocked lessons and accuracy rates across all 5 modules.
+        <p style="font-size:0.85rem; color:#833a5c; margin-top:16px; font-weight:600;">
+          Real-time tracking of unlocked lessons across all core modules.
         </p>
       </div>
 
       <!-- Streak Badge -->
       <div class="card" style="text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
         <h2 style="font-size:1rem; font-weight:800;">Current Streak</h2>
-        <div id="streakBadge" style="font-size:2rem; font-weight:800; color:var(--pink-primary); margin:12px 0;">0 </div>
-        <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Days active</span>
+        <div id="streakBadge" style="font-size:2rem; font-weight:800; color:#d63384; margin:12px 0;">0 </div>
+        <span style="font-size:0.8rem; color:#833a5c; font-weight:600;">Days active</span>
       </div>
 
     </section>
@@ -297,7 +259,7 @@
       
       <div class="card">
         <h2 style="font-size:1.1rem; font-weight:800; margin-bottom:12px;">Sign Language Modules</h2>
-        <table class="lessons-table" aria-label="Available modules table">
+        <table class="lessons-table">
           <thead>
             <tr>
               <th>Module</th>
@@ -315,20 +277,20 @@
       <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
         <div>
           <h2 style="font-size:1.1rem; font-weight:800;">Practice Mode</h2>
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:8px; line-weight:1.4; font-weight:600;">
+          <p style="font-size:0.85rem; color:#833a5c; margin-top:8px; line-height:1.4; font-weight:600;">
             Test your sign recognition live using web camera recognition.
           </p>
         </div>
-        <a href="collect.html" class="btn-action" style="text-align:center;" aria-label="Start Practice Mode">Start Practice Mode</a>
+        <a href="collect.html" class="btn-action" style="text-align:center;">Start Practice Mode</a>
       </div>
 
     </section>
 
   </main>
 
-  <div id="toast" aria-live="polite"></div>
+  <div id="toast"></div>
 
-  <!-- REALTIME SUPABASE & LOGIC SCRIPT -->
+  <!-- REALTIME SUPABASE SCRIPT -->
   <script>
     const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
@@ -342,6 +304,8 @@
       { id: 'abc',       name: '#5 : ABC Basics' }
     ];
 
+    let realtimeChannel = null;
+
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -349,7 +313,7 @@
       setTimeout(() => t.style.opacity = '0', 2500);
     }
 
-    async function loadDashboardData() {
+    async function fetchAndRenderData() {
       const { data: { session } } = await _supabase.auth.getSession();
       
       let completedCategories = [];
@@ -378,6 +342,9 @@
         if (progressData) {
           completedCategories = progressData.map(i => i.category_id);
         }
+      } else {
+        document.getElementById('userName').textContent = 'Guest';
+        document.getElementById('userAvatar').textContent = '?';
       }
 
       // Update UI Metrics
@@ -386,7 +353,6 @@
       document.getElementById('completionRateText').textContent = `${percent}% core curriculum completed`;
       document.getElementById('modulePercentText').textContent = `${percent}%`;
       document.getElementById('moduleProgressFill').style.width = `${percent}%`;
-      document.getElementById('progressBarRole').setAttribute('aria-valuenow', percent);
       document.getElementById('streakBadge').textContent = `${streak} `;
 
       renderTable(completedCategories);
@@ -410,7 +376,7 @@
           </td>
           <td>
             ${isUnlocked 
-              ? `<a href="lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}" class="btn-action" aria-label="${isDone ? 'Review' : 'Start'} ${cat.name}">${isDone ? 'Review' : 'Start'}</a>`
+              ? `<a href="lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}" class="btn-action">${isDone ? 'Review' : 'Start'}</a>`
               : `<span style="color:#94a3b8; font-weight:700;">Locked</span>`}
           </td>
         `;
@@ -418,25 +384,47 @@
       });
     }
 
-    // REAL-TIME AUTH & DATA LISTENERS
-    _supabase.auth.onAuthStateChange((event, session) => {
-      loadDashboardData();
-    });
+    // ENABLE REAL-TIME SUPABASE LISTENER
+    async function setupRealtimeListener() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) return;
 
-    // High Contrast Accessibility Toggle
-    document.getElementById('contrastToggleBtn').addEventListener('click', () => {
-      document.body.classList.toggle('high-contrast');
-      const isHigh = document.body.classList.contains('high-contrast');
-      showToast(isHigh ? "High Contrast Mode Enabled" : "High Contrast Mode Disabled");
+      if (realtimeChannel) _supabase.removeChannel(realtimeChannel);
+
+      realtimeChannel = _supabase
+        .channel('db-progress-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'user_progress',
+            filter: `user_id=eq.${session.user.id}`
+          },
+          () => {
+            fetchAndRenderData(); // Re-render instantly whenever a progress row is added/updated!
+          }
+        )
+        .subscribe();
+    }
+
+    // Auth Change Handlers
+    _supabase.auth.onAuthStateChange((event, session) => {
+      fetchAndRenderData();
+      if (session) setupRealtimeListener();
     });
 
     // Logout Handling
     document.getElementById('logoutBtn').addEventListener('click', async () => {
+      if (realtimeChannel) _supabase.removeChannel(realtimeChannel);
       await _supabase.auth.signOut();
       window.location.href = 'login.html';
     });
 
-    document.addEventListener('DOMContentLoaded', loadDashboardData);
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchAndRenderData();
+      setupRealtimeListener();
+    });
   </script>
 </body>
 </html>
