@@ -5,21 +5,91 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SignPath</title>
   <link rel="stylesheet" href="style.css">
+  
+  <!-- GSAP Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 <body>
 
-<section class="landing">
-  <div class="butterfly">
-    <div class="wing left"></div>
-    <div class="wing right"></div>
-    <div class="body"></div>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+    </div>
+    <h1 class="brand-title"> Ishara</h1>
+    <div class="progress-wrapper">
+      <div class="progress-bar"></div>
+    </div>
   </div>
 
-  <h1 class="logo">SignPath </h1>
-  <p class="subtitle">Learn Indian Sign Language.</p>
+  <!-- Your Main Landing Section -->
+  <section class="landing" id="main-content">
+    <div class="butterfly">
+      <div class="wing left"></div>
+      <div class="wing right"></div>
+      <div class="body"></div>
+    </div>
 
-  <a href="learn.html" class="start-btn">Start Learning</a>
-</section>
+    <h1 class="logo">Ishara</h1>
+    <p class="subtitle">Learn Indian Sign Language.</p>
+
+    <a href="learn.html" class="start-btn">Start Learning</a>
+  </section>
+
+  <!-- Animation Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tl = gsap.timeline();
+
+      // Initial State Setup
+      gsap.set(".logo-icon", { scale: 0, rotation: -180 });
+      gsap.set("#main-content", { visibility: "hidden", opacity: 0 });
+
+      // Splash Sequence
+      tl.to(".logo-icon", {
+        scale: 1,
+        rotation: 0,
+        duration: 1,
+        ease: "back.out(1.7)"
+      })
+      .to(".brand-title", {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: "power2.out"
+      }, "-=0.4")
+      .to(".progress-wrapper", {
+        opacity: 1,
+        duration: 0.4
+      }, "-=0.2")
+      .to(".progress-bar", {
+        scaleX: 1,
+        duration: 1.5,
+        ease: "power1.inOut"
+      })
+      
+      // Exit Splash & Reveal Landing Page
+      .to("#splash-screen", {
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.inOut",
+        onComplete: () => {
+          document.getElementById("splash-screen").style.display = "none";
+        }
+      })
+      .set("#main-content", { visibility: "visible" })
+      .to("#main-content", {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power2.out"
+      }, "-=0.4");
+    });
+  </script>
 
 </body>
 </html>
