@@ -286,7 +286,7 @@
       <!-- Streak Badge -->
       <div class="card" style="text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
         <h2 style="font-size:1rem; font-weight:800;">Current Streak</h2>
-        <div id="streakBadge" style="font-size:2rem; font-weight:800; color:var(--pink-primary); margin:12px 0;">0 🔥</div>
+        <div id="streakBadge" style="font-size:2rem; font-weight:800; color:var(--pink-primary); margin:12px 0;">0 </div>
         <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Days active</span>
       </div>
 
@@ -387,7 +387,7 @@
       document.getElementById('modulePercentText').textContent = `${percent}%`;
       document.getElementById('moduleProgressFill').style.width = `${percent}%`;
       document.getElementById('progressBarRole').setAttribute('aria-valuenow', percent);
-      document.getElementById('streakBadge').textContent = `${streak} 🔥`;
+      document.getElementById('streakBadge').textContent = `${streak} `;
 
       renderTable(completedCategories);
     }
