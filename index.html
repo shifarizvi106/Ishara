@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ishara</title>
 
-  
   <style>
     @font-face {
       font-family: 'Croissant One';
@@ -49,45 +48,52 @@
 </head>
 <body>
 
-  <!-- ====== SPLASH SCREEN  ====== -->
+  <!-- ====== SPLASH SCREEN ====== -->
   <div id="splash-screen">
     <h1 class="splash-text">Ishara</h1>
   </div>
 
   <!-- ====== MAIN LANDING ====== -->
   <section class="landing" id="main-content">
-    <div class="butterfly">
-      <div class="wing left"></div>
-      <div class="wing right"></div>
-      <div class="body"></div>
+    <div class="landing-card">
+      <div class="butterfly">
+        <div class="wing left"></div>
+        <div class="wing right"></div>
+        <div class="body"></div>
+      </div>
+
+      <h1 class="logo">Ishara</h1>
+      <p class="subtitle">Learn Indian Sign Language.</p>
+      
+      <form class="terms-form" id="consent-form">
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="age-check" class="custom-checkbox">
+            <span>I am at least 13 years old</span>
+          </label>
+          
+          <label class="checkbox-label">
+            <input type="checkbox" id="tos-check" class="custom-checkbox">
+            <span>I have read the <a href="tos.html" target="_blank" class="inline-link">Terms of Service</a></span>
+          </label>
+        </div>
+
+        <button type="submit" id="start-btn" class="start-btn" disabled>Start Learning</button>
+      </form>
     </div>
 
-    <h1 class="logo">Ishara</h1>
-    <p class="subtitle">Learn Indian Sign Language.</p>
-    <form class="terms-form" id="consent-form">
-  <div class="checkbox-group">
-    <label class="checkbox-label">
-      <input type="checkbox" id="age-check" class="custom-checkbox">
-      <span>I am at least 13 years old</span>
-    </label>
     
-    <label class="checkbox-label">
-      <input type="checkbox" id="tos-check" class="custom-checkbox">
-      <span>I have read the <a href="#" class="inline-link">Terms of Service</a></span>
-    </label>
-  </div>
-
-  <button type="submit" id="start-btn" class="start-btn" disabled>Start Learning</button>
-      <a href="tos.html" target="_blank" class="inline-link">Terms of Service</a>
-</form>
+    <footer class="landing-footer">
+      <p>© 2026 Ishara • <a href="tos.html" target="_blank">Terms</a></p>
+    </footer>
   </section>
 
-  <!-- ====== ANIMATION ====== -->
+  <!-- ====== LOGIC & ANIMATION ====== -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // 1. GSAP Splash Screen Animation
       const tl = gsap.timeline();
 
-      // Text fades/slides in
       tl.to(".splash-text", {
         opacity: 1,
         y: 0,
@@ -95,7 +101,6 @@
         ease: "power2.out",
         delay: 0.3
       })
-      // Hold briefly, then fade splash out
       .to("#splash-screen", {
         opacity: 0,
         duration: 0.8,
@@ -111,6 +116,26 @@
         duration: 0.8,
         ease: "power2.out"
       }, "-=0.4");
+
+      // 2. Checkbox Validation Logic
+      const ageCheck = document.getElementById('age-check');
+      const tosCheck = document.getElementById('tos-check');
+      const startBtn = document.getElementById('start-btn');
+      const form = document.getElementById('consent-form');
+
+      function validateForm() {
+        startBtn.disabled = !(ageCheck.checked && tosCheck.checked);
+      }
+
+      ageCheck.addEventListener('change', validateForm);
+      tosCheck.addEventListener('change', validateForm);
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!startBtn.disabled) {
+          window.location.href = 'learn.html';
+        }
+      });
     });
   </script>
 
