@@ -10,6 +10,72 @@ body {
   color: #3a2a33;
 }
 
+/* ===== SPLASH SCREEN ===== */
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(180deg, #ffe3f1 0%, #fde6f2 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.logo-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-icon {
+  width: 80px;
+  height: 80px;
+  background: #ff5fa2;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 24px rgba(255, 95, 162, 0.4);
+}
+
+.logo-icon svg {
+  width: 40px;
+  height: 40px;
+  fill: #ffffff;
+}
+
+.brand-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #3a2a33;
+  letter-spacing: -0.025em;
+  opacity: 0;
+}
+
+.progress-wrapper {
+  width: 200px;
+  height: 6px;
+  background: rgba(214, 51, 132, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 1.5rem;
+  opacity: 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 100%;
+  background: #ff5fa2;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
 /* ===== LANDING ===== */
 .landing {
   min-height: 100vh;
