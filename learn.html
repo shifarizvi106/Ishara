@@ -3,17 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ishara - Dashboard</title>
+  <title>Ishara - Accessible Dashboard</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    :root {
+      --bg-main: #fff0f6;
+      --card-bg: #ffffff;
+      --text-dark: #1f2937;
+      --text-muted: #833a5c;
+      --pink-primary: #d63384;
+      --pink-bright: #ff5fa2;
+      --border-color: #fbcfe8;
+      --focus-ring: #9333ea;
+    }
+
+    /* High Contrast Accessibility Mode */
+    body.high-contrast {
+      --bg-main: #ffffff;
+      --card-bg: #000000;
+      --text-dark: #ffffff;
+      --text-muted: #ffea00;
+      --pink-primary: #ff007f;
+      --pink-bright: #ffff00;
+      --border-color: #ffffff;
+      --focus-ring: #ffff00;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -21,39 +44,43 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    body {
-      background-color: #fff0f6;
-      color: #1f2937;
-      display: flex;
-      min-height: 100vh;
-      overflow-x: hidden;
+    /* Accessibility Focus Visible outline */
+    *:focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
     }
 
-    /* ====== SIDEBAR NAVIGATION ====== */
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-dark);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Navigation */
     .sidebar {
-      width: 240px;
-      background-color: #ffffff;
+      width: 250px;
+      background-color: var(--card-bg);
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      border-right: 1px solid #fbcfe8;
+      border-right: 2px solid var(--border-color);
       flex-shrink: 0;
     }
 
     .brand {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 800;
-      color: #d63384;
-      letter-spacing: -0.02em;
-      margin-bottom: 32px;
-      padding-left: 12px;
+      color: var(--pink-primary);
+      margin-bottom: 24px;
+      padding-left: 8px;
     }
 
     .nav-menu {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       list-style: none;
     }
 
@@ -61,102 +88,56 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
+      padding: 14px 16px;
       border-radius: 12px;
-      color: #a14a76;
+      color: var(--text-muted);
       text-decoration: none;
       font-weight: 700;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
+      font-size: 0.95rem;
     }
 
-    .nav-item.active a, .nav-item a:hover {
-      background-color: #ff5fa2;
+    .nav-item.active a {
+      background-color: var(--pink-bright);
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(255, 95, 162, 0.25);
     }
 
-    .logout-btn {
-      color: #a14a76;
-      background: none;
-      border: none;
-      padding: 12px 16px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      text-align: left;
+    /* Accessibility Controls */
+    .a11y-controls {
+      background: var(--bg-main);
+      padding: 12px;
       border-radius: 12px;
-      transition: background 0.2s;
+      margin-top: 16px;
+      border: 1px solid var(--border-color);
     }
 
-    .logout-btn:hover {
-      background: #ffe6f2;
-      color: #be185d;
+    .a11y-btn {
+      width: 100%;
+      background: var(--pink-primary);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.85rem;
+      min-height: 44px; /* Accessible Touch Target */
     }
 
-    /* ====== MAIN DASHBOARD WRAPPER ====== */
+    /* Main Area */
     .main-content {
       flex: 1;
       padding: 32px;
       display: flex;
       flex-direction: column;
       gap: 24px;
-      max-width: 1400px;
     }
 
-    /* Top Bar Header */
     .dashboard-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashboard-title {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #1f2937;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .search-input {
-      background: #ffffff;
-      border: 1px solid #f4b6d2;
-      padding: 10px 16px;
-      border-radius: 10px;
-      color: #1f2937;
-      outline: none;
-      font-size: 0.85rem;
-    }
-
-    .user-profile-badge {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #ffffff;
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid #f4b6d2;
-    }
-
-    .user-avatar-circle {
-      width: 32px;
-      height: 32px;
-      background: #ff5fa2;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.85rem;
-    }
-
-    /* ====== GRID LAYOUT ====== */
     .dashboard-grid {
       display: grid;
       grid-template-columns: 1.2fr 1.8fr 1.2fr;
@@ -169,181 +150,72 @@
       gap: 20px;
     }
 
-    /* Common Card Styling */
     .card {
-      background-color: #ffffff;
+      background-color: var(--card-bg);
       border-radius: 20px;
       padding: 24px;
-      border: 1px solid #fbcfe8;
-      box-shadow: 0 4px 12px rgba(255, 95, 162, 0.05);
+      border: 2px solid var(--border-color);
     }
 
-    /* Card 1: Main Highlight Card */
     .highlight-card {
-      background: linear-gradient(135deg, #ff5fa2, #d63384);
+      background: linear-gradient(135deg, var(--pink-bright), var(--pink-primary));
       color: white;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 220px;
-      border: none;
-      box-shadow: 0 10px 25px rgba(255, 95, 162, 0.3);
-    }
-
-    .highlight-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      opacity: 0.95;
-    }
-
-    .highlight-value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-top: 12px;
-    }
-
-    /* Card 2: Select Course Dropdown & Progress */
-    .course-report-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .card-title {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #1f2937;
-    }
-
-    .course-select-dropdown {
-      background: #fdf2f8;
-      border: 1px solid #f4b6d2;
-      color: #1f2937;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      outline: none;
-      cursor: pointer;
+      min-height: 200px;
     }
 
     .progress-bar-container {
       background: #ffe6f2;
-      height: 12px;
+      height: 16px;
       border-radius: 999px;
       overflow: hidden;
-      margin-top: 16px;
+      margin-top: 12px;
     }
 
     .progress-bar-fill {
-      background: #ff5fa2;
+      background: var(--pink-primary);
       height: 100%;
       width: 0%;
-      transition: width 0.4s ease;
+      transition: width 0.5s ease-in-out;
     }
 
-    /* Card 3: Activity / Streak */
-    .stats-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      text-align: center;
-    }
-
-    .radial-badge {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 8px solid #ff5fa2;
-      border-top-color: #ffe6f2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #d63384;
-      margin: 12px 0;
-    }
-
-    /* Table Styling for Lessons List */
+    /* Lessons Table */
     .lessons-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 12px;
+    }
+
+    .lessons-table th, .lessons-table td {
+      padding: 14px 8px;
       text-align: left;
-    }
-
-    .lessons-table th {
-      color: #a14a76;
-      font-size: 0.75rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #fbcfe8;
-    }
-
-    .lessons-table td {
-      padding: 14px 0;
-      font-size: 0.88rem;
-      border-bottom: 1px solid #fbcfe8;
-      color: #1f2937;
-    }
-
-    .status-pill {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-
-    .status-pill.completed {
-      background: #dcfce7;
-      color: #15803d;
-    }
-
-    .status-pill.available {
-      background: #ffe6f2;
-      color: #be185d;
-    }
-
-    .status-pill.locked {
-      background: #f1f5f9;
-      color: #64748b;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .btn-action {
-      background: #ff5fa2;
+      background: var(--pink-primary);
       color: white;
       text-decoration: none;
-      padding: 6px 14px;
+      padding: 10px 18px;
       border-radius: 8px;
-      font-size: 0.8rem;
       font-weight: 700;
-      transition: background 0.2s;
+      font-size: 0.85rem;
+      display: inline-block;
+      min-height: 44px;
+      line-height: 24px;
     }
 
-    .btn-action:hover {
-      background: #d63384;
-    }
-
-    /* Toast Notification */
     #toast {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: #3a2a33;
+      background: #1f2937;
       color: white;
       padding: 12px 20px;
       border-radius: 10px;
       font-weight: 700;
-      font-size: 0.85rem;
       opacity: 0;
       transition: opacity 0.3s;
       pointer-events: none;
@@ -352,120 +224,111 @@
 </head>
 <body>
 
-  <!-- ====== SIDE NAVIGATION ====== -->
-  <aside class="sidebar">
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar" aria-label="Main Navigation">
     <div>
-      <div class="brand">ISHARA</div>
-      <ul class="nav-menu">
-        <li class="nav-item active"><a href="learn.html">Dashboard</a></li>
-        <li class="nav-item"><a href="practice.html">Practice Mode</a></li>
-        <li class="nav-item"><a href="progress.html">Analytics</a></li>
-        <li class="nav-item"><a href="profile.html">Profile</a></li>
-      </ul>
+      <div class="brand">ISHARA 🤟</div>
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item active"><a href="learn.html" aria-current="page">Dashboard</a></li>
+          <li class="nav-item"><a href="collect.html">Practice Mode</a></li>
+          <li class="nav-item"><a href="profile.html">Profile Settings</a></li>
+        </ul>
+      </nav>
     </div>
-    <button class="logout-btn" id="logoutBtn">Log out</button>
+
+    <div>
+      <!-- ACCESSIBILITY TOOLKIT -->
+      <div class="a11y-controls">
+        <span style="font-size:0.75rem; font-weight:800; display:block; margin-bottom:8px;">ACCESSIBILITY</span>
+        <button class="a11y-btn" id="contrastToggleBtn" aria-label="Toggle High Contrast Mode">High Contrast Mode</button>
+      </div>
+      <button class="logout-btn" id="logoutBtn" style="margin-top:16px; cursor:pointer;" aria-label="Log out of account">Log out</button>
+    </div>
   </aside>
 
-  <!-- ====== MAIN CONTENT AREA ====== -->
+  <!-- MAIN CONTENT AREA -->
   <main class="main-content">
     
-    <!-- Top Header Bar -->
     <header class="dashboard-header">
-      <h1 class="dashboard-title">Overview</h1>
-      <div class="header-right">
-        <input type="text" class="search-input" placeholder="Search lessons...">
-        <div class="user-profile-badge">
-          <div class="user-avatar-circle" id="userAvatar">?</div>
-          <span id="userName" style="font-size: 0.88rem; font-weight: 800; color: #1f2937;">Guest</span>
-        </div>
+      <h1 style="font-size: 1.8rem; font-weight: 800;">Learn & Overview</h1>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div id="userAvatar" style="width:40px; height:40px; background:var(--pink-primary); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">?</div>
+        <span id="userName" style="font-weight:800;">Guest</span>
       </div>
     </header>
 
-    <!-- TOP GRID CARDS -->
-    <section class="dashboard-grid">
+    <!-- METRICS GRID -->
+    <section class="dashboard-grid" aria-label="Key Performance Indicators">
       
-      <!-- Card 1: Overall Completion -->
       <div class="card highlight-card">
         <div>
-          <span class="highlight-title">Total Signs Mastered</span>
-          <div class="highlight-value" id="totalSignsValue">0</div>
+          <h2 style="font-size:1.1rem; font-weight:700;">Total Signs Mastered</h2>
+          <div style="font-size:2.8rem; font-weight:800;" id="totalSignsValue">0</div>
         </div>
-        <span style="font-size: 0.85rem; opacity: 0.9;" id="completionRateText">0% of core curriculum completed</span>
+        <span id="completionRateText" style="font-weight:700;">0% core curriculum completed</span>
       </div>
 
-      <!-- Card 2: Course Selector & Detailed Progress -->
-      <div class="card course-report-card">
-        <div class="card-header">
-          <span class="card-title">Active Module</span>
-          <select id="courseSelect" class="course-select-dropdown">
-            <option value="greetings">#1 : Greetings</option>
-            <option value="relations">#2 : Relationships</option>
-            <option value="emotions">#3 : Emotions</option>
-            <option value="general">#4 : General</option>
-            <option value="abc">#5 : ABC Basics</option>
-          </select>
+      <!-- Combined Analytics & Module Progress -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 style="font-size:1.1rem; font-weight:800;">Curriculum Progress</h2>
+          <span id="modulePercentText" style="font-weight:800; color:var(--pink-primary);">0%</span>
         </div>
-        <div>
-          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #a14a76; font-weight: 700;">
-            <span>Module Progress</span>
-            <span id="modulePercentText">0%</span>
-          </div>
-          <div class="progress-bar-container">
-            <div class="progress-bar-fill" id="moduleProgressFill"></div>
-          </div>
+        <div class="progress-bar-container" role="progressbar" id="progressBarRole" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar-fill" id="moduleProgressFill"></div>
         </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:16px; font-weight:600;">
+          Real-time tracking of unlocked lessons and accuracy rates across all 5 modules.
+        </p>
       </div>
 
-      <!-- Card 3: Activity / Streak -->
-      <div class="card stats-card">
-        <span class="card-title">Current Streak</span>
-        <div class="radial-badge" id="streakBadge">0</div>
-        <span style="font-size: 0.8rem; color: #a14a76; font-weight: 600;">Keep learning daily to increase your streak!</span>
+      <!-- Streak Badge -->
+      <div class="card" style="text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <h2 style="font-size:1rem; font-weight:800;">Current Streak</h2>
+        <div id="streakBadge" style="font-size:2rem; font-weight:800; color:var(--pink-primary); margin:12px 0;">0 🔥</div>
+        <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Days active</span>
       </div>
 
     </section>
 
-    <!-- BOTTOM GRID CARDS -->
+    <!-- LESSONS & DIRECT PRACTICE ROUTING -->
     <section class="grid-row-bottom">
       
-      <!-- Card 4: Lesson Modules Path Table -->
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">Curriculum Modules</span>
-        </div>
-        <table class="lessons-table">
+        <h2 style="font-size:1.1rem; font-weight:800; margin-bottom:12px;">Sign Language Modules</h2>
+        <table class="lessons-table" aria-label="Available modules table">
           <thead>
             <tr>
-              <th>Module Name</th>
+              <th>Module</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody id="lessonsTableBody">
-            <!-- Dynamic Content via JS -->
+            <!-- Dynamic Injection -->
           </tbody>
         </table>
       </div>
 
-      <!-- Card 5: Quick Practice Mode Action Card -->
-      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+      <!-- Direct Practice Mode Card -->
+      <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
         <div>
-          <span class="card-title">Quick Practice</span>
-          <p style="font-size: 0.85rem; color: #a14a76; margin-top: 8px; line-height: 1.4; font-weight: 500;">
-            Review signs you've unlocked and test your recall speed in flashcard mode.
+          <h2 style="font-size:1.1rem; font-weight:800;">Practice Mode</h2>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-top:8px; line-weight:1.4; font-weight:600;">
+            Test your sign recognition live using web camera recognition.
           </p>
         </div>
-        <a href="practice.html" class="btn-action" style="text-align: center; padding: 12px; margin-top: 16px;">Start Practice</a>
+        <a href="collect.html" class="btn-action" style="text-align:center;" aria-label="Start Practice Mode">Start Practice Mode</a>
       </div>
 
     </section>
 
   </main>
 
-  <!-- Toast Element -->
-  <div id="toast"></div>
+  <div id="toast" aria-live="polite"></div>
 
-  <!-- ====== SUPABASE & DASHBOARD LOGIC ====== -->
+  <!-- REALTIME SUPABASE & LOGIC SCRIPT -->
   <script>
     const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
@@ -483,10 +346,10 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.style.opacity = '1';
-      setTimeout(() => t.style.opacity = '0', 2000);
+      setTimeout(() => t.style.opacity = '0', 2500);
     }
 
-    async function initDashboard() {
+    async function loadDashboardData() {
       const { data: { session } } = await _supabase.auth.getSession();
       
       let completedCategories = [];
@@ -499,7 +362,6 @@
         document.getElementById('userName').textContent = name;
         document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
 
-        // Fetch User Profile Stats
         const { data: profile } = await _supabase
           .from('profiles')
           .select('streak')
@@ -508,7 +370,6 @@
 
         if (profile) streak = profile.streak ?? 0;
 
-        // Fetch User Progress
         const { data: progressData } = await _supabase
           .from('user_progress')
           .select('category_id')
@@ -519,15 +380,15 @@
         }
       }
 
-      // Update Dashboard Metrics
+      // Update UI Metrics
       document.getElementById('totalSignsValue').textContent = completedCategories.length * 10;
       const percent = Math.round((completedCategories.length / CATEGORIES.length) * 100);
-      document.getElementById('completionRateText').textContent = `${percent}% of core curriculum completed`;
+      document.getElementById('completionRateText').textContent = `${percent}% core curriculum completed`;
       document.getElementById('modulePercentText').textContent = `${percent}%`;
       document.getElementById('moduleProgressFill').style.width = `${percent}%`;
-      document.getElementById('streakBadge').textContent = `${streak}`;
+      document.getElementById('progressBarRole').setAttribute('aria-valuenow', percent);
+      document.getElementById('streakBadge').textContent = `${streak} 🔥`;
 
-      // Render Table
       renderTable(completedCategories);
     }
 
@@ -541,29 +402,41 @@
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td style="font-weight: 700; color: #1f2937;">${cat.name}</td>
+          <td style="font-weight: 700;">${cat.name}</td>
           <td>
-            <span class="status-pill ${isDone ? 'completed' : (isUnlocked ? 'available' : 'locked')}">
-              ${isDone ? 'Completed' : (isUnlocked ? 'Available' : 'Locked')}
+            <span style="font-weight:800; color:${isDone ? '#15803d' : (isUnlocked ? '#be185d' : '#64748b')};">
+              ${isDone ? '✓ Completed' : (isUnlocked ? 'Available' : 'Locked')}
             </span>
           </td>
           <td>
             ${isUnlocked 
-              ? `<a href="lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}" class="btn-action">${isDone ? 'Review' : 'Start'}</a>`
-              : `<span style="color:#94a3b8; font-size:0.8rem; font-weight: 700;">Locked</span>`}
+              ? `<a href="lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}" class="btn-action" aria-label="${isDone ? 'Review' : 'Start'} ${cat.name}">${isDone ? 'Review' : 'Start'}</a>`
+              : `<span style="color:#94a3b8; font-weight:700;">Locked</span>`}
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // Logout handling
+    // REAL-TIME AUTH & DATA LISTENERS
+    _supabase.auth.onAuthStateChange((event, session) => {
+      loadDashboardData();
+    });
+
+    // High Contrast Accessibility Toggle
+    document.getElementById('contrastToggleBtn').addEventListener('click', () => {
+      document.body.classList.toggle('high-contrast');
+      const isHigh = document.body.classList.contains('high-contrast');
+      showToast(isHigh ? "High Contrast Mode Enabled" : "High Contrast Mode Disabled");
+    });
+
+    // Logout Handling
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await _supabase.auth.signOut();
       window.location.href = 'login.html';
     });
 
-    document.addEventListener('DOMContentLoaded', initDashboard);
+    document.addEventListener('DOMContentLoaded', loadDashboardData);
   </script>
 </body>
 </html>
