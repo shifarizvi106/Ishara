@@ -117,11 +117,23 @@
       /* Custom Highlight */
 
     ::selection {
-      backgroud : rgb(229,235,194);
+  background-color: rgb(229, 235, 194);
+  color: #111827; 
+}
       }
       /* Custom Scroll bar*/
-scrollbar-colour: #293a56 #e9b4d2;
-      scrollbare-width: auto;
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e9b4d2;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #293a56;
+  border-radius: 6px;
+}
       
     }
   </style>
