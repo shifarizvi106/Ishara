@@ -14,6 +14,23 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    :root {
+      --primary: #ff5fa2;
+      --primary-dark: #d63384;
+      --primary-light: #ffe6f2;
+      --bg-body: #fff0f6;
+      --bg-card: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #833a5c;
+      --text-faint: #64748b;
+      --border: #fbcfe8;
+      --success: #15803d;
+      --shadow: 0 4px 12px rgba(255, 95, 162, 0.05);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --radius-xs: 8px;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -22,28 +39,28 @@
     }
 
     body {
-      background-color: #fff0f6;
-      color: #1f2937;
+      background-color: var(--bg-body);
+      color: var(--text-main);
       display: flex;
       min-height: 100vh;
     }
 
-    /* Sidebar Navigation */
+    /* ── Sidebar ── */
     .sidebar {
       width: 240px;
-      background-color: #ffffff;
+      background: var(--bg-card);
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      border-right: 1px solid #fbcfe8;
+      border-right: 1px solid var(--border);
       flex-shrink: 0;
     }
 
     .brand {
       font-size: 1.4rem;
       font-weight: 800;
-      color: #d63384;
+      color: var(--primary-dark);
       margin-bottom: 24px;
       padding-left: 8px;
     }
@@ -60,20 +77,26 @@
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
-      border-radius: 12px;
-      color: #833a5c;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
       text-decoration: none;
       font-weight: 700;
       font-size: 0.95rem;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-item a:hover {
+      background: var(--primary-light);
+      color: var(--primary-dark);
     }
 
     .nav-item.active a {
-      background-color: #ff5fa2;
+      background: var(--primary);
       color: #ffffff;
     }
 
     .logout-btn {
-      color: #833a5c;
+      color: var(--text-muted);
       background: none;
       border: none;
       padding: 12px 16px;
@@ -81,21 +104,23 @@
       font-size: 0.9rem;
       cursor: pointer;
       text-align: left;
-      border-radius: 12px;
+      border-radius: var(--radius-sm);
+      transition: background 0.2s, color 0.2s;
     }
 
     .logout-btn:hover {
-      background: #ffe6f2;
-      color: #be185d;
+      background: var(--primary-light);
+      color: var(--primary-dark);
     }
 
-    /* Main Content */
+    /* ── Main Content ── */
     .main-content {
       flex: 1;
       padding: 32px;
       display: flex;
       flex-direction: column;
       gap: 24px;
+      max-width: calc(100vw - 240px);
     }
 
     .dashboard-header {
@@ -104,6 +129,35 @@
       align-items: center;
     }
 
+    .dashboard-header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .user-name {
+      font-weight: 800;
+    }
+
+    /* ── Grid Layouts ── */
     .dashboard-grid {
       display: grid;
       grid-template-columns: 1.2fr 1.8fr 1.2fr;
@@ -116,25 +170,75 @@
       gap: 20px;
     }
 
+    @media (max-width: 1100px) {
+      .dashboard-grid { grid-template-columns: 1fr 1fr; }
+      .dashboard-grid > *:first-child { grid-column: 1 / -1; }
+      .grid-row-bottom { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; flex-direction: row; padding: 16px; }
+      .sidebar > div:first-child { display: flex; gap: 16px; align-items: center; }
+      .nav-menu { flex-direction: row; }
+      .main-content { max-width: 100%; padding: 20px; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Cards ── */
     .card {
-      background-color: #ffffff;
-      border-radius: 20px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
       padding: 24px;
-      border: 1px solid #fbcfe8;
-      box-shadow: 0 4px 12px rgba(255, 95, 162, 0.05);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
     }
 
     .highlight-card {
-      background: linear-gradient(135deg, #ff5fa2, #d63384);
-      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       min-height: 200px;
     }
 
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .big-number {
+      font-size: 2.8rem;
+      font-weight: 800;
+    }
+
+    .streak-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin: 12px 0;
+    }
+
+    /* ── Progress ── */
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
     .progress-bar-container {
-      background: #ffe6f2;
+      background: var(--primary-light);
       height: 16px;
       border-radius: 999px;
       overflow: hidden;
@@ -142,42 +246,128 @@
     }
 
     .progress-bar-fill {
-      background: #ff5fa2;
+      background: var(--primary);
       height: 100%;
       width: 0%;
-      transition: width 0.4s ease-in-out;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Lessons Table */
+    /* ── Table ── */
     .lessons-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 12px;
     }
 
-    .lessons-table th, .lessons-table td {
+    .lessons-table th,
+    .lessons-table td {
       padding: 14px 8px;
       text-align: left;
-      border-bottom: 1px solid #fbcfe8;
+      border-bottom: 1px solid var(--border);
     }
 
+    .lessons-table th {
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-badge {
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .status-completed { color: var(--success); }
+    .status-available { color: var(--primary-dark); }
+    .status-locked    { color: var(--text-faint); }
+
     .btn-action {
-      background: #ff5fa2;
-      color: white;
+      background: var(--primary);
+      color: #fff;
       text-decoration: none;
       padding: 8px 16px;
-      border-radius: 8px;
+      border-radius: var(--radius-xs);
       font-weight: 700;
       font-size: 0.85rem;
       display: inline-block;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
     }
 
     .btn-action:hover {
-      background: #d63384;
+      background: var(--primary-dark);
     }
+
+    .btn-action:active {
+      transform: scale(0.97);
+    }
+
+    .btn-action:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Toast Notifications ── */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-xs);
+      padding: 14px 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      font-weight: 600;
+      font-size: 0.9rem;
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+      max-width: 320px;
+    }
+
+    .toast.success { border-left-color: var(--success); }
+    .toast.error   { border-left-color: #dc2626; }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(20px); }
+    }
+
+    /* ── Loading Skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--primary-light) 25%, #fff 50%, var(--primary-light) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .hidden { display: none !important; }
   </style>
+<base target="_blank">
 </head>
 <body>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <!-- SIDEBAR NAVIGATION -->
   <aside class="sidebar">
@@ -191,60 +381,56 @@
         </ul>
       </nav>
     </div>
-
     <button class="logout-btn" id="logoutBtn">Log out</button>
   </aside>
 
   <!-- MAIN CONTENT AREA -->
   <main class="main-content">
-    
+
     <header class="dashboard-header">
-      <h1 style="font-size: 1.8rem; font-weight: 800;">Learn & Overview</h1>
-      <div style="display:flex; align-items:center; gap:12px;">
-        <div id="userAvatar" style="width:40px; height:40px; background:#ff5fa2; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">?</div>
-        <span id="userName" style="font-weight:800;">Guest</span>
+      <h1>Learn & Overview</h1>
+      <div class="user-badge">
+        <div class="avatar" id="userAvatar">?</div>
+        <span class="user-name" id="userName">Guest</span>
       </div>
     </header>
 
     <!-- METRICS GRID -->
     <section class="dashboard-grid">
-      
+
       <div class="card highlight-card">
         <div>
-          <h2 style="font-size:1.1rem; font-weight:700;">Total Signs Mastered</h2>
-          <div style="font-size:2.8rem; font-weight:800;" id="totalSignsValue">0</div>
+          <h2 class="card-title">Total Signs Mastered</h2>
+          <div class="big-number" id="totalSignsValue">0</div>
         </div>
         <span id="completionRateText" style="font-weight:700;">0% core curriculum completed</span>
       </div>
 
-      <!-- Combined Analytics & Module Progress -->
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h2 style="font-size:1.1rem; font-weight:800;">Curriculum Progress</h2>
-          <span id="modulePercentText" style="font-weight:800; color:#d63384;">0%</span>
+        <div class="progress-header">
+          <h2 class="card-title">Curriculum Progress</h2>
+          <span id="modulePercentText" style="font-weight:800; color:var(--primary-dark);">0%</span>
         </div>
         <div class="progress-bar-container">
           <div class="progress-bar-fill" id="moduleProgressFill"></div>
         </div>
-        <p style="font-size:0.85rem; color:#833a5c; margin-top:16px; font-weight:600;">
+        <p class="card-subtitle">
           Real-time tracking of unlocked lessons across all core modules.
         </p>
       </div>
 
-      <!-- Streak Badge -->
       <div class="card" style="text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-        <h2 style="font-size:1rem; font-weight:800;">Current Streak</h2>
-        <div id="streakBadge" style="font-size:2rem; font-weight:800; color:#d63384; margin:12px 0;">0 </div>
-        <span style="font-size:0.8rem; color:#833a5c; font-weight:600;">Days active</span>
+        <h2 class="card-title">Current Streak</h2>
+        <div class="streak-number" id="streakBadge">0</div>
+        <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Days active</span>
       </div>
-
     </section>
 
-    <!-- LESSONS & DIRECT PRACTICE ROUTING -->
+    <!-- LESSONS & PRACTICE -->
     <section class="grid-row-bottom">
-      
+
       <div class="card">
-        <h2 style="font-size:1.1rem; font-weight:800; margin-bottom:12px;">Sign Language Modules</h2>
+        <h2 class="card-title" style="margin-bottom:12px;">Sign Language Modules</h2>
         <table class="lessons-table">
           <thead>
             <tr>
@@ -254,156 +440,336 @@
             </tr>
           </thead>
           <tbody id="lessonsTableBody">
-            <!-- Dynamic Injection -->
+            <tr><td colspan="3" style="text-align:center; padding:32px; color:var(--text-faint);">Loading modules...</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Direct Practice Mode Card -->
       <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
         <div>
-          <h2 style="font-size:1.1rem; font-weight:800;">Practice Mode</h2>
-          <p style="font-size:0.85rem; color:#833a5c; margin-top:8px; line-height:1.4; font-weight:600;">
+          <h2 class="card-title">Practice Mode</h2>
+          <p class="card-subtitle" style="margin-top:8px;">
             Test your sign recognition live using web camera recognition.
           </p>
         </div>
-        <a href="collect.html" class="btn-action" style="text-align:center;">Start Practice Mode</a>
+        <a href="collect.html" class="btn-action" style="text-align:center; margin-top:16px;">Start Practice Mode</a>
       </div>
-
     </section>
 
   </main>
 
-  <!-- REALTIME SUPABASE & LOGIC SCRIPT -->
-  <script>
-    const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <!-- ── APP LOGIC ─────────────────────────────────────────── -->
+  <script type="module">
+    // ── Config ──
+    const CONFIG = {
+      SUPABASE_URL: 'https://xxijjaiytnqrdbqjegjr.supabase.co',
+      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8',
+      SIGNS_PER_MODULE: 10,
+      CATEGORIES: [
+        { id: 'greetings',  name: '#1 : Greetings' },
+        { id: 'relations', name: '#2 : Relationships' },
+        { id: 'emotions',   name: '#3 : Emotions' },
+        { id: 'general',    name: '#4 : General' },
+        { id: 'abc',        name: '#5 : ABC Basics' }
+      ]
+    };
 
-    const CATEGORIES = [
-      { id: 'greetings', name: '#1 : Greetings' },
-      { id: 'relations', name: '#2 : Relationships' },
-      { id: 'emotions',  name: '#3 : Emotions' },
-      { id: 'general',   name: '#4 : General' },
-      { id: 'abc',       name: '#5 : ABC Basics' }
-    ];
+    // ── State ──
+    const state = {
+      user: null,
+      completedCategories: [],
+      streak: 0,
+      realtimeChannel: null,
+      isSaving: false
+    };
 
-    let realtimeChannel = null;
+    // ── Supabase Client ──
+    const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
 
-    async function fetchAndRenderData() {
-      const { data: { session } } = await _supabase.auth.getSession();
-      
-      let completedCategories = [];
-      let streak = 0;
+    // ── DOM Helpers ──
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => document.querySelectorAll(sel);
 
-      if (session) {
-        const user = session.user;
-        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Learner';
-        
-        document.getElementById('userName').textContent = name;
-        document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-
-        const { data: profile } = await _supabase
-          .from('profiles')
-          .select('streak')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profile) streak = profile.streak ?? 0;
-
-        const { data: progressData } = await _supabase
-          .from('user_progress')
-          .select('category_id')
-          .eq('user_id', user.id);
-
-        if (progressData) {
-          completedCategories = progressData.map(i => i.category_id);
-        }
-      } else {
-        document.getElementById('userName').textContent = 'Guest';
-        document.getElementById('userAvatar').textContent = '?';
-      }
-
-      // Update Dashboard Metrics
-      document.getElementById('totalSignsValue').textContent = completedCategories.length * 10;
-      const percent = Math.round((completedCategories.length / CATEGORIES.length) * 100);
-      document.getElementById('completionRateText').textContent = `${percent}% core curriculum completed`;
-      document.getElementById('modulePercentText').textContent = `${percent}%`;
-      document.getElementById('moduleProgressFill').style.width = `${percent}%`;
-      document.getElementById('streakBadge').textContent = `${streak} `;
-
-      renderTable(completedCategories);
+    function showToast(message, type = 'info') {
+      const container = $('#toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
     }
 
-    function renderTable(completed) {
-      const tbody = document.getElementById('lessonsTableBody');
+    // ── Auth ──
+    async function getSession() {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) console.error('Session error:', error);
+      return data?.session ?? null;
+    }
+
+    async function getUserProfile(userId) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('streak, full_name')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error) console.error('Profile fetch error:', error);
+      return data ?? { streak: 0, full_name: null };
+    }
+
+    async function getUserProgress(userId) {
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('category_id, completed_at')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Progress fetch error:', error);
+        return [];
+      }
+      return data ?? [];
+    }
+
+    // ── Progress Saving (Real-time) ──
+
+    /**
+     * Save a completed category to Supabase.
+     * Called when a lesson page reports completion via postMessage or URL param.
+     */
+    async function saveCategoryProgress(categoryId) {
+      if (!state.user) {
+        showToast('Please log in to save progress', 'error');
+        return { success: false, error: 'Not authenticated' };
+      }
+      if (state.completedCategories.includes(categoryId)) {
+        return { success: true, alreadyDone: true };
+      }
+      if (state.isSaving) {
+        return { success: false, error: 'Save in progress' };
+      }
+
+      state.isSaving = true;
+      showToast(`Saving progress for ${categoryId}...`);
+
+      try {
+        const { error } = await supabase
+          .from('user_progress')
+          .upsert({
+            user_id: state.user.id,
+            category_id: categoryId,
+            completed_at: new Date().toISOString()
+          }, { onConflict: 'user_id,category_id' });
+
+        if (error) throw error;
+
+        // Update local state immediately for instant UI feedback
+        state.completedCategories.push(categoryId);
+        updateDashboardUI();
+
+        showToast('Progress saved! ', 'success');
+        return { success: true };
+
+      } catch (err) {
+        console.error('Save failed:', err);
+        showToast('Failed to save progress. Retrying...', 'error');
+
+        // Retry once after 2s
+        setTimeout(() => saveCategoryProgress(categoryId), 2000);
+        return { success: false, error: err.message };
+      } finally {
+        state.isSaving = false;
+      }
+    }
+
+    /**
+     * Update streak count in database.
+     */
+    async function updateStreak(newStreak) {
+      if (!state.user) return;
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ id: state.user.id, streak: newStreak }, { onConflict: 'id' });
+
+      if (error) console.error('Streak update error:', error);
+    }
+
+    // ── UI Rendering ──
+    function updateDashboardUI() {
+      const completed = state.completedCategories;
+      const totalModules = CONFIG.CATEGORIES.length;
+      const percent = Math.round((completed.length / totalModules) * 100);
+      const totalSigns = completed.length * CONFIG.SIGNS_PER_MODULE;
+
+      $('#totalSignsValue').textContent = totalSigns;
+      $('#completionRateText').textContent = `${percent}% core curriculum completed`;
+      $('#modulePercentText').textContent = `${percent}%`;
+      $('#moduleProgressFill').style.width = `${percent}%`;
+      $('#streakBadge').textContent = state.streak;
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = $('#lessonsTableBody');
+      const completed = state.completedCategories;
       tbody.innerHTML = '';
 
-      CATEGORIES.forEach((cat, idx) => {
+      CONFIG.CATEGORIES.forEach((cat, idx) => {
         const isDone = completed.includes(cat.id);
-        const isUnlocked = idx === 0 || completed.includes(CATEGORIES[idx - 1].id);
+        const isUnlocked = idx === 0 || completed.includes(CONFIG.CATEGORIES[idx - 1].id);
 
         const tr = document.createElement('tr');
+
+        // Status styling
+        let statusClass, statusText;
+        if (isDone) {
+          statusClass = 'status-completed';
+          statusText = '✓ Completed';
+        } else if (isUnlocked) {
+          statusClass = 'status-available';
+          statusText = 'Available';
+        } else {
+          statusClass = 'status-locked';
+          statusText = 'Locked';
+        }
+
+        // Action button
+        let actionCell;
+        if (isUnlocked) {
+          const link = document.createElement('a');
+          link.href = `lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}`;
+          link.className = 'btn-action';
+          link.textContent = isDone ? 'Review' : 'Start';
+          actionCell = link.outerHTML;
+        } else {
+          actionCell = '<span style="color:#94a3b8; font-weight:700;">Locked</span>';
+        }
+
         tr.innerHTML = `
-          <td style="font-weight: 700;">${cat.name}</td>
-          <td>
-            <span style="font-weight:800; color:${isDone ? '#15803d' : (isUnlocked ? '#be185d' : '#64748b')};">
-              ${isDone ? '✓ Completed' : (isUnlocked ? 'Available' : 'Locked')}
-            </span>
-          </td>
-          <td>
-            ${isUnlocked 
-              ? `<a href="lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}" class="btn-action">${isDone ? 'Review' : 'Start'}</a>`
-              : `<span style="color:#94a3b8; font-weight:700;">Locked</span>`}
-          </td>
+          <td style="font-weight:700;">${cat.name}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>${actionCell}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
+    // ── Real-time Listener ──
     async function initRealtimeListener() {
-      const { data: { session } } = await _supabase.auth.getSession();
-      if (!session) return;
-
-      if (realtimeChannel) {
-        _supabase.removeChannel(realtimeChannel);
+      if (!state.user) return;
+      if (state.realtimeChannel) {
+        await supabase.removeChannel(state.realtimeChannel);
       }
 
-      realtimeChannel = _supabase
-        .channel('dashboard-realtime-changes')
+      state.realtimeChannel = supabase
+        .channel('dashboard-progress')
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
             table: 'user_progress',
-            filter: `user_id=eq.${session.user.id}`
+            filter: `user_id=eq.${state.user.id}`
           },
-          () => {
-            fetchAndRenderData();
+          (payload) => {
+            console.log('Realtime update:', payload);
+            // Refresh data from server to stay in sync
+            refreshData();
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          console.log('Realtime subscription status:', status);
+        });
     }
 
-    // Auto-update on tab focus
-    window.addEventListener('focus', fetchAndRenderData);
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) fetchAndRenderData();
+    // ── Data Refresh ──
+    async function refreshData() {
+      const session = await getSession();
+
+      if (session?.user) {
+        state.user = session.user;
+        const name = state.user.user_metadata?.full_name || state.user.email?.split('@')[0] || 'Learner';
+
+        $('#userName').textContent = name;
+        $('#userAvatar').textContent = name.charAt(0).toUpperCase();
+
+        const [profile, progressData] = await Promise.all([
+          getUserProfile(state.user.id),
+          getUserProgress(state.user.id)
+        ]);
+
+        state.streak = profile.streak ?? 0;
+        state.completedCategories = progressData.map(i => i.category_id);
+
+      } else {
+        state.user = null;
+        state.streak = 0;
+        state.completedCategories = [];
+        $('#userName').textContent = 'Guest';
+        $('#userAvatar').textContent = '?';
+      }
+
+      updateDashboardUI();
+    }
+
+    // ── Cross-tab / Lesson Communication ──
+
+    /**
+     * Listen for messages from lesson.html (same-origin postMessage)
+     */
+    window.addEventListener('message', async (event) => {
+      // Security: verify origin if lesson.html is on same domain
+      if (event.origin !== window.location.origin) return;
+
+      const { type, categoryId } = event.data || {};
+      if (type === 'LESSON_COMPLETE' && categoryId) {
+        console.log('Received lesson completion:', categoryId);
+        await saveCategoryProgress(categoryId);
+      }
     });
 
-    // Logout Handling
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      if (realtimeChannel) _supabase.removeChannel(realtimeChannel);
-      await _supabase.auth.signOut();
+    /**
+     * Check URL params for lesson completion (fallback for non-postMessage)
+     */
+    function checkUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const completedCat = params.get('completed');
+      if (completedCat) {
+        saveCategoryProgress(completedCat);
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    // ── Visibility & Focus ──
+    window.addEventListener('focus', () => {
+      refreshData();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refreshData();
+    });
+
+    // ── Logout ──
+    $('#logoutBtn').addEventListener('click', async () => {
+      if (state.realtimeChannel) await supabase.removeChannel(state.realtimeChannel);
+      await supabase.auth.signOut();
       window.location.href = 'login.html';
     });
 
-    // Init on Load
+    // ── Init ──
     document.addEventListener('DOMContentLoaded', async () => {
-      await fetchAndRenderData();
+      await refreshData();
       await initRealtimeListener();
+      checkUrlParams();
     });
+
+    // ── Expose API for lesson pages ──
+    window.IsharaDashboard = {
+      saveProgress: saveCategoryProgress,
+      refresh: refreshData,
+      getState: () => ({ ...state })
+    };
   </script>
 </body>
 </html>
