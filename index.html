@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SignPath</title>
+  <title>Ishara</title>
 
   
   <style>
@@ -64,7 +64,22 @@
 
     <h1 class="logo">Ishara</h1>
     <p class="subtitle">Learn Indian Sign Language.</p>
-    <a href="learn.html" class="start-btn">Start Learning</a>
+    <form class="terms-form" id="consent-form">
+  <div class="checkbox-group">
+    <label class="checkbox-label">
+      <input type="checkbox" id="age-check" class="custom-checkbox">
+      <span>I am at least 13 years old</span>
+    </label>
+    
+    <label class="checkbox-label">
+      <input type="checkbox" id="tos-check" class="custom-checkbox">
+      <span>I have read the <a href="#" class="inline-link">Terms of Service</a></span>
+    </label>
+  </div>
+
+  <button type="submit" id="start-btn" class="start-btn" disabled>Start Learning</button>
+      <a href="tos.html" target="_blank" class="inline-link">Terms of Service</a>
+</form>
   </section>
 
   <!-- ====== ANIMATION ====== -->
