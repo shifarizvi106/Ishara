@@ -3,192 +3,480 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ishara - Learn</title>
+  <title>Ishara - Dashboard</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    /* ====== SINGLE PROFILE CARD (MATCHING SCREENSHOT) ====== */
-    .guest-profile-card {
-      background: #ffe6f2;
-      border-radius: 24px;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: #fff0f6;
+      color: #1f2937;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ====== SIDEBAR NAVIGATION ====== */
+    .sidebar {
+      width: 240px;
+      background-color: #ffffff;
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
-      margin-bottom: 20px;
+      justify-content: space-between;
+      border-right: 1px solid #fbcfe8;
+      flex-shrink: 0;
     }
 
-    .guest-avatar {
-      width: 64px;
-      height: 64px;
-      background: #ec4899;
+    .brand {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #d63384;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+      padding-left: 12px;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #a14a76;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item.active a, .nav-item a:hover {
+      background-color: #ff5fa2;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(255, 95, 162, 0.25);
+    }
+
+    .logout-btn {
+      color: #a14a76;
+      background: none;
+      border: none;
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      border-radius: 12px;
+      transition: background 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #ffe6f2;
+      color: #be185d;
+    }
+
+    /* ====== MAIN DASHBOARD WRAPPER ====== */
+    .main-content {
+      flex: 1;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 1400px;
+    }
+
+    /* Top Bar Header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dashboard-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-input {
+      background: #ffffff;
+      border: 1px solid #f4b6d2;
+      padding: 10px 16px;
+      border-radius: 10px;
+      color: #1f2937;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #f4b6d2;
+    }
+
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      background: #ff5fa2;
       color: white;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
       font-weight: 800;
-      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3);
-      margin-bottom: 8px;
+      font-size: 0.85rem;
     }
 
-    .guest-name {
-      font-size: 1.25rem;
+    /* ====== GRID LAYOUT ====== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1.8fr 1.2fr;
+      gap: 20px;
+    }
+
+    .grid-row-bottom {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    /* Common Card Styling */
+    .card {
+      background-color: #ffffff;
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid #fbcfe8;
+      box-shadow: 0 4px 12px rgba(255, 95, 162, 0.05);
+    }
+
+    /* Card 1: Main Highlight Card */
+    .highlight-card {
+      background: linear-gradient(135deg, #ff5fa2, #d63384);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 220px;
+      border: none;
+      box-shadow: 0 10px 25px rgba(255, 95, 162, 0.3);
+    }
+
+    .highlight-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      opacity: 0.95;
+    }
+
+    .highlight-value {
+      font-size: 2.5rem;
       font-weight: 800;
-      color: #1f2937;
+      margin-top: 12px;
+    }
+
+    /* Card 2: Select Course Dropdown & Progress */
+    .course-report-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 16px;
     }
 
-    .guest-stats-row {
-      display: flex;
-      gap: 10px;
-      width: 100%;
+    .card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #1f2937;
     }
 
-    .guest-stat-box {
-      flex: 1;
-      background: white;
-      border-radius: 16px;
-      padding: 12px 6px;
+    .course-select-dropdown {
+      background: #fdf2f8;
+      border: 1px solid #f4b6d2;
+      color: #1f2937;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .progress-bar-container {
+      background: #ffe6f2;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .progress-bar-fill {
+      background: #ff5fa2;
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Card 3: Activity / Streak */
+    .stats-card {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      text-align: center;
     }
 
-    .guest-stat-value {
-      font-size: 1.2rem;
+    .radial-badge {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 8px solid #ff5fa2;
+      border-top-color: #ffe6f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
       font-weight: 800;
       color: #d63384;
-      line-height: 1;
-      margin-bottom: 4px;
+      margin: 12px 0;
     }
 
-    .guest-stat-label {
-      font-size: 0.68rem;
-      font-weight: 700;
+    /* Table Styling for Lessons List */
+    .lessons-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      text-align: left;
+    }
+
+    .lessons-table th {
       color: #a14a76;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #fbcfe8;
     }
 
-    /* Toast Alert Message */
+    .lessons-table td {
+      padding: 14px 0;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #fbcfe8;
+      color: #1f2937;
+    }
+
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .status-pill.completed {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-pill.available {
+      background: #ffe6f2;
+      color: #be185d;
+    }
+
+    .status-pill.locked {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .btn-action {
+      background: #ff5fa2;
+      color: white;
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      transition: background 0.2s;
+    }
+
+    .btn-action:hover {
+      background: #d63384;
+    }
+
+    /* Toast Notification */
     #toast {
       position: fixed;
-      bottom: 90px;
-      left: 50%;
-      transform: translateX(-50%);
+      bottom: 24px;
+      right: 24px;
       background: #3a2a33;
       color: white;
-      padding: 10px 22px;
-      border-radius: 999px;
-      font-size: 0.85rem;
+      padding: 12px 20px;
+      border-radius: 10px;
       font-weight: 700;
+      font-size: 0.85rem;
       opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 999;
+      transition: opacity 0.3s;
       pointer-events: none;
-      white-space: nowrap;
     }
   </style>
-
-  <!-- Supabase JS Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <div class="dashboard-container">
-    
-    <!-- ====== COMBINED USER/GUEST PROFILE CARD ====== -->
-    <header class="guest-profile-card">
-      <div class="guest-avatar" id="user-avatar">?</div>
-      <div class="guest-name" id="user-name">Guest</div>
+  <!-- ====== SIDE NAVIGATION ====== -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">ISHARA</div>
+      <ul class="nav-menu">
+        <li class="nav-item active"><a href="learn.html">Dashboard</a></li>
+        <li class="nav-item"><a href="practice.html">Practice Mode</a></li>
+        <li class="nav-item"><a href="progress.html">Analytics</a></li>
+        <li class="nav-item"><a href="profile.html">Profile</a></li>
+      </ul>
+    </div>
+    <button class="logout-btn" id="logoutBtn">Log out</button>
+  </aside>
 
-      <div class="guest-stats-row">
-        <div class="guest-stat-box">
-          <span class="guest-stat-value" id="starsDisplay">0</span>
-          <span class="guest-stat-label">★ stars</span>
-        </div>
-        <div class="guest-stat-box">
-          <span class="guest-stat-value" id="learnedDisplay">0</span>
-          <span class="guest-stat-label">signs learned</span>
-        </div>
-        <div class="guest-stat-box">
-          <span class="guest-stat-value" id="streakDisplay">0</span>
-          <span class="guest-stat-label"> streak</span>
+  <!-- ====== MAIN CONTENT AREA ====== -->
+  <main class="main-content">
+    
+    <!-- Top Header Bar -->
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">Overview</h1>
+      <div class="header-right">
+        <input type="text" class="search-input" placeholder="Search lessons...">
+        <div class="user-profile-badge">
+          <div class="user-avatar-circle" id="userAvatar">?</div>
+          <span id="userName" style="font-size: 0.88rem; font-weight: 800; color: #1f2937;">Guest</span>
         </div>
       </div>
     </header>
 
-    <!-- ====== COURSE DROPDOWN SELECTOR ====== -->
-    <section class="course-selector-card">
-      <label for="course-select" class="course-label">Select Course</label>
-      <select id="course-select" class="course-dropdown">
-        <option value="greetings">#1 : Greetings</option>
-        <option value="relations">#2 : Relationships</option>
-        <option value="emotions">#3 : Emotions</option>
-        <option value="general">#4 : General</option>
-        <option value="abc">#5 : ABC Basics</option>
-      </select>
+    <!-- TOP GRID CARDS -->
+    <section class="dashboard-grid">
+      
+      <!-- Card 1: Overall Completion -->
+      <div class="card highlight-card">
+        <div>
+          <span class="highlight-title">Total Signs Mastered</span>
+          <div class="highlight-value" id="totalSignsValue">0</div>
+        </div>
+        <span style="font-size: 0.85rem; opacity: 0.9;" id="completionRateText">0% of core curriculum completed</span>
+      </div>
+
+      <!-- Card 2: Course Selector & Detailed Progress -->
+      <div class="card course-report-card">
+        <div class="card-header">
+          <span class="card-title">Active Module</span>
+          <select id="courseSelect" class="course-select-dropdown">
+            <option value="greetings">#1 : Greetings</option>
+            <option value="relations">#2 : Relationships</option>
+            <option value="emotions">#3 : Emotions</option>
+            <option value="general">#4 : General</option>
+            <option value="abc">#5 : ABC Basics</option>
+          </select>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #a14a76; font-weight: 700;">
+            <span>Module Progress</span>
+            <span id="modulePercentText">0%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="moduleProgressFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Activity / Streak -->
+      <div class="card stats-card">
+        <span class="card-title">Current Streak</span>
+        <div class="radial-badge" id="streakBadge">0</div>
+        <span style="font-size: 0.8rem; color: #a14a76; font-weight: 600;">Keep learning daily to increase your streak!</span>
+      </div>
+
     </section>
 
-    <!-- ====== OVERALL COURSE PROGRESS CARD ====== -->
-    <section class="progress-card">
-      <div class="progress-info">
-        <span class="progress-title">Overall Progress</span>
-        <span class="progress-percentage" id="progress-text">0%</span>
+    <!-- BOTTOM GRID CARDS -->
+    <section class="grid-row-bottom">
+      
+      <!-- Card 4: Lesson Modules Path Table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Curriculum Modules</span>
+        </div>
+        <table class="lessons-table">
+          <thead>
+            <tr>
+              <th>Module Name</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="lessonsTableBody">
+            <!-- Dynamic Content via JS -->
+          </tbody>
+        </table>
       </div>
-      <div class="progress-bar-track">
-        <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+
+      <!-- Card 5: Quick Practice Mode Action Card -->
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <span class="card-title">Quick Practice</span>
+          <p style="font-size: 0.85rem; color: #a14a76; margin-top: 8px; line-height: 1.4; font-weight: 500;">
+            Review signs you've unlocked and test your recall speed in flashcard mode.
+          </p>
+        </div>
+        <a href="practice.html" class="btn-action" style="text-align: center; padding: 12px; margin-top: 16px;">Start Practice</a>
       </div>
+
     </section>
 
-    <!-- ====== PRACTICE MODE CARD ====== -->
-    <section class="practice-mode-card">
-      <div class="practice-text">
-        <h3>Practice Mode</h3>
-        <p>Review learned signs and test your speed.</p>
-      </div>
-      <a href="collect.html" class="practice-btn">Start Practice</a>
-    </section>
+  </main>
 
-    <!-- ====== DYNAMIC LESSON PATH GRID ====== -->
-    <main class="learn">
-      <div class="path" id="lessonPath">
-        <!-- Built Dynamically via JavaScript -->
-      </div>
-    </main>
-
-  </div>
-
-  <!-- Toast Container -->
+  <!-- Toast Element -->
   <div id="toast"></div>
 
-  <!-- ====== BOTTOM NAVIGATION ====== -->
-  <nav class="bottom-nav">
-    <a href="learn.html" class="nav active">Learn</a>
-    <a href="progress.html" class="nav">Progress</a>
-    <a href="profile.html" class="nav">Profile</a>
-  </nav>
-
-  <!-- ====== DASHBOARD & SUPABASE LOGIC ====== -->
+  <!-- ====== SUPABASE & DASHBOARD LOGIC ====== -->
   <script>
     const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const CATEGORIES = [
-      { id: 'greetings', label: '#1 : Greetings',   name: 'Greetings' },
-      { id: 'relations', label: '#2 : Relations',   name: 'Relationships' },
-      { id: 'emotions',  label: '#3 : Emotions',    name: 'Emotions' },
-      { id: 'general',   label: '#4 : General',     name: 'General' },
-      { id: 'abc',       label: '#5 : ABC',         name: 'ABC Basics' },
+      { id: 'greetings', name: '#1 : Greetings' },
+      { id: 'relations', name: '#2 : Relationships' },
+      { id: 'emotions',  name: '#3 : Emotions' },
+      { id: 'general',   name: '#4 : General' },
+      { id: 'abc',       name: '#5 : ABC Basics' }
     ];
 
     function showToast(msg) {
@@ -202,28 +490,23 @@
       const { data: { session } } = await _supabase.auth.getSession();
       
       let completedCategories = [];
-      let stars = 0;
       let streak = 0;
 
       if (session) {
-        // User is Logged In
         const user = session.user;
-        const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Learner';
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Learner';
         
-        document.getElementById('user-name').textContent = displayName;
-        document.getElementById('user-avatar').textContent = displayName.charAt(0).toUpperCase();
+        document.getElementById('userName').textContent = name;
+        document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
 
         // Fetch User Profile Stats
         const { data: profile } = await _supabase
           .from('profiles')
-          .select('stars, streak')
+          .select('streak')
           .eq('id', user.id)
           .single();
 
-        if (profile) {
-          stars = profile.stars ?? 0;
-          streak = profile.streak ?? 0;
-        }
+        if (profile) streak = profile.streak ?? 0;
 
         // Fetch User Progress
         const { data: progressData } = await _supabase
@@ -232,84 +515,52 @@
           .eq('user_id', user.id);
 
         if (progressData) {
-          completedCategories = progressData.map(item => item.category_id);
+          completedCategories = progressData.map(i => i.category_id);
         }
-      } else {
-        // User is NOT Signed In -> Stay as Guest with ? Avatar
-        document.getElementById('user-name').textContent = 'Guest';
-        document.getElementById('user-avatar').textContent = '?';
       }
 
-      // Update Card Stats
-      document.getElementById('starsDisplay').textContent = stars;
-      document.getElementById('learnedDisplay').textContent = completedCategories.length;
-      document.getElementById('streakDisplay').textContent = streak;
-
-      // Update Progress Bar
+      // Update Dashboard Metrics
+      document.getElementById('totalSignsValue').textContent = completedCategories.length * 10;
       const percent = Math.round((completedCategories.length / CATEGORIES.length) * 100);
-      document.getElementById('progress-text').textContent = `${percent}%`;
-      document.getElementById('progress-fill').style.width = `${percent}%`;
+      document.getElementById('completionRateText').textContent = `${percent}% of core curriculum completed`;
+      document.getElementById('modulePercentText').textContent = `${percent}%`;
+      document.getElementById('moduleProgressFill').style.width = `${percent}%`;
+      document.getElementById('streakBadge').textContent = `${streak}`;
 
-      // Render Lesson Path
-      renderNodes(completedCategories);
+      // Render Table
+      renderTable(completedCategories);
     }
 
-    function renderNodes(completed) {
-      const pathContainer = document.getElementById('lessonPath');
-      pathContainer.innerHTML = '';
+    function renderTable(completed) {
+      const tbody = document.getElementById('lessonsTableBody');
+      tbody.innerHTML = '';
 
-      CATEGORIES.forEach((cat, index) => {
+      CATEGORIES.forEach((cat, idx) => {
         const isDone = completed.includes(cat.id);
-        const isUnlocked = index === 0 || completed.includes(CATEGORIES[index - 1].id);
+        const isUnlocked = idx === 0 || completed.includes(CATEGORIES[idx - 1].id);
 
-        const node = document.createElement('div');
-
-        if (isUnlocked) {
-          node.className = `node active ${isDone ? 'done' : ''}`;
-          node.innerHTML = `
-            <span class="node-number">${index + 1}</span>
-            <span class="label">${cat.name} ${isDone ? '(Done)' : ''}</span>
-          `;
-          node.onclick = () => {
-            window.location.href = `lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}`;
-          };
-        } else {
-          node.className = 'node locked';
-          node.innerHTML = `
-            <span class="node-number">${index + 1}</span>
-            <span class="label">${cat.name}</span>
-          `;
-          node.onclick = () => {
-            showToast(`Complete ${CATEGORIES[index - 1].name} first!`);
-          };
-        }
-
-        pathContainer.appendChild(node);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: #1f2937;">${cat.name}</td>
+          <td>
+            <span class="status-pill ${isDone ? 'completed' : (isUnlocked ? 'available' : 'locked')}">
+              ${isDone ? 'Completed' : (isUnlocked ? 'Available' : 'Locked')}
+            </span>
+          </td>
+          <td>
+            ${isUnlocked 
+              ? `<a href="lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}" class="btn-action">${isDone ? 'Review' : 'Start'}</a>`
+              : `<span style="color:#94a3b8; font-size:0.8rem; font-weight: 700;">Locked</span>`}
+          </td>
+        `;
+        tbody.appendChild(tr);
       });
     }
 
-    document.getElementById('course-select').addEventListener('change', async (e) => {
-      const catId = e.target.value;
-      const { data: { session } } = await _supabase.auth.getSession();
-      
-      let completed = [];
-      if (session) {
-        const { data } = await _supabase
-          .from('user_progress')
-          .select('category_id')
-          .eq('user_id', session.user.id);
-        if (data) completed = data.map(item => item.category_id);
-      }
-
-      const index = CATEGORIES.findIndex(c => c.id === catId);
-      const isUnlocked = index === 0 || completed.includes(CATEGORIES[index - 1].id);
-      const isDone = completed.includes(catId);
-
-      if (isUnlocked) {
-        window.location.href = `lesson.html?cat=${catId}${isDone ? '&replay=1' : ''}`;
-      } else {
-        showToast(`Complete ${CATEGORIES[index - 1].name} first!`);
-      }
+    // Logout handling
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await _supabase.auth.signOut();
+      window.location.href = 'login.html';
     });
 
     document.addEventListener('DOMContentLoaded', initDashboard);
