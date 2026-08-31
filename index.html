@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SignPath</title>
 
- 
+  
   <style>
     @font-face {
       font-family: 'Croissant One';
@@ -16,10 +16,7 @@
     }
   </style>
 
-  <!-- Your existing stylesheet -->
   <link rel="stylesheet" href="style.css">
-
-  <!-- YOUR LOCAL GSAP BUNDLE -->
   <script src="assets/animation.js"></script>
 
   <style>
@@ -28,121 +25,33 @@
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: #0a0a0a;
-      overflow: hidden;
-    }
-
-    .pixso-splash-wrapper {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-    }
-
-    .Pixso-canvas-0_1 {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-
-    .Pixso-vector-2_1 {
-      width: 100%;
-      height: 100%;
-      min-width: unset !important;
-      background-image: url('assets/Webpage.svg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    /* Overlay on top of the Pixso SVG */
-    .splash-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
+      background: #FF74B4;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      pointer-events: none;
     }
 
-    .splash-overlay .logo-icon {
-      width: 64px;
-      height: 64px;
-      margin-bottom: 16px;
-      color: #ffffff;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
-    }
-
-    .splash-overlay .logo-icon svg {
-      width: 100%;
-      height: 100%;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .splash-overlay .brand-title {
-      font-family: 'Croissant One', cursive; 
-      font-size: clamp(2rem, 6vw, 4rem);
-      color: #ffffff;
-      letter-spacing: 2px;
+    .splash-text {
+      font-family: 'Croissant One', cursive;
+      font-size: clamp(3rem, 10vw, 6rem);
+      color: #F8F6F0;
+      letter-spacing: 4px;
       opacity: 0;
-      transform: translateY(20px);
-      text-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-
-    .splash-overlay .progress-wrapper {
-      margin-top: 32px;
-      width: min(240px, 60vw);
-      height: 4px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 2px;
-      overflow: hidden;
-      opacity: 0;
-    }
-
-    .splash-overlay .progress-bar {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, #ff6b6b, #feca57);
-      transform-origin: left;
-      transform: scaleX(0);
+      transform: translateY(30px);
     }
 
     /* Main content starts hidden */
     #main-content {
       visibility: hidden;
       opacity: 0;
-      transform: translateY(20px);
     }
   </style>
 </head>
 <body>
 
-  <!-- ====== SPLASH SCREEN ====== -->
+  <!-- ====== SPLASH SCREEN  ====== -->
   <div id="splash-screen">
-    <!-- Pixso SVG background -->
-    <div class="pixso-splash-wrapper">
-      <div id="0_1" class="Pixso-canvas-0_1">
-        <div id="2_1" class="Pixso-vector-2_1"></div>
-      </div>
-    </div>
-
-    <!-- Animated overlay -->
-    <div class="splash-overlay">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
-      </div>
-      <h1 class="brand-title">Ishara</h1>
-      <div class="progress-wrapper">
-        <div class="progress-bar"></div>
-      </div>
-    </div>
+    <h1 class="splash-text">Ishara</h1>
   </div>
 
   <!-- ====== MAIN LANDING ====== -->
@@ -163,39 +72,20 @@
     document.addEventListener("DOMContentLoaded", () => {
       const tl = gsap.timeline();
 
-      // Initial states
-      gsap.set(".logo-icon", { scale: 0, rotation: -180 });
-      gsap.set(".brand-title", { opacity: 0, y: 20 });
-      gsap.set("#main-content", { visibility: "hidden", opacity: 0, y: 20 });
-
-      // Splash sequence
-      tl.to(".logo-icon", {
-        scale: 1,
-        rotation: 0,
-        duration: 1,
-        ease: "back.out(1.7)"
-      })
-      .to(".brand-title", {
+      // Text fades/slides in
+      tl.to(".splash-text", {
         opacity: 1,
         y: 0,
-        duration: 0.6,
-        ease: "power2.out"
-      }, "-=0.4")
-      .to(".progress-wrapper", {
-        opacity: 1,
-        duration: 0.4
-      }, "-=0.2")
-      .to(".progress-bar", {
-        scaleX: 1,
-        duration: 1.5,
-        ease: "power1.inOut"
+        duration: 0.8,
+        ease: "power2.out",
+        delay: 0.3
       })
-
-      // Exit splash & reveal landing
+      // Hold briefly, then fade splash out
       .to("#splash-screen", {
         opacity: 0,
         duration: 0.8,
         ease: "power2.inOut",
+        delay: 1.2,
         onComplete: () => {
           document.getElementById("splash-screen").style.display = "none";
         }
@@ -203,7 +93,6 @@
       .set("#main-content", { visibility: "visible" })
       .to("#main-content", {
         opacity: 1,
-        y: 0,
         duration: 0.8,
         ease: "power2.out"
       }, "-=0.4");
