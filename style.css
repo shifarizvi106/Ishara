@@ -1,5 +1,4 @@
 
-
 /* ===== RESET ===== */
 * {
   box-sizing: border-box;
@@ -8,11 +7,15 @@
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, #ffe3f1, #fde6f2);
+  background-color: #fdf2f8;
+  background-image: 
+    radial-gradient(at 20% 20%, rgba(255, 182, 217, 0.45) 0px, transparent 50%),
+    radial-gradient(at 80% 80%, rgba(244, 114, 182, 0.25) 0px, transparent 50%);
   color: #3a2a33;
+  min-height: 100vh;
 }
 
-/* ===== LANDING ===== */
+/* ===== LANDING PAGE ===== */
 .landing {
   min-height: 100vh;
   display: flex;
@@ -20,23 +23,33 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
+  padding: 24px;
 }
 
-.logo {
-  font-size: 3.2rem;
+/* Glassmorphism Card Container */
+.landing-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 32px;
+  padding: 40px 32px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 20px 40px -15px rgba(244, 114, 182, 0.15);
+
+  /* Force vertical center alignment */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.subtitle {
-  color: #a14a76;
-  margin-bottom: 36px;
-}
-
-/* Butterfly */
+/* Butterfly Setup & Centering */
 .butterfly {
   position: relative;
   width: 90px;
   height: 70px;
-  margin-bottom: 24px;
+  margin: 0 auto 24px auto;
   animation: float 3s ease-in-out infinite;
 }
 
@@ -78,14 +91,113 @@ body {
   50% { transform: translateY(-12px); }
 }
 
+/* Typography */
+.logo {
+  font-family: 'Croissant One', cursive, serif;
+  font-size: 3.2rem;
+  font-weight: 400;
+  color: #111827;
+  margin: 0 0 6px 0;
+}
+
+.subtitle {
+  color: #a14a76;
+  margin: 0 0 24px 0;
+  font-size: 1rem;
+}
+
+/* Checkboxes & Highlighted Links */
+.terms-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.custom-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff5fa2;
+  cursor: pointer;
+}
+
+/* Pink Highlight & Underline on TOS */
+.inline-link {
+  color: #be185d;
+  font-weight: 600;
+  background-color: #fce7f3;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-decoration: underline;
+  text-decoration-color: #ec4899;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  transition: all 0.2s ease;
+}
+
+.inline-link:hover {
+  background-color: #fbcfe8;
+  color: #9d174d;
+  text-decoration-color: #db2777;
+}
+
+/* Start Learning Button & Disabled State */
 .start-btn {
   background: #ff5fa2;
   color: white;
-  text-decoration: none;
-  padding: 18px 36px;
+  border: none;
+  padding: 16px 36px;
   border-radius: 999px;
   font-weight: 800;
-  box-shadow: 0 10px 24px rgba(255,95,162,0.4);
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(255, 95, 162, 0.4);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.start-btn:hover:not(:disabled) {
+  background: #db2777;
+  transform: translateY(-2px);
+}
+
+.start-btn:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Micro Footer */
+.landing-footer {
+  margin-top: 24px;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.landing-footer a {
+  color: #6b7280;
+  text-decoration: none;
+}
+
+.landing-footer a:hover {
+  color: #ff5fa2;
 }
 
 /* ===== LEARN PAGE ===== */
@@ -128,7 +240,7 @@ body {
   background: #ff5fa2;
   color: white;
   opacity: 1;
-  box-shadow: 0 14px 30px rgba(255,95,162,0.45);
+  box-shadow: 0 14px 30px rgba(255, 95, 162, 0.45);
   animation: pulse 2s infinite;
 }
 
@@ -165,3 +277,4 @@ body {
 .nav.active {
   color: #ff5fa2;
 }
+
