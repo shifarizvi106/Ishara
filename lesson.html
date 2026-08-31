@@ -3,794 +3,371 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SignPath – Lesson</title>
+  <title>Ishara – Lesson</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    * { box-sizing:border-box; font-family:system-ui,-apple-system,sans-serif; margin:0; padding:0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
     body {
-      min-height:100vh;
-      background:linear-gradient(180deg,#ffe3f1,#fde6f2);
-      color:#3a2a33;
-      display:flex; flex-direction:column;
+      min-height: 100vh;
+      background-color: #fff0f6;
+      color: #1f2937;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ── Header ── */
     .lesson-header {
-      display:flex; align-items:center; gap:12px;
-      padding:18px 22px 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 32px;
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
     }
+
     .close-btn {
-      background:none; border:none; font-size:1.3rem;
-      color:#c77aa0; cursor:pointer; flex-shrink:0;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: #833a5c;
+      cursor: pointer;
+      font-weight: 800;
     }
+
     .progress-track {
-      flex:1; height:14px; background:#f4b6d2;
-      border-radius:999px; overflow:hidden;
+      flex: 1;
+      height: 10px;
+      background: #ffe6f2;
+      border-radius: 999px;
+      overflow: hidden;
     }
+
     .progress-fill {
-      height:100%; width:0%;
-      background:linear-gradient(90deg,#ff5fa2,#d63384);
-      border-radius:999px;
-      transition:width 0.5s cubic-bezier(.4,2,.6,1);
-    }
-    .lives-display { font-size:1.2rem; font-weight:800; flex-shrink:0; letter-spacing:3px; }
-
-    /* ── Category badge ── */
-    .cat-badge {
-      text-align:center; padding:4px 0 0;
-      font-size:0.72rem; font-weight:700;
-      color:#c77aa0; text-transform:uppercase; letter-spacing:2px;
+      height: 100%;
+      width: 0%;
+      background: #ff5fa2;
+      border-radius: 999px;
+      transition: width 0.3s ease;
     }
 
-    /* ── Stage ── */
+    /* ── Main Stage ── */
     .stage {
-      flex:1; display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      padding:16px 20px 110px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 24px 100px;
     }
+
     .card {
-      width:100%; max-width:380px;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      gap:14px; text-align:center;
-      animation:slideIn 0.35s cubic-bezier(.4,2,.6,1);
-    }
-    @keyframes slideIn {
-      from { opacity:0; transform:translateX(36px); }
-      to   { opacity:1; transform:translateX(0); }
-    }
-    .card.exit {
-      animation:slideOut 0.22s ease-in forwards;
-      pointer-events:none;
-    }
-    @keyframes slideOut {
-      to { opacity:0; transform:translateX(-36px); }
+      background: #ffffff;
+      border: 1px solid #fbcfe8;
+      border-radius: 24px;
+      padding: 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 4px 20px rgba(255, 95, 162, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+      animation: fadeIn 0.25s ease-out;
     }
 
-    /* ── Show phase ── */
-    .phase-label {
-      font-size:0.7rem; font-weight:700; color:#c77aa0;
-      text-transform:uppercase; letter-spacing:2px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .emoji-box {
-      width:130px; height:130px; background:white;
-      border-radius:28px;
-      box-shadow:0 10px 32px rgba(255,95,162,0.2);
-      display:flex; align-items:center; justify-content:center;
-      font-size:5rem;
+
+    .cat-badge {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #d63384;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
     }
+
     .sign-name {
-      font-size:2rem; font-weight:900; color:#d63384;
-    }
-    .sign-desc {
-      background:white; border-radius:18px;
-      padding:14px 18px; width:100%;
-      box-shadow:0 4px 16px rgba(255,95,162,0.1);
-      font-size:0.88rem; color:#3a2a33;
-      line-height:1.65; text-align:center;
-    }
-    .sign-tip {
-      font-size:0.76rem; color:#a14a76;
-      font-style:italic; text-align:center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #1f2937;
     }
 
-    /* ── Sign image ── */
     .sign-img-wrap {
-      width:220px; height:220px;
-      background:white; border-radius:28px;
-      box-shadow:0 10px 32px rgba(255,95,162,0.2);
-      display:flex; align-items:center; justify-content:center;
-      overflow:hidden; position:relative;
+      width: 200px;
+      height: 200px;
+      background: #fff0f6;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
+
     .sign-img {
-      width:100%; height:100%; object-fit:contain;
-      padding:10px;
-    }
-    /* Fallback emoji shown when no image */
-    .sign-img-wrap .fallback {
-      font-size:5rem;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 12px;
     }
 
-    /* Animation: wave (Hello) */
-    .anim-wave {
-      animation:wave 1.2s ease-in-out infinite;
-      transform-origin:bottom center;
-    }
-    @keyframes wave {
-      0%,100% { transform:rotate(-8deg); }
-      50%     { transform:rotate(8deg); }
+    .fallback-emoji {
+      font-size: 4.5rem;
     }
 
-    /* Animation: sweep (Thank You) */
-    .anim-sweep {
-      animation:sweep 1.6s ease-in-out infinite;
-    }
-    @keyframes sweep {
-      0%,100% { transform:translate(0,0); }
-      50%     { transform:translate(12px, 10px); }
+    .sign-desc {
+      font-size: 0.95rem;
+      color: #4b5563;
+      line-height: 1.6;
+      font-weight: 500;
     }
 
-    /* Animation: pulse (static handshapes A-D) */
-    .anim-pulse {
-      animation:pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%,100% { transform:scale(1); }
-      50%     { transform:scale(1.06); }
-    }
-
-    /* Animation: fadein (default fallback) */
-    .anim-fadein {
-      animation:fadein 0.6s ease-out forwards;
-    }
-    @keyframes fadein {
-      from { opacity:0; transform:scale(0.9); }
-      to   { opacity:1; transform:scale(1); }
+    .sign-tip {
+      font-size: 0.85rem;
+      color: #833a5c;
+      font-style: italic;
+      background: #fff0f6;
+      padding: 10px 16px;
+      border-radius: 12px;
+      width: 100%;
     }
 
-    /* ── Quiz phase ── */
-    .quiz-prompt {
-      font-size:1rem; font-weight:700;
-      color:#3a2a33; text-align:center; line-height:1.5;
-    }
-    .quiz-emoji {
-      font-size:3.8rem; background:white;
-      border-radius:22px; padding:14px 22px;
-      box-shadow:0 6px 20px rgba(255,95,162,0.15);
-    }
-    .choices {
-      display:grid; grid-template-columns:1fr 1fr;
-      gap:10px; width:100%;
-    }
-    .choice-btn {
-      background:white; border:2.5px solid #f4b6d2;
-      border-radius:16px; padding:15px 10px;
-      font-size:0.92rem; font-weight:700; color:#3a2a33;
-      cursor:pointer; transition:border-color 0.15s;
-      line-height:1.3;
-    }
-    .choice-btn:not(:disabled):hover { border-color:#ff5fa2; }
-    .choice-btn.correct {
-      background:#d4f5e2; border-color:#28a745; color:#155724;
-      animation:pop 0.3s cubic-bezier(.4,2,.6,1);
-    }
-    .choice-btn.wrong {
-      background:#fde8ec; border-color:#dc3545; color:#721c24;
-      animation:shake 0.35s;
-    }
-    .choice-btn.reveal {
-      background:#d4f5e2; border-color:#28a745; color:#155724;
-    }
-    .choice-btn:disabled { cursor:default; }
-    @keyframes pop {
-      0%,100% { transform:scale(1); }
-      50%     { transform:scale(1.06); }
-    }
-    @keyframes shake {
-      0%,100% { transform:translateX(0); }
-      25%     { transform:translateX(-7px); }
-      75%     { transform:translateX(7px); }
-    }
-
-    /* ── Action button ── */
+    /* ── Action Footer ── */
     .action-wrap {
-      position:fixed; bottom:0; left:0; right:0;
-      padding:16px 22px 28px;
-      background:linear-gradient(to top,#fde6f2 55%,transparent);
-      display:flex; justify-content:center;
-    }
-    .action-wrap button {
-      background:linear-gradient(135deg,#ff5fa2,#d63384);
-      color:white; border:none; border-radius:999px;
-      padding:15px 0; font-size:1rem; font-weight:800;
-      cursor:pointer; width:100%; max-width:340px;
-      box-shadow:0 8px 24px rgba(255,95,162,0.35);
-      transition:transform 0.12s;
-    }
-    .action-wrap button:active { transform:scale(0.97); }
-
-    /* ── Feedback bar ── */
-    .feedback-bar {
-      position:fixed; bottom:0; left:0; right:0;
-      padding:16px 22px 28px;
-      display:flex; align-items:center; gap:12px;
-      transform:translateY(100%);
-      transition:transform 0.3s cubic-bezier(.4,2,.6,1);
-      z-index:20;
-    }
-    .feedback-bar.show { transform:translateY(0); }
-    .feedback-bar.ok  { background:#d4f5e2; }
-    .feedback-bar.bad { background:#fde8ec; }
-    .fb-icon  { font-size:1.8rem; }
-    .fb-text  { flex:1; }
-    .fb-title { font-size:0.95rem; font-weight:800; display:block; margin-bottom:2px; }
-    .ok  .fb-title { color:#155724; }
-    .bad .fb-title { color:#721c24; }
-    .fb-sub   { font-size:0.78rem; color:#555; }
-    .continue-btn {
-      border:none; border-radius:999px;
-      padding:11px 22px; font-size:0.88rem; font-weight:800;
-      cursor:pointer; flex-shrink:0; color:white;
-    }
-    .ok  .continue-btn { background:#28a745; }
-    .bad .continue-btn { background:#dc3545; }
-
-    /* ── XP pop ── */
-    .xp-pop {
-      position:fixed; top:28%; left:50%;
-      transform:translate(-50%,-50%) scale(0);
-      background:linear-gradient(135deg,#ff5fa2,#d63384);
-      color:white; font-size:1.8rem; font-weight:900;
-      border-radius:20px; padding:14px 28px;
-      box-shadow:0 16px 40px rgba(255,95,162,0.4);
-      pointer-events:none; z-index:60;
-      transition:transform 0.3s cubic-bezier(.4,2,.6,1),opacity 0.35s;
-      opacity:0;
-    }
-    .xp-pop.show { transform:translate(-50%,-50%) scale(1); opacity:1; }
-
-    /* ── Heart pop ── */
-    .heart-pop {
-      position:fixed; top:60px; right:22px;
-      font-size:1.4rem; pointer-events:none; z-index:50;
-      animation:heartUp 0.55s forwards;
-    }
-    @keyframes heartUp {
-      to { opacity:0; transform:translateY(-28px) scale(0.6); }
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 24px 32px;
+      background: linear-gradient(to top, #fff0f6 70%, transparent);
+      display: flex;
+      justify-content: center;
     }
 
-    /* ── Finish ── */
-    .finish {
-      flex:1; display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      gap:16px; padding:32px 24px 40px; text-align:center;
+    .btn-primary {
+      background: #ff5fa2;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 0;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 4px 12px rgba(255, 95, 162, 0.25);
+      transition: background 0.15s ease;
     }
-    .finish-emoji { font-size:5rem; animation:bounce 0.7s ease-in-out infinite alternate; }
-    @keyframes bounce { to { transform:translateY(-14px); } }
-    .finish-title { font-size:2rem; font-weight:900; color:#d63384; }
-    .finish-sub   { color:#a14a76; line-height:1.6; }
-    .xp-badge {
-      background:linear-gradient(135deg,#ff5fa2,#d63384);
-      color:white; border-radius:999px; padding:12px 28px;
-      font-size:1.1rem; font-weight:900;
-      box-shadow:0 8px 24px rgba(255,95,162,0.3);
+
+    .btn-primary:hover {
+      background: #d63384;
     }
-    .unlock-banner {
-      background:white; border-radius:20px; padding:14px 20px;
-      box-shadow:0 6px 20px rgba(255,95,162,0.15);
-      font-size:0.9rem; color:#3a2a33; text-align:center;
-      border:2px solid #f4b6d2;
+
+    /* ── Finish View ── */
+    .finish-card {
+      background: #ffffff;
+      border: 1px solid #fbcfe8;
+      border-radius: 24px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(255, 95, 162, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
     }
-    .unlock-banner strong { color:#d63384; }
-    .stat-row { display:flex; gap:10px; }
-    .stat-box {
-      background:white; border-radius:16px;
-      padding:12px 16px; text-align:center;
-      box-shadow:0 4px 14px rgba(255,95,162,0.1);
-      min-width:80px;
+
+    .finish-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1f2937;
     }
-    .stat-num { font-size:1.4rem; font-weight:900; color:#d63384; }
-    .stat-lbl { font-size:0.68rem; color:#a14a76; }
-    .back-btn {
-      background:white; border:2.5px solid #f4b6d2;
-      color:#a14a76; border-radius:999px;
-      padding:13px 36px; font-size:0.92rem; font-weight:800;
-      cursor:pointer; text-decoration:none; display:inline-block;
-    }
-    .retry-btn {
-      background:linear-gradient(135deg,#ff5fa2,#d63384);
-      color:white; border:none; border-radius:999px;
-      padding:13px 36px; font-size:0.92rem; font-weight:800;
-      cursor:pointer;
+
+    .finish-sub {
+      color: #6b7280;
+      font-size: 0.95rem;
     }
   </style>
 </head>
 <body>
 
-<div class="xp-pop" id="xpPop">+1 ★</div>
+  <header class="lesson-header">
+    <button class="close-btn" onclick="confirmExit()">✕</button>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </header>
 
-<header class="lesson-header">
-  <button class="close-btn" onclick="confirmExit()">✕</button>
-  <div class="progress-track">
-    <div class="progress-fill" id="progressFill"></div>
+  <main class="stage" id="stage"></main>
+
+  <div class="action-wrap" id="actionWrap">
+    <button class="btn-primary" id="actionBtn" onclick="nextStep()">Got it! Next Sign →</button>
   </div>
-  <div class="lives-display" id="livesEl">♡♡♡</div>
-</header>
 
-<div class="cat-badge" id="catBadge"></div>
-<main class="stage" id="stage"></main>
+  <script>
+    // SUPABASE SETUP
+    const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<div class="feedback-bar" id="feedbackBar">
-  <div class="fb-icon" id="fbIcon"></div>
-  <div class="fb-text">
-    <strong class="fb-title" id="fbTitle"></strong>
-    <span   class="fb-sub"   id="fbSub"></span>
-  </div>
-  <button class="continue-btn" onclick="nextStep()">Continue</button>
-</div>
-
-<script>
-// ─────────────────────────────────────────────
-// ALL LESSON DATA
-// ─────────────────────────────────────────────
-const ALL_LESSONS = {
-  greetings: {
-    label: 'Greetings',
-    next:  'relations',
-    nextLabel: 'Relations',
-    signs: [
-      {
-        word: 'Hello',
-        img:  'assets/hello.gif',
-        anim: '',
-        desc: 'Raise your right hand to your forehead in a salute, fingers together and flat.',
-        tip: 'Like a military salute — hand to the forehead!'
+    // LESSON DATA
+    const ALL_LESSONS = {
+      greetings: {
+        label: 'Greetings',
+        signs: [
+          { word: 'Hello', img: 'assets/hello.gif', desc: 'Raise your right hand to your forehead in a salute with fingers flat and together.', tip: 'Like a crisp salute towards the forehead.' },
+          { word: 'Thank You', img: 'assets/thankyou.gif', desc: 'Touch your fingers to your chin, then move your hand forward and down toward the person.', tip: 'Similar to blowing a kiss from your chin.' },
+          { word: 'How Are You', emoji: '🤝', desc: 'Point both index fingers toward each other at chest level and alternate them up and down.', tip: 'Expressive movement at chest height.' },
+          { word: "I'm Fine", emoji: '😊', desc: 'Place your hand flat on your chest and push outward in a subtle downward arc.', tip: 'Smooth gesture outward from your heart.' }
+        ]
       },
-      {
-        word: 'Thank You',
-        img:  'assets/thankyou.gif',
-        anim: '',
-        desc: 'Touch your chin with flat fingers, then sweep your hand forward and down.',
-        tip: 'Like blowing a kiss outward from your chin.'
+      relations: {
+        label: 'Relationships',
+        signs: [
+          { word: 'Mother', emoji: '👩', desc: 'Touch your nose with your index finger in a single, clear motion.', tip: 'Signifying mother.' },
+          { word: 'Father', emoji: '👨', desc: 'Twirl your mustache area with your index finger.', tip: 'Signifying father.' },
+          { word: 'Sister', emoji: '👧', desc: 'Touch index finger to nose, then move fingertips away from your shoulder.', tip: 'Female relation gesture.' },
+          { word: 'Brother', emoji: '👦', desc: 'Twirl mustache area, then move fingertips outward from your shoulder.', tip: 'Male relation gesture.' },
+          { word: 'Friend', emoji: '🤝', desc: 'Hook your index fingers together gently.', tip: 'Interlocking fingers bond.' }
+        ]
       },
-      {
-        word: 'How Are You',
-        emoji: '😹',
-        img:  null,
-        anim: 'anim-pulse',
-        desc: 'Point both index fingers toward each other at chest level, then move them up and down alternately.',
-        tip: 'Like asking a question with your hands in front of you.'
+      emotions: {
+        label: 'Emotions',
+        signs: [
+          { word: 'Happy', emoji: '😊', desc: 'Open your hand and sweep it gently upward near your chest.', tip: 'Upward motion with a smile.' },
+          { word: 'Sad', emoji: '😢', desc: 'Place open hand near face and move downward.', tip: 'Downward motion with expression.' },
+          { word: 'Angry', emoji: '😠', desc: 'Form a claw hand shape in front of face with tension.', tip: 'Claw shape indicates intensity.' },
+          { word: 'Love', emoji: '❤️', desc: 'Cross both arms comfortably over your chest.', tip: 'Universal embrace sign.' }
+        ]
       },
-      {
-        word: "I'm Fine",
-        emoji: '😨',
-        img:  null,
-        anim: 'anim-pulse',
-        desc: 'Place your right hand flat on your chest, then move it forward with a slight downward arc.',
-        tip: 'A calm, reassuring gesture from the heart outward.'
+      general: {
+        label: 'General',
+        signs: [
+          { word: 'Yes', emoji: '✅', desc: 'Make a fist and nod it forward and down.', tip: 'Fist mimics head nodding.' },
+          { word: 'No', emoji: '❌', desc: 'Snap index and middle finger closed against thumb.', tip: 'Quick, decisive motion.' },
+          { word: 'Help', emoji: '🆘', desc: 'Place flat hand under opposite fist and lift together.', tip: 'Lifting hand supports the other.' },
+          { word: 'Water', emoji: '💧', desc: 'Form W shape with fingers and tap index against chin.', tip: 'W shape at chin.' }
+        ]
       },
-    ]
-  },
-  relations: {
-    label: 'Relations',
-    next:  'emotions',
-    nextLabel: 'Emotions',
-    signs: [
-      {
-        word: 'Mother',
-        emoji: '👩',
-        desc: 'Touch your nose with your index finger and point the number 1 ',
-        tip: 'Mother as the first woman in your life.'
-      },
-      {
-        word: 'Father',
-        emoji: '👨',
-        desc: 'Twirl your mustache and point 1 with your index finger.',
-        tip: 'Father as the first man in your life.'
-      },
-      {
-        word: 'Sister',
-        emoji: '👧',
-        desc: 'Index finger to your nose (like in mother) and then place your fingertips to your shoulder and move them away from your shoulder in the same position ',
-        tip: 'A woman equal to you, your sister.'
-      },
-      {
-        word: 'Brother',
-        emoji: '👦',
-        desc: 'Twirl your mustache (like in father)and then place your fingertips to your shoulder and move them away from your shoulder in the same position',
-        tip: 'Starting near the forehead indicates male.'
-      },
-      {
-        word: 'Friend',
-        emoji: '🤝',
-        desc: 'Hook your index fingers together and give a gentle shake.',
-        tip: 'Interlocked fingers — the bond of friendship!'
-      },
-    ]
-  },
-  emotions: {
-    label: 'Emotions',
-    next:  'general',
-    nextLabel: 'General',
-    signs: [
-      {
-        word: 'Happy',
-        emoji: '😊',
-        desc: ' Open your hand and move it upwards',
-        tip: 'Add a smile.'
-      },
-      {
-        word: 'Sad',
-        emoji: '😢',
-        desc: 'Open your hand and move it downwards.',
-        tip: 'Add a frown.'
-      },
-      {
-        word: 'Angry',
-        emoji: '😠',
-        desc: 'Make a claw hand in front of your face, tense your expression.',
-        tip: 'The claw shape shows tension and frustration.'
-      },
-      {
-        word: 'Love',
-        emoji: '❤️',
-        desc: 'Cross both arms over your chest in a self-hug.',
-        tip: 'Hugging yourself — universal sign of love!'
-      },
-      {
-        word: 'Surprised',
-        emoji: '😲',
-        desc: 'Start with fists near your cheeks, then spring both hands open quickly.',
-        tip: 'The sudden opening mimics eyes going wide with surprise.'
-      },
-    ]
-  },
-  general: {
-    label: 'General',
-    next:  'abc',
-    nextLabel: 'ABC',
-    signs: [
-      {
-        word: 'Yes',
-        emoji: '✅',
-        desc: 'Make a fist and nod it forward and downward, like a head nodding yes.',
-        tip: 'Your fist nods just like your head would.'
-      },
-      {
-        word: 'No',
-        emoji: '❌',
-        desc: 'Extend your index and middle fingers, then snap them shut to your thumb twice.',
-        tip: 'A quick snapping motion — sharp and clear.'
-      },
-      {
-        word: 'Help',
-        emoji: '🆘',
-        desc: 'Place your flat right hand on top of your left fist, then lift both hands upward.',
-        tip: 'One hand lifting the other — giving support.'
-      },
-      {
-        word: 'Water',
-        emoji: '💧',
-        desc: 'Form a W shape with three fingers, then tap your chin twice with your index finger.',
-        tip: 'W for Water, signed at the chin.'
-      },
-      {
-        word: 'Food',
-        emoji: '🍽️',
-        desc: 'Bring your bunched fingertips to your mouth twice, like eating.',
-        tip: 'Mimicking putting food in your mouth.'
-      },
-    ]
-  },
-  abc: {
-    label: 'ABC — Fingerspelling',
-    next:  null,
-    nextLabel: null,
-    signs: [
-      { word:'A', emoji:'🅰️', img:'assets/a.png', anim:'anim-pulse', desc:'Make a fist with thumb resting on the side.',                         tip:'Compact and clean — like the letter A.' },
-      { word:'B', emoji:'🅱️', img:'assets/b.png', anim:'anim-pulse', desc:'Hold four fingers up together, thumb tucked across palm.',             tip:'Flat fingers — like the straight lines of B.' },
-      { word:'C', emoji:'©️',  img:'assets/c.png', anim:'anim-pulse', desc:'Curve your hand into a C shape.',                                     tip:'Your hand literally makes a C!' },
-      { word:'D', emoji:'🔵', img:'assets/d.png', anim:'anim-pulse', desc:'Index finger points up, other fingers and thumb form a circle.',        tip:'The circle is the round belly of D.' },
-      { word:'E', emoji:'📧', img:null, anim:'anim-pulse', desc:'Bend all fingers down to touch the thumb.',                             tip:'Fingers curled in, touching thumb.' },
-      { word:'F', emoji:'🎏', desc:'Index finger and thumb form a circle, other three fingers up.',         tip:'Circle with three fingers raised.' },
-      { word:'G', emoji:'↔️', desc:'Index finger and thumb point horizontally to the side.',               tip:'Like pointing sideways.' },
-      { word:'H', emoji:'➡️', desc:'Index and middle fingers extended together, pointing sideways.',        tip:'Two fingers out flat — like the two lines of H.' },
-      { word:'I', emoji:'🤙', desc:'Pinky finger up, all others closed into a fist.',                      tip:'Just the pinky — tall like the letter I.' },
-      { word:'J', emoji:'〽️', desc:'Pinky up, then trace a J curve downward.',                            tip:'Draw the letter J in the air with your pinky.' },
-      { word:'K', emoji:'🔑', desc:'Index finger points up, middle finger angled out, thumb between them.', tip:'Three points — like a K.' },
-      { word:'L', emoji:'👆', desc:'Index finger points up, thumb points out — forming an L shape.',       tip:'Your hand is literally an L!' },
-      { word:'M', emoji:'〰️', desc:'Tuck three fingers over your thumb.',                                  tip:'Three fingers for three humps of M.' },
-      { word:'N', emoji:'🌀', desc:'Tuck two fingers over your thumb.',                                    tip:'Two fingers for two humps of N.' },
-      { word:'O', emoji:'⭕', desc:'Curve all fingers and thumb to form an O circle.',                     tip:'Make a perfect O with your hand.' },
-      { word:'P', emoji:'🅿️', desc:'K handshape but pointed downward.',                                   tip:'Like a K rotated down.' },
-      { word:'Q', emoji:'🔽', desc:'G handshape pointed downward.',                                        tip:'Like a G pointing to the ground.' },
-      { word:'R', emoji:'🔀', desc:'Cross your index and middle fingers.',                                  tip:'Crossed fingers — like the crossed lines of R.' },
-      { word:'S', emoji:'✊', desc:'Make a fist with thumb tucked over fingers.',                          tip:'A tight fist — strong like S.' },
-      { word:'T', emoji:'✝️', desc:'Tuck your thumb between index and middle fingers.',                    tip:'Thumb peeking between fingers.' },
-      { word:'U', emoji:'🔱', desc:'Index and middle fingers up and pressed together.',                    tip:'Two fingers together — like the two lines of U.' },
-      { word:'V', emoji:'✌️', desc:'Index and middle fingers up and spread in a V.',                       tip:'Peace sign — V for Victory!' },
-      { word:'W', emoji:'🌊', desc:'Index, middle, and ring fingers up and spread.',                       tip:'Three fingers — W has three points.' },
-      { word:'X', emoji:'❎', desc:'Bend your index finger into a hook.',                                  tip:'A hooked finger like a little X.' },
-      { word:'Y', emoji:'🤙', desc:'Thumb and pinky extended, other fingers closed.',                      tip:'Shaka / hang loose — Y shape!' },
-      { word:'Z', emoji:'💤', desc:'Extend index finger and trace a Z shape in the air.',                  tip:'Draw Z in the air with your finger.' },
-    ]
-  },
-};
+      abc: {
+        label: 'ABC Basics',
+        signs: [
+          { word: 'A', img: 'assets/a.png', emoji: '🅰️', desc: 'Form a fist with thumb resting against the side of index finger.', tip: 'Clean fist shape.' },
+          { word: 'B', img: 'assets/b.png', emoji: '🅱️', desc: 'Open palm with four fingers straight up and thumb tucked across palm.', tip: 'Flat vertical fingers.' },
+          { word: 'C', img: 'assets/c.png', emoji: '©️', desc: 'Curve fingers and thumb to form the letter C shape.', tip: 'Literal C hand shape.' },
+          { word: 'D', img: 'assets/d.png', emoji: '🔵', desc: 'Point index finger straight up, remaining fingers touch thumb.', tip: 'Index finger vertical.' }
+        ]
+      }
+    };
 
-// ─────────────────────────────────────────────
-// PARSE URL PARAMS
-// ─────────────────────────────────────────────
-const params  = new URLSearchParams(window.location.search);
-const catId   = params.get('cat') || 'greetings';
-const isReplay = params.get('replay') === '1';
-const lesson  = ALL_LESSONS[catId] || ALL_LESSONS.greetings;
-const SIGNS   = lesson.signs;
+    // STATE
+    const params = new URLSearchParams(window.location.search);
+    const catId = params.get('cat') || 'greetings';
+    const isReplay = params.get('replay') === '1';
+    const lesson = ALL_LESSONS[catId] || ALL_LESSONS.greetings;
+    const SIGNS = lesson.signs;
 
-document.getElementById('catBadge').textContent = lesson.label;
-document.title = `SignPath – ${lesson.label}`;
+    let step = 0;
 
-// ─────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────
-let step     = 0;
-let phase    = 'show';
-let lives    = 3;
-let correct  = 0;
-let wrong    = 0;
-let answered = false;
-let actionWrap = null;
+    // RENDER CARD
+    function renderCard() {
+      if (step >= SIGNS.length) {
+        showFinish();
+        return;
+      }
 
-// ─────────────────────────────────────────────
-// RENDER
-// ─────────────────────────────────────────────
-function renderStep() {
-  hideFeedback();
-  answered = false;
-  updateProgress();
-  updateLives();
+      // Update Header Progress
+      const percent = Math.round(((step + 1) / SIGNS.length) * 100);
+      document.getElementById('progressFill').style.width = `${percent}%`;
 
-  if (step >= SIGNS.length) { showFinish(); return; }
+      const sign = SIGNS[step];
+      const stage = document.getElementById('stage');
 
-  const sign  = SIGNS[step];
-  const stage = document.getElementById('stage');
-  const old   = stage.querySelector('.card');
+      const imgHtml = sign.img
+        ? `<div class="sign-img-wrap"><img class="sign-img" src="${sign.img}" alt="${sign.word}" onerror="this.style.display='none'"></div>`
+        : `<div class="sign-img-wrap"><span class="fallback-emoji">${sign.emoji || '🖐️'}</span></div>`;
 
-  if (old) {
-    old.classList.add('exit');
-    setTimeout(() => { old.remove(); buildCard(sign, stage); }, 230);
-  } else {
-    buildCard(sign, stage);
-  }
-}
+      stage.innerHTML = `
+        <div class="card">
+          <div class="cat-badge">${lesson.label} • ${step + 1} of ${SIGNS.length}</div>
+          <h1 class="sign-name">${sign.word}</h1>
+          ${imgHtml}
+          <p class="sign-desc">${sign.desc}</p>
+          ${sign.tip ? `<p class="sign-tip">Tip: ${sign.tip}</p>` : ''}
+        </div>
+      `;
 
-function buildCard(sign, stage) {
-  phase === 'show' ? buildShow(sign, stage) : buildQuiz(sign, stage);
-}
-
-function buildShow(sign, stage) {
-  const card = el('div','card');
-
-  const imgHtml = sign.img
-    ? `<div class="sign-img-wrap">
-         <img class="sign-img ${sign.anim||'anim-fadein'}"
-              src="${sign.img}"
-              onerror="this.parentNode.innerHTML=''"
-              alt="${sign.word}">
-       </div>`
-    : `<div class="sign-img-wrap"><span class="fallback">${sign.emoji}</span></div>`;
-
-  card.innerHTML = `
-    <div class="phase-label">Learn this sign</div>
-    ${imgHtml}
-    <div class="sign-name">${sign.word}</div>
-    <div class="sign-desc">${sign.desc}</div>
-    <p class="sign-tip"> ${sign.tip}</p>
-  `;
-  stage.appendChild(card);
-  showAction('Got it! ✓', () => { phase='quiz'; renderStep(); });
-}
-
-function buildQuiz(sign, stage) {
-  const choices = makeChoices(sign.word);
-  const card = el('div','card');
-
-  const imgHtml = sign.img
-    ? `<div class="sign-img-wrap">
-         <img class="sign-img ${sign.anim||'anim-fadein'}" src="${sign.img}" alt="${sign.word}">
-       </div>`
-    : `<div class="sign-img-wrap"><span class="fallback">${sign.emoji}</span></div>`;
-
-  card.innerHTML = `
-    <div class="phase-label">What sign is this?</div>
-    ${imgHtml}
-    <p class="quiz-prompt">${sign.desc}</p>
-    <div class="choices" id="choices"></div>
-  `;
-  stage.appendChild(card);
-  hideAction();
-
-  choices.forEach(word => {
-    const b = el('button','choice-btn');
-    b.textContent = word;
-    b.onclick = () => checkAnswer(word, sign.word, b);
-    card.querySelector('#choices').appendChild(b);
-  });
-}
-
-function makeChoices(correct) {
-  const pool = shuffle(SIGNS.map(s=>s.word).filter(w=>w!==correct));
-  // pad with words from other categories if not enough in current
-  if (pool.length < 3) {
-    const extra = ['Hello','Mother','Happy','Yes','A','B','C','No','Food','Love']
-      .filter(w => w !== correct && !pool.includes(w));
-    pool.push(...extra);
-  }
-  return shuffle([...pool.slice(0,3), correct]);
-}
-
-// ─────────────────────────────────────────────
-// ANSWER
-// ─────────────────────────────────────────────
-function checkAnswer(chosen, correctWord, btn) {
-  if (answered) return;
-  answered = true;
-  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
-
-  if (chosen === correctWord) {
-    btn.classList.add('correct');
-    correct++;
-    popXP();
-    showFeedback(true, '✅ Correct!', `"${correctWord}" — great job!`);
-  } else {
-    btn.classList.add('wrong');
-    document.querySelectorAll('.choice-btn').forEach(b => {
-      if (b.textContent.trim() === correctWord) b.classList.add('reveal');
-    });
-    lives--;
-    wrong++;
-    updateLives();
-    popHeart();
-    showFeedback(false, '❌ Not quite!', `The correct answer is "${correctWord}"`);
-    if (lives <= 0) { setTimeout(() => showFinish(true), 1500); return; }
-  }
-}
-
-function nextStep() {
-  if (phase === 'quiz') { step++; phase = 'show'; }
-  renderStep();
-}
-
-// ─────────────────────────────────────────────
-// FEEDBACK
-// ─────────────────────────────────────────────
-function showFeedback(ok, title, sub) {
-  const bar = document.getElementById('feedbackBar');
-  bar.className = 'feedback-bar show ' + (ok ? 'ok' : 'bad');
-  document.getElementById('fbIcon').textContent  = ok ? '🎉' : '💔';
-  document.getElementById('fbTitle').textContent = title;
-  document.getElementById('fbSub').textContent   = sub;
-  hideAction();
-}
-function hideFeedback() {
-  document.getElementById('feedbackBar').className = 'feedback-bar';
-}
-
-// ─────────────────────────────────────────────
-// ACTION BUTTON
-// ─────────────────────────────────────────────
-function showAction(label, cb) {
-  if (!actionWrap) {
-    actionWrap = el('div','action-wrap');
-    document.body.appendChild(actionWrap);
-  }
-  actionWrap.innerHTML = `<button>${label}</button>`;
-  actionWrap.querySelector('button').onclick = cb;
-  actionWrap.style.display = 'flex';
-}
-function hideAction() {
-  if (actionWrap) actionWrap.style.display = 'none';
-}
-
-// ─────────────────────────────────────────────
-// PROGRESS + LIVES
-// ─────────────────────────────────────────────
-function updateProgress() {
-  const total   = SIGNS.length * 2;
-  const current = step * 2 + (phase==='quiz' ? 1 : 0);
-  document.getElementById('progressFill').style.width = (current/total*100) + '%';
-}
-function updateLives() {
-  document.getElementById('livesEl').innerHTML =
-    '<span style="color:#ff5fa2">♡</span>'.repeat(Math.max(lives,0)) +
-    '<span style="color:#f4b6d2">♡</span>'.repeat(Math.max(3-lives,0));
-}
-
-// ─────────────────────────────────────────────
-// ANIMATIONS
-// ─────────────────────────────────────────────
-function popXP() {
-  const p = document.getElementById('xpPop');
-  p.classList.add('show');
-  setTimeout(()=>p.classList.remove('show'), 1300);
-}
-function popHeart() {
-  const h = el('div','heart-pop'); h.textContent='💔';
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(), 600);
-}
-
-// ─────────────────────────────────────────────
-// SAVE PROGRESS
-// ─────────────────────────────────────────────
-function saveCompletion() {
-  if (isReplay) return; // don't re-save on replay
-  try {
-    const done = JSON.parse(localStorage.getItem('sp_completed') || '[]');
-    if (!done.includes(catId)) {
-      done.push(catId);
-      localStorage.setItem('sp_completed', JSON.stringify(done));
+      const isLast = step === SIGNS.length - 1;
+      document.getElementById('actionBtn').textContent = isLast ? 'Complete Lesson ✓' : 'Did you get it? Next Sign →';
     }
-  } catch(e) {}
-}
 
-// ─────────────────────────────────────────────
-// FINISH SCREEN
-// ─────────────────────────────────────────────
-function showFinish(failed=false) {
-  hideAction(); hideFeedback();
-  document.getElementById('progressFill').style.width = '100%';
-  document.getElementById('stage').innerHTML = '';
+    function nextStep() {
+      step++;
+      renderCard();
+    }
 
-  if (!failed) saveCompletion();
+    // SAVE PROGRESS TO SUPABASE
+    async function saveCompletion() {
+      if (isReplay) return;
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) return;
 
-  const xp  = correct * 10;
-  const fin = el('div','finish');
+        await _supabase
+          .from('user_progress')
+          .upsert({
+            user_id: session.user.id,
+            category_id: catId,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id, category_id' });
+      } catch (e) {
+        console.error('Error saving progress:', e);
+      }
+    }
 
-  if (failed) {
-    fin.innerHTML = `
-      <div class="finish-emoji"></div>
-      <div class="finish-title">Out of hearts!</div>
-      <p class="finish-sub">Don't give up — you're learning!</p>
-      <button class="retry-btn" onclick="location.reload()">↺ Try Again</button>
-      <a href="learn.html" class="back-btn">Back to Path</a>
-    `;
-  } else {
-    const unlockBanner = lesson.next ? `
-      <div class="unlock-banner">
-        🔓 <strong>${lesson.nextLabel}</strong> is now unlocked!
-      </div>` : `<div class="unlock-banner">🏆 You've completed all categories!</div>`;
+    // FINISH VIEW
+    async function showFinish() {
+      await saveCompletion();
 
-    fin.innerHTML = `
-      <div class="finish-emoji">🎉</div>
-      <div class="finish-title">Lesson Complete!</div>
-      <p class="finish-sub">You've learned all ${lesson.label} signs!</p>
-      <div class="xp-badge">+${xp} XP earned 🌟</div>
-      <div class="stat-row">
-        <div class="stat-box"><div class="stat-num">${correct}</div><div class="stat-lbl">correct</div></div>
-        <div class="stat-box"><div class="stat-num">${wrong}</div><div class="stat-lbl">mistakes</div></div>
-        <div class="stat-box"><div class="stat-num">${SIGNS.length}</div><div class="stat-lbl">signs</div></div>
-      </div>
-      ${unlockBanner}
-      <a href="learn.html" class="back-btn">Back to Path</a>
-    `;
-  }
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('actionWrap').style.display = 'none';
 
-  document.getElementById('stage').appendChild(fin);
-}
+      const stage = document.getElementById('stage');
+      stage.innerHTML = `
+        <div class="finish-card">
+          <div style="font-size: 3rem;"></div>
+          <h2 class="finish-title">Module Completed!</h2>
+          <p class="finish-sub">You have reviewed all core signs in ${lesson.label}.</p>
+          <a href="learn.html" class="btn-primary" style="text-decoration:none; text-align:center; display:block; margin-top:12px;">Return to Dashboard</a>
+        </div>
+      `;
+    }
 
-// ─────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────
-function el(tag,cls){ const e=document.createElement(tag); e.className=cls; return e; }
-function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-function confirmExit(){
-  if(confirm('Leave lesson? Progress will be lost.')) location.href='learn.html';
-}
+    function confirmExit() {
+      if (confirm('Exit lesson?')) {
+        window.location.href = 'learn.html';
+      }
+    }
 
-// ─────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────
-updateLives();
-renderStep();
-</script>
+    // INIT
+    renderCard();
+  </script>
 </body>
 </html>
