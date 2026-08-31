@@ -13,6 +13,71 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* ====== SINGLE PROFILE CARD (MATCHING SCREENSHOT) ====== */
+    .guest-profile-card {
+      background: #ffe6f2;
+      border-radius: 24px;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .guest-avatar {
+      width: 64px;
+      height: 64px;
+      background: #ec4899;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3);
+      margin-bottom: 8px;
+    }
+
+    .guest-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 16px;
+    }
+
+    .guest-stats-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .guest-stat-box {
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      padding: 12px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .guest-stat-value {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #d63384;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .guest-stat-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #a14a76;
+    }
+
     /* Toast Alert Message */
     #toast {
       position: fixed;
@@ -40,24 +105,23 @@
 
   <div class="dashboard-container">
     
-    <!-- ====== USER PROFILE & STATS HEADER ====== -->
-    <header class="dashboard-header">
-      <div class="user-profile">
-        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=IsharaLearner" alt="User Avatar" class="avatar" id="user-avatar">
-        <div class="user-meta">
-          <h2 class="username" id="user-name">Loading...</h2>
-          <span class="user-rank" id="user-rank">Beginner</span>
-        </div>
-      </div>
+    <!-- ====== COMBINED USER/GUEST PROFILE CARD ====== -->
+    <header class="guest-profile-card">
+      <div class="guest-avatar" id="user-avatar">?</div>
+      <div class="guest-name" id="user-name">Guest</div>
 
-      <div class="stats-group">
-        <div class="stat-badge streak-badge" title="Daily Streak">
-          <span class="stat-label">STREAK</span>
-          <span class="stat-value" id="streakDisplay">0</span>
+      <div class="guest-stats-row">
+        <div class="guest-stat-box">
+          <span class="guest-stat-value" id="starsDisplay">0</span>
+          <span class="guest-stat-label">★ stars</span>
         </div>
-        <div class="stat-badge star-badge" title="Stars Collected">
-          <span class="stat-label">STARS</span>
-          <span class="stat-value" id="starsDisplay">0</span>
+        <div class="guest-stat-box">
+          <span class="guest-stat-value" id="learnedDisplay">0</span>
+          <span class="guest-stat-label">signs learned</span>
+        </div>
+        <div class="guest-stat-box">
+          <span class="guest-stat-value" id="streakDisplay">0</span>
+          <span class="guest-stat-label"> streak</span>
         </div>
       </div>
     </header>
@@ -89,7 +153,7 @@
     <section class="practice-mode-card">
       <div class="practice-text">
         <h3>Practice Mode</h3>
-        <p>Review learned signs.</p>
+        <p>Review learned signs and test your speed.</p>
       </div>
       <a href="collect.html" class="practice-btn">Start Practice</a>
     </section>
@@ -115,13 +179,10 @@
 
   <!-- ====== DASHBOARD & SUPABASE LOGIC ====== -->
   <script>
-    // 1. Initialize Supabase Client
     const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // 2. Categories Definition
     const CATEGORIES = [
       { id: 'greetings', label: '#1 : Greetings',   name: 'Greetings' },
       { id: 'relations', label: '#2 : Relations',   name: 'Relationships' },
@@ -137,57 +198,62 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       setTimeout(() => t.style.opacity = '0', 2000);
     }
 
-    // 3. Main Data Loading & Syncing Logic
     async function initDashboard() {
-      // Check for logged-in user session
       const { data: { session } } = await _supabase.auth.getSession();
       
-      if (!session) {
-        // Redirect to login if user isn't authenticated
-        window.location.href = 'login.html';
-        return;
+      let completedCategories = [];
+      let stars = 0;
+      let streak = 0;
+
+      if (session) {
+        // User is Logged In
+        const user = session.user;
+        const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Learner';
+        
+        document.getElementById('user-name').textContent = displayName;
+        document.getElementById('user-avatar').textContent = displayName.charAt(0).toUpperCase();
+
+        // Fetch User Profile Stats
+        const { data: profile } = await _supabase
+          .from('profiles')
+          .select('stars, streak')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          stars = profile.stars ?? 0;
+          streak = profile.streak ?? 0;
+        }
+
+        // Fetch User Progress
+        const { data: progressData } = await _supabase
+          .from('user_progress')
+          .select('category_id')
+          .eq('user_id', user.id);
+
+        if (progressData) {
+          completedCategories = progressData.map(item => item.category_id);
+        }
+      } else {
+        // User is NOT Signed In -> Stay as Guest with ? Avatar
+        document.getElementById('user-name').textContent = 'Guest';
+        document.getElementById('user-avatar').textContent = '?';
       }
 
-      const user = session.user;
-      
-      // Set User Display Name
-      const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Learner';
-      document.getElementById('user-name').textContent = displayName;
-
-      // --- A. Fetch Profile Stats (Stars & Streak) from Supabase ---
-      const { data: profile } = await _supabase
-        .from('profiles')
-        .select('stars, streak')
-        .eq('id', user.id)
-        .single();
-
-      const stars = profile?.stars ?? 0;
-      const streak = profile?.streak ?? 0;
-
+      // Update Card Stats
       document.getElementById('starsDisplay').textContent = stars;
+      document.getElementById('learnedDisplay').textContent = completedCategories.length;
       document.getElementById('streakDisplay').textContent = streak;
 
-      // --- B. Fetch User Progress from Supabase ---
-      const { data: progressData, error } = await _supabase
-        .from('user_progress')
-        .select('category_id')
-        .eq('user_id', user.id);
-
-      let completedCategories = [];
-      if (!error && progressData) {
-        completedCategories = progressData.map(item => item.category_id);
-      }
-
-      // --- C. Calculate and Render Progress Bar ---
+      // Update Progress Bar
       const percent = Math.round((completedCategories.length / CATEGORIES.length) * 100);
       document.getElementById('progress-text').textContent = `${percent}%`;
       document.getElementById('progress-fill').style.width = `${percent}%`;
 
-      // --- D. Dynamically Render Path Nodes ---
+      // Render Lesson Path
       renderNodes(completedCategories);
     }
 
-    // Render path nodes based on Supabase progress data
     function renderNodes(completed) {
       const pathContainer = document.getElementById('lessonPath');
       pathContainer.innerHTML = '';
@@ -222,18 +288,19 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       });
     }
 
-    // Handle Dropdown Selection
     document.getElementById('course-select').addEventListener('change', async (e) => {
       const catId = e.target.value;
-      const { data: { user } } = await _supabase.auth.getUser();
-      if (!user) return;
+      const { data: { session } } = await _supabase.auth.getSession();
+      
+      let completed = [];
+      if (session) {
+        const { data } = await _supabase
+          .from('user_progress')
+          .select('category_id')
+          .eq('user_id', session.user.id);
+        if (data) completed = data.map(item => item.category_id);
+      }
 
-      const { data } = await _supabase
-        .from('user_progress')
-        .select('category_id')
-        .eq('user_id', user.id);
-
-      const completed = data ? data.map(item => item.category_id) : [];
       const index = CATEGORIES.findIndex(c => c.id === catId);
       const isUnlocked = index === 0 || completed.includes(CATEGORIES[index - 1].id);
       const isDone = completed.includes(catId);
@@ -245,7 +312,6 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     });
 
-    // Run when DOM loads
     document.addEventListener('DOMContentLoaded', initDashboard);
   </script>
 </body>
