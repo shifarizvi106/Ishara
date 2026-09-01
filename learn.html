@@ -7,28 +7,29 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
-      --bg-body: #f8fafc;
+      --bg-body: #fff0f6;
       --bg-card: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --primary: #0f172a;
-      --primary-hover: #1e293b;
-      --accent: #2563eb;
-      --radius: 8px;
+      --primary: #ff5fa2;
+      --primary-hover: #d63384;
+      --primary-light: #ffe6f2;
+      --border: #fbcfe8;
+      --text-main: #1f2937;
+      --text-muted: #833a5c;
+      --radius: 16px;
+      --shadow: 0 4px 20px rgba(255, 95, 162, 0.08);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     body {
@@ -38,12 +39,49 @@
       display: flex;
     }
 
-    /* ── Sidebar Navigation ── */
+    /* ── Global Loader & Skeleton ── */
+    #pageLoader {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-body);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      transition: opacity 0.25s ease;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid var(--primary-light);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #ffe6f2 25%, #fff0f6 50%, #ffe6f2 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ── Sidebar ── */
     .sidebar {
       width: 240px;
       background: var(--bg-card);
       border-right: 1px solid var(--border);
-      padding: 24px 16px;
+      padding: 32px 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -53,101 +91,186 @@
     }
 
     .brand {
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-main);
-      padding: 0 8px 24px 8px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary-hover);
+      margin-bottom: 32px;
+      padding-left: 8px;
     }
 
     .nav-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 8px;
     }
 
     .nav-item button {
       width: 100%;
       text-align: left;
-      padding: 8px 12px;
+      padding: 12px 16px;
       background: none;
       border: none;
-      border-radius: var(--radius);
+      border-radius: 12px;
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 700;
       font-size: 0.9rem;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
 
     .nav-item.active button, .nav-item button:hover {
-      background: var(--bg-body);
-      color: var(--text-main);
+      background: var(--primary-light);
+      color: var(--primary-hover);
     }
 
-    .user-profile {
-      padding-top: 16px;
+    .sidebar-footer {
       border-top: 1px solid var(--border);
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    /* ── Main Workarea ── */
+    .user-info {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: #e11d48;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    /* ── Main Content ── */
     .main-content {
       flex: 1;
       padding: 40px;
       max-width: 960px;
     }
 
-    /* ── Views Layout ── */
-    .view-section {
-      display: none;
-    }
+    .view-section { display: none; }
+    .view-section.active { display: block; }
 
-    .view-section.active {
-      display: block;
-    }
-
-    /* ── Dashboard Cards & Tables ── */
-    .page-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      margin-bottom: 24px;
-    }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+    /* ── Dashboard Cards & Circular Progress ── */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 32px;
     }
 
-    .stat-card {
+    .page-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .top-stats {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .circular-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px 20px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .circle-wrap {
+      position: relative;
+      width: 110px;
+      height: 110px;
+    }
+
+    .circle-wrap svg {
+      width: 110px;
+      height: 110px;
+      transform: rotate(-90deg);
+    }
+
+    .circle-bg {
+      fill: none;
+      stroke: var(--primary-light);
+      stroke-width: 10;
+    }
+
+    .circle-progress {
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      transition: stroke-dashoffset 0.6s ease;
+    }
+
+    .circle-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--primary-hover);
+    }
+
+    .stats-card-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .stat-label {
       font-size: 0.75rem;
+      font-weight: 800;
       text-transform: uppercase;
-      font-weight: 600;
       color: var(--text-muted);
       letter-spacing: 0.05em;
     }
 
     .stat-value {
       font-size: 1.8rem;
-      font-weight: 700;
+      font-weight: 800;
       margin-top: 4px;
+      color: var(--text-main);
     }
 
-    .table-container {
+    /* ── Curriculum Table ── */
+    .table-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
+      box-shadow: var(--shadow);
       overflow: hidden;
     }
 
@@ -155,85 +278,102 @@
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.9rem;
     }
 
     th {
-      background: var(--bg-body);
+      background: #fff0f6;
       color: var(--text-muted);
-      font-weight: 600;
+      font-weight: 800;
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      padding: 12px 20px;
+      padding: 16px 24px;
       border-bottom: 1px solid var(--border);
     }
 
     td {
-      padding: 16px 20px;
+      padding: 18px 24px;
       border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
     }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+    tr:last-child td { border-bottom: none; }
 
     .status-pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 800;
     }
 
-    .status-pill.completed { background: #e2e8f0; color: #0f172a; }
-    .status-pill.available { background: #eff6ff; color: #2563eb; }
+    .status-pill.completed { background: #dcfce7; color: #15803d; }
+    .status-pill.available { background: var(--primary-light); color: var(--primary-hover); }
 
-    /* ── Clean Lesson Stage ── */
+    /* ── Buttons ── */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.15s ease;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(255, 95, 162, 0.25); }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: var(--primary-light); color: var(--primary-hover); }
+    .btn-secondary:hover { background: #fbcfe8; }
+    .btn-full { width: 100%; padding: 16px; font-size: 1rem; }
+
+    /* ── Lesson Card View ── */
     .lesson-stage {
-      max-width: 480px;
-      margin: 40px auto 0;
+      max-width: 440px;
+      margin: 20px auto 0;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: 24px;
       padding: 32px;
+      box-shadow: var(--shadow);
+      text-align: center;
     }
 
-    .lesson-progress-bar {
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin-bottom: 24px;
+    .progress-track {
+      height: 8px;
+      background: var(--primary-light);
+      border-radius: 999px;
       overflow: hidden;
+      margin-bottom: 24px;
     }
 
-    .lesson-progress-fill {
+    .progress-fill {
       height: 100%;
       background: var(--primary);
       width: 0%;
-      transition: width 0.2s ease;
+      transition: width 0.3s ease;
     }
 
-    .sign-meta {
+    .card-badge {
       font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-muted);
+      font-weight: 800;
+      color: var(--primary-hover);
       text-transform: uppercase;
+      letter-spacing: 1.5px;
       margin-bottom: 8px;
     }
 
     .sign-title {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 2rem;
+      font-weight: 800;
       margin-bottom: 16px;
     }
 
     .media-box {
       width: 100%;
-      height: 240px;
+      height: 220px;
       background: var(--bg-body);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -245,69 +385,70 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+      padding: 12px;
     }
 
-    .sign-description {
-      font-size: 0.9rem;
-      color: var(--text-muted);
+    .sign-desc {
+      font-size: 0.95rem;
+      color: #4b5563;
       line-height: 1.5;
       margin-bottom: 24px;
     }
-
-    /* ── SaaS Buttons ── */
-    .btn {
-      display: inline-block;
-      padding: 8px 16px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      border-radius: var(--radius);
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.15s;
-    }
-
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-secondary { background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: var(--border); }
-    .btn-full { width: 100%; text-align: center; }
   </style>
 </head>
 <body>
+
+  <div id="pageLoader">
+    <div class="spinner"></div>
+  </div>
 
   <aside class="sidebar">
     <div>
       <div class="brand">Ishara</div>
       <ul class="nav-list">
         <li class="nav-item active" id="navDash"><button onclick="showDashboard()">Dashboard</button></li>
+        <li class="nav-item" id="navPractice"><button onclick="startPracticeMode()">Practice Mode</button></li>
       </ul>
     </div>
-    <div class="user-profile" id="userEmail">Loading session...</div>
+    <div class="sidebar-footer">
+      <div class="user-info" id="userEmail">Loading...</div>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
   </aside>
 
   <main class="main-content">
 
     <section id="dashboardView" class="view-section active">
-      <h1 class="page-title">Overview</h1>
-      
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Modules Completed</div>
-          <div class="stat-value" id="statCompleted">0 / 5</div>
+      <div class="header-bar">
+        <h1 class="page-title">Dashboard</h1>
+      </div>
+
+      <div class="top-stats">
+        <div class="circular-card">
+          <div class="circle-wrap">
+            <svg>
+              <circle class="circle-bg" cx="55" cy="55" r="45"></circle>
+              <circle class="circle-progress" id="circleFill" cx="55" cy="55" r="45"></circle>
+            </svg>
+            <div class="circle-text" id="circlePercent">0%</div>
+          </div>
+          <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted); margin-top: 12px;">OVERALL PROGRESS</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Total Signs Learnt</div>
-          <div class="stat-value" id="statSigns">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Active Streak</div>
-          <div class="stat-value" id="statStreak">0 days</div>
+
+        <div class="stats-card-group">
+          <div class="stat-box">
+            <div class="stat-label">Modules Finished</div>
+            <div class="stat-value" id="statCompleted">0 / 5</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Signs Learnt</div>
+            <div class="stat-value" id="statSigns">0</div>
+          </div>
         </div>
       </div>
 
-      <h2 class="page-title" style="font-size: 1.1rem; margin-bottom: 16px;">Curriculum</h2>
-      <div class="table-container">
+      <h2 class="page-title" style="font-size: 1.1rem; margin-bottom: 16px;">Learning Path</h2>
+      <div class="table-card">
         <table>
           <thead>
             <tr>
@@ -318,29 +459,35 @@
             </tr>
           </thead>
           <tbody id="moduleTable">
-            </tbody>
+            <tr>
+              <td colspan="4"><div class="skeleton" style="height: 24px;"></div></td>
+            </tr>
+            <tr>
+              <td colspan="4"><div class="skeleton" style="height: 24px;"></div></td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </section>
 
     <section id="lessonView" class="view-section">
-      <button class="btn btn-secondary" onclick="showDashboard()" style="margin-bottom: 24px;">← Back to Overview</button>
-      
+      <button class="btn btn-secondary" onclick="showDashboard()" style="margin-bottom: 24px;">← Exit Lesson</button>
+
       <div class="lesson-stage">
-        <div class="lesson-progress-bar">
-          <div class="lesson-progress-fill" id="lessonProgress"></div>
-        </div>
-        
-        <div class="sign-meta" id="lessonCategory">Category</div>
-        <h2 class="sign-title" id="signWord">Word</h2>
-        
-        <div class="media-box" id="mediaBox">
-          <span style="color: var(--text-muted); font-size: 0.85rem;">No Image Available</span>
+        <div class="progress-track">
+          <div class="progress-fill" id="lessonProgress"></div>
         </div>
 
-        <p class="sign-description" id="signDesc">Description of the sign will appear here.</p>
-        
-        <button class="btn btn-primary btn-full" id="nextBtn" onclick="nextSign()">Next Sign</button>
+        <div class="card-badge" id="lessonCategory">CATEGORY</div>
+        <h2 class="sign-title" id="signWord">Word</h2>
+
+        <div class="media-box" id="mediaBox">
+          <span style="color: var(--text-muted); font-weight: 600;">No Image Available</span>
+        </div>
+
+        <p class="sign-desc" id="signDesc">Sign description will appear here.</p>
+
+        <button class="btn btn-primary btn-full" id="nextBtn" onclick="nextSign()">Did you get it? Next Sign →</button>
       </div>
     </section>
 
@@ -352,7 +499,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ── CURRICULUM DATA ──
+    // ── CURRICULUM ──
     const MODULES = [
       { id: 'greetings', name: 'Greetings', signs: [
         { word: 'Hello', img: 'assets/hello.gif', desc: 'Raise hand to forehead with flat fingers in a salute motion.' },
@@ -382,21 +529,30 @@
     let completedCategoryIds = [];
     let currentModule = null;
     let currentStep = 0;
+    let isPracticeMode = false;
 
-    // ── INIT ──
+    // ── INITIALIZATION ──
     async function init() {
-      const { data: { session } } = await _supabase.auth.getSession();
-      if (session) {
-        currentUser = session.user;
-        document.getElementById('userEmail').innerText = currentUser.email;
-        await fetchUserProgress();
-      } else {
-        document.getElementById('userEmail').innerText = 'Guest Mode';
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (session) {
+          currentUser = session.user;
+          document.getElementById('userEmail').innerText = currentUser.email;
+          await fetchUserProgress();
+        } else {
+          document.getElementById('userEmail').innerText = 'Guest Mode';
+        }
+      } catch (err) {
+        console.error('Session error:', err);
+      } finally {
+        // Hide global page loader
+        const loader = document.getElementById('pageLoader');
+        loader.style.opacity = '0';
+        setTimeout(() => loader.style.display = 'none', 250);
+        renderDashboard();
       }
-      renderDashboard();
     }
 
-    // ── SUPABASE SYNC ──
     async function fetchUserProgress() {
       if (!currentUser) return;
       const { data, error } = await _supabase
@@ -405,7 +561,7 @@
         .eq('user_id', currentUser.id);
 
       if (!error && data) {
-        completedCategoryIds = data.map(row => row.category_id);
+        completedCategoryIds = data.map(r => r.category_id);
       }
     }
 
@@ -421,29 +577,36 @@
       renderDashboard();
     }
 
-    // ── UI RENDERING ──
+    // ── RENDER DASHBOARD & CIRCULAR PROGRESS ──
     function renderDashboard() {
-      // Calculate Stats
       const doneCount = completedCategoryIds.length;
-      document.getElementById('statCompleted').innerText = `${doneCount} / ${MODULES.length}`;
-      
+      const totalModules = MODULES.length;
+      const percent = Math.round((doneCount / totalModules) * 100);
+
+      // SVG Circle Fill Calculation
+      const circumference = 283;
+      const offset = circumference - (percent / 100) * circumference;
+      document.getElementById('circleFill').style.strokeDashoffset = offset;
+      document.getElementById('circlePercent').innerText = `${percent}%`;
+
+      document.getElementById('statCompleted').innerText = `${doneCount} / ${totalModules}`;
+
       let totalSignsLearnt = 0;
       MODULES.forEach(m => {
         if (completedCategoryIds.includes(m.id)) totalSignsLearnt += m.signs.length;
       });
       document.getElementById('statSigns').innerText = totalSignsLearnt;
-      document.getElementById('statStreak').innerText = `${doneCount > 0 ? 1 : 0} days`;
 
-      // Render Table
+      // Table Render
       const tbody = document.getElementById('moduleTable');
       tbody.innerHTML = '';
-      
+
       MODULES.forEach(mod => {
         const isDone = completedCategoryIds.includes(mod.id);
         const tr = document.createElement('tr');
-        
+
         tr.innerHTML = `
-          <td style="font-weight: 600;">${mod.name}</td>
+          <td style="font-weight: 700;">${mod.name}</td>
           <td>${mod.signs.length} signs</td>
           <td><span class="status-pill ${isDone ? 'completed' : 'available'}">${isDone ? 'Completed' : 'Available'}</span></td>
           <td style="text-align: right;">
@@ -457,21 +620,38 @@
     }
 
     function showDashboard() {
+      isPracticeMode = false;
       document.getElementById('dashboardView').classList.add('active');
       document.getElementById('lessonView').classList.remove('active');
       document.getElementById('navDash').classList.add('active');
+      document.getElementById('navPractice').classList.remove('active');
       renderDashboard();
     }
 
-    // ── LESSON ENGINE ──
+    // ── LESSON & PRACTICE ENGINE ──
     function startLesson(moduleId) {
       currentModule = MODULES.find(m => m.id === moduleId);
       currentStep = 0;
       
       document.getElementById('dashboardView').classList.remove('active');
       document.getElementById('lessonView').classList.add('active');
-      document.getElementById('navDash').classList.remove('active');
       
+      renderLessonStep();
+    }
+
+    function startPracticeMode() {
+      isPracticeMode = true;
+      document.getElementById('navDash').classList.remove('active');
+      document.getElementById('navPractice').classList.add('active');
+
+      // Aggregate all signs into one pool
+      const allSigns = MODULES.flatMap(m => m.signs);
+      currentModule = { name: 'Practice Mode', signs: allSigns };
+      currentStep = 0;
+
+      document.getElementById('dashboardView').classList.remove('active');
+      document.getElementById('lessonView').classList.add('active');
+
       renderLessonStep();
     }
 
@@ -479,28 +659,23 @@
       const sign = currentModule.signs[currentStep];
       const total = currentModule.signs.length;
 
-      // Update progress fill
       document.getElementById('lessonProgress').style.width = `${((currentStep + 1) / total) * 100}%`;
-      
-      // Update details
       document.getElementById('lessonCategory').innerText = currentModule.name;
       document.getElementById('signWord').innerText = sign.word;
       document.getElementById('signDesc').innerText = sign.desc;
 
-      // Media Box
       const mediaBox = document.getElementById('mediaBox');
       if (sign.img) {
-        mediaBox.innerHTML = `<img src="${sign.img}" alt="${sign.word}" onerror="this.parentNode.innerHTML='<span style=\\'color: var(--text-muted); font-size: 0.85rem;\\'>Image missing</span>'">`;
+        mediaBox.innerHTML = `<img src="${sign.img}" alt="${sign.word}" onerror="this.parentNode.innerHTML='<span style=\\'color: var(--text-muted); font-weight:600;\\'>Image missing</span>'">`;
       } else {
-        mediaBox.innerHTML = `<span style="color: var(--text-muted); font-size: 0.85rem;">No Image Available</span>`;
+        mediaBox.innerHTML = `<span style="color: var(--text-muted); font-weight:600;">No Image Available</span>`;
       }
 
-      // Next button text
       const nextBtn = document.getElementById('nextBtn');
       if (currentStep === total - 1) {
-        nextBtn.innerText = 'Complete Module';
+        nextBtn.innerText = isPracticeMode ? 'Finish Practice' : 'Complete Module ✓';
       } else {
-        nextBtn.innerText = 'Next Sign';
+        nextBtn.innerText = 'Did you get it? Next Sign →';
       }
     }
 
@@ -510,9 +685,14 @@
         currentStep++;
         renderLessonStep();
       } else {
-        recordCompletion(currentModule.id);
+        if (!isPracticeMode) recordCompletion(currentModule.id);
         showDashboard();
       }
+    }
+
+    async function logout() {
+      await _supabase.auth.signOut();
+      window.location.reload();
     }
 
     init();
