@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ishara – Learn</title>
 
-  <!-- Google Fonts: Plus Jakarta Sans & Croissant One -->
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -41,7 +42,7 @@
       display: flex;
     }
 
-    /* ── Global Loader ── */
+    /* ── Global Page Spinner ── */
     #pageLoader {
       position: fixed;
       inset: 0;
@@ -50,12 +51,12 @@
       align-items: center;
       justify-content: center;
       z-index: 999;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
+      transition: opacity 0.25s ease;
     }
 
     .spinner {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border: 4px solid var(--primary-light);
       border-top-color: var(--primary);
       border-radius: 50%;
@@ -66,15 +67,13 @@
       to { transform: rotate(360deg); }
     }
 
-    /* ── Skeleton Loading Effect ── */
-    .skeleton-line {
-      display: inline-block;
-      width: 100%;
-      height: 20px;
+    /* ── Shimmer Skeleton System ── */
+    .skeleton-box {
       background: linear-gradient(90deg, #ffe6f2 25%, #fff0f6 50%, #ffe6f2 75%);
       background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 6px;
+      animation: shimmer 1.2s infinite;
+      border-radius: 8px;
+      display: inline-block;
     }
 
     @keyframes shimmer {
@@ -82,7 +81,7 @@
       100% { background-position: 200% 0; }
     }
 
-    /* ── Sidebar ── */
+    /* ── Sidebar Navigation ── */
     .sidebar {
       width: 240px;
       background: var(--bg-card);
@@ -157,7 +156,7 @@
       text-align: left;
     }
 
-    /* ── Main Workarea ── */
+    /* ── Main Layout ── */
     .main-content {
       flex: 1;
       padding: 40px;
@@ -167,7 +166,6 @@
     .view-section { display: none; }
     .view-section.active { display: block; }
 
-    /* ── Dashboard & Circular Progress ── */
     .header-bar {
       margin-bottom: 32px;
     }
@@ -178,6 +176,7 @@
       color: var(--text-main);
     }
 
+    /* ── Dashboard Stats & Circular Progress ── */
     .top-stats {
       display: grid;
       grid-template-columns: 220px 1fr;
@@ -222,7 +221,7 @@
       stroke-linecap: round;
       stroke-dasharray: 283;
       stroke-dashoffset: 283;
-      transition: stroke-dashoffset 0.6s ease;
+      transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .circle-text {
@@ -330,7 +329,7 @@
     .btn-secondary:hover { background: #fbcfe8; }
     .btn-full { width: 100%; padding: 16px; font-size: 1rem; }
 
-    /* ── Lesson Card View ── */
+    /* ── Lesson Stage ── */
     .lesson-stage {
       max-width: 440px;
       margin: 20px auto 0;
@@ -401,7 +400,7 @@
 </head>
 <body>
 
-  <!-- Full Page Loader -->
+  <!-- Full Screen Initial Spinner -->
   <div id="pageLoader">
     <div class="spinner"></div>
   </div>
@@ -416,12 +415,12 @@
       </ul>
     </div>
     <div class="sidebar-footer">
-      <div class="user-info" id="userEmail">Loading...</div>
+      <div class="user-info" id="userEmail"><span class="skeleton-box" style="width: 100px; height: 16px;"></span></div>
       <button class="logout-btn" onclick="logout()">Log out</button>
     </div>
   </aside>
 
-  <!-- Main Area -->
+  <!-- Main Workarea -->
   <main class="main-content">
 
     <!-- DASHBOARD VIEW -->
@@ -431,14 +430,14 @@
       </div>
 
       <div class="top-stats">
-        <!-- Circular Progress Bar -->
+        <!-- Circular Progress -->
         <div class="circular-card">
           <div class="circle-wrap">
             <svg>
               <circle class="circle-bg" cx="55" cy="55" r="45"></circle>
               <circle class="circle-progress" id="circleFill" cx="55" cy="55" r="45"></circle>
             </svg>
-            <div class="circle-text" id="circlePercent">0%</div>
+            <div class="circle-text" id="circlePercent">--</div>
           </div>
           <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted); margin-top: 12px;">OVERALL PROGRESS</div>
         </div>
@@ -446,11 +445,11 @@
         <div class="stats-card-group">
           <div class="stat-box">
             <div class="stat-label">Modules Finished</div>
-            <div class="stat-value" id="statCompleted">0 / 5</div>
+            <div class="stat-value" id="statCompleted"><span class="skeleton-box" style="width: 60px; height: 32px;"></span></div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Total Signs Learnt</div>
-            <div class="stat-value" id="statSigns">0</div>
+            <div class="stat-value" id="statSigns"><span class="skeleton-box" style="width: 40px; height: 32px;"></span></div>
           </div>
         </div>
       </div>
@@ -467,10 +466,25 @@
             </tr>
           </thead>
           <tbody id="moduleTable">
-            <!-- Skeleton Rows -->
-            <tr><td colspan="4"><div class="skeleton-line"></div></td></tr>
-            <tr><td colspan="4"><div class="skeleton-line"></div></td></tr>
-            <tr><td colspan="4"><div class="skeleton-line"></div></td></tr>
+            <!-- Table Skeleton Rows -->
+            <tr>
+              <td><span class="skeleton-box" style="width: 100px; height: 18px;"></span></td>
+              <td><span class="skeleton-box" style="width: 60px; height: 18px;"></span></td>
+              <td><span class="skeleton-box" style="width: 80px; height: 18px;"></span></td>
+              <td style="text-align: right;"><span class="skeleton-box" style="width: 70px; height: 32px;"></span></td>
+            </tr>
+            <tr>
+              <td><span class="skeleton-box" style="width: 120px; height: 18px;"></span></td>
+              <td><span class="skeleton-box" style="width: 60px; height: 18px;"></span></td>
+              <td><span class="skeleton-box" style="width: 80px; height: 18px;"></span></td>
+              <td style="text-align: right;"><span class="skeleton-box" style="width: 70px; height: 32px;"></span></td>
+            </tr>
+            <tr>
+              <td><span class="skeleton-box" style="width: 90px; height: 18px;"></span></td>
+              <td><span class="skeleton-box" style="width: 60px; height: 18px;"></span></td>
+              <td><span class="skeleton-box" style="width: 80px; height: 18px;"></span></td>
+              <td style="text-align: right;"><span class="skeleton-box" style="width: 70px; height: 32px;"></span></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -506,7 +520,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ── CURRICULUM ──
+    // ── CURRICULUM DATA ──
     const MODULES = [
       { id: 'greetings', name: 'Greetings', signs: [
         { word: 'Hello', img: 'assets/hello.gif', desc: 'Raise hand to forehead with flat fingers in a salute motion.' },
@@ -531,17 +545,23 @@
       ]}
     ];
 
-    // ── STATE ──
+    // ── APP STATE ──
     let currentUser = null;
     let completedCategoryIds = [];
     let currentModule = null;
     let currentStep = 0;
     let isPracticeMode = false;
 
-    // ── INITIALIZATION ──
+    // ── INITIALIZATION & SKELETON LIFECYCLE ──
     async function init() {
-      // Allow skeleton to render visually briefly before data populate
-      await new Promise(res => setTimeout(res, 500));
+      // Hide full overlay loader quickly so skeleton screen can be visible
+      setTimeout(() => {
+        const loader = document.getElementById('pageLoader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => loader.style.display = 'none', 250);
+        }
+      }, 150);
 
       try {
         const { data: { session } } = await _supabase.auth.getSession();
@@ -553,19 +573,10 @@
           document.getElementById('userEmail').innerText = 'Guest Mode';
         }
       } catch (err) {
-        console.error('Session error:', err);
+        console.error('Session load error:', err);
       } finally {
-        hideLoader();
         renderDashboard();
       }
-    }
-
-    function hideLoader() {
-      const loader = document.getElementById('pageLoader');
-      loader.style.opacity = '0';
-      setTimeout(() => {
-        loader.style.display = 'none';
-      }, 300);
     }
 
     async function fetchUserProgress() {
@@ -576,29 +587,34 @@
         .eq('user_id', currentUser.id);
 
       if (!error && data) {
-        completedCategoryIds = data.map(r => r.category_id);
+        completedCategoryIds = data.map(r => String(r.category_id));
       }
     }
 
     async function recordCompletion(catId) {
-      if (!currentUser || completedCategoryIds.includes(catId)) return;
+      catId = String(catId);
+      if (!completedCategoryIds.includes(catId)) {
+        completedCategoryIds.push(catId);
+      }
       
-      completedCategoryIds.push(catId);
-      await _supabase.from('user_progress').insert({
-        user_id: currentUser.id,
-        category_id: catId,
-        completed_at: new Date().toISOString()
-      });
-      renderDashboard();
+      renderDashboard(); // Re-render local state immediately
+
+      if (currentUser) {
+        await _supabase.from('user_progress').insert({
+          user_id: currentUser.id,
+          category_id: catId,
+          completed_at: new Date().toISOString()
+        });
+      }
     }
 
-    // ── RENDER DASHBOARD & CIRCULAR PROGRESS ──
+    // ── RENDER DASHBOARD & CALC PROGRESS ──
     function renderDashboard() {
       const doneCount = completedCategoryIds.length;
       const totalModules = MODULES.length;
       const percent = Math.round((doneCount / totalModules) * 100);
 
-      // SVG Circle Fill Calculation
+      // SVG Circular Fill
       const circumference = 283;
       const offset = circumference - (percent / 100) * circumference;
       document.getElementById('circleFill').style.strokeDashoffset = offset;
@@ -606,9 +622,12 @@
 
       document.getElementById('statCompleted').innerText = `${doneCount} / ${totalModules}`;
 
+      // Calculate Total Learnt Signs
       let totalSignsLearnt = 0;
       MODULES.forEach(m => {
-        if (completedCategoryIds.includes(m.id)) totalSignsLearnt += m.signs.length;
+        if (completedCategoryIds.includes(String(m.id))) {
+          totalSignsLearnt += m.signs.length;
+        }
       });
       document.getElementById('statSigns').innerText = totalSignsLearnt;
 
@@ -617,7 +636,7 @@
       tbody.innerHTML = '';
 
       MODULES.forEach(mod => {
-        const isDone = completedCategoryIds.includes(mod.id);
+        const isDone = completedCategoryIds.includes(String(mod.id));
         const tr = document.createElement('tr');
 
         tr.innerHTML = `
@@ -643,7 +662,7 @@
       renderDashboard();
     }
 
-    // ── LESSON & PRACTICE ENGINE ──
+    // ── LESSON ENGINE ──
     function startLesson(moduleId) {
       isPracticeMode = false;
       currentModule = MODULES.find(m => m.id === moduleId);
