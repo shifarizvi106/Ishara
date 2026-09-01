@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ishara – Practice</title>
 
-  <!-- Google Fonts: Plus Jakarta Sans & Croissant One -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- MediaPipe Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
@@ -30,12 +28,7 @@
       --shadow: 0 4px 20px rgba(255, 95, 162, 0.08);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
     body {
       background: var(--bg-body);
@@ -44,7 +37,39 @@
       display: flex;
     }
 
-    /* Sidebar Navigation */
+    /* ── Spinner Overlay ── */
+    .spinner-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 240, 246, 0.9);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    .spinner-overlay.active { display: flex; }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--primary-light);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .spinner-text {
+      font-weight: 700;
+      color: var(--primary-hover);
+      font-size: 0.9rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Sidebar ── */
     .sidebar {
       width: 240px;
       background: var(--bg-card);
@@ -58,7 +83,6 @@
       top: 0;
       z-index: 20;
     }
-
     .brand {
       font-family: 'Croissant One', cursive;
       font-size: 1.8rem;
@@ -66,379 +90,211 @@
       margin-bottom: 32px;
       padding-left: 8px;
     }
-
-    .nav-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
     .nav-item button {
-      width: 100%;
-      text-align: left;
-      padding: 12px 16px;
-      background: none;
-      border: none;
-      border-radius: 12px;
-      color: var(--text-muted);
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.15s ease;
+      width: 100%; text-align: left; padding: 12px 16px;
+      background: none; border: none; border-radius: 12px;
+      color: var(--text-muted); font-weight: 700; font-size: 0.9rem;
+      cursor: pointer; transition: all 0.15s ease;
     }
-
     .nav-item.active button, .nav-item button:hover {
-      background: var(--primary-light);
-      color: var(--primary-hover);
+      background: var(--primary-light); color: var(--primary-hover);
     }
 
-    /* Main Area */
+    /* ── Main ── */
     .main-content {
-      flex: 1;
-      padding: 32px 40px;
-      max-width: 960px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      flex: 1; padding: 32px 40px; max-width: 960px;
+      display: flex; flex-direction: column; gap: 20px;
     }
-
-    .practice-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .page-title {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--text-main);
-    }
-
+    .practice-header { display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 1.6rem; font-weight: 800; color: var(--text-main); }
     .sign-counter {
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--primary-hover);
-      background: var(--primary-light);
-      padding: 6px 14px;
-      border-radius: 999px;
+      font-size: 0.85rem; font-weight: 800; color: var(--primary-hover);
+      background: var(--primary-light); padding: 6px 14px; border-radius: 999px;
     }
 
     .practice-body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      width: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 16px; width: 100%;
     }
 
+    /* ── Reference Card ── */
     .reference-card {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      padding: 20px;
-      width: 100%;
-      max-width: 540px;
-      box-shadow: var(--shadow);
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      border: 1px solid var(--border);
-      transition: all 0.3s ease;
+      background: var(--bg-card); border-radius: var(--radius); padding: 20px;
+      width: 100%; max-width: 540px; box-shadow: var(--shadow);
+      display: flex; align-items: center; gap: 20px;
+      border: 1px solid var(--border); transition: all 0.3s ease;
     }
-
     .reference-card.success {
       border-color: var(--primary);
       box-shadow: 0 4px 20px rgba(255, 95, 162, 0.3);
+      animation: pulseSuccess 0.6s ease;
     }
-
+    @keyframes pulseSuccess {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
     .sign-preview {
-      width: 80px;
-      height: 80px;
-      flex-shrink: 0;
-      background: var(--bg-body);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--primary-hover);
-      overflow: hidden;
-      border: 1px solid var(--border);
+      width: 80px; height: 80px; flex-shrink: 0;
+      background: var(--bg-body); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; font-weight: 800; color: var(--primary-hover);
+      overflow: hidden; border: 1px solid var(--border);
     }
-
-    .sign-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      padding: 4px;
-    }
-
+    .sign-preview img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
     .sign-info { flex: 1; }
-    
-    .sign-word {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--primary-hover);
-      display: block;
-      margin-bottom: 4px;
-    }
+    .sign-word { font-size: 1.4rem; font-weight: 800; color: var(--primary-hover); display: block; margin-bottom: 4px; }
+    .sign-desc { font-size: 0.85rem; color: #4b5563; line-height: 1.4; margin-bottom: 4px; }
+    .sign-tip { font-size: 0.78rem; color: var(--text-muted); font-style: italic; display: block; }
 
-    .sign-desc {
-      font-size: 0.85rem;
-      color: #4b5563;
-      line-height: 1.4;
-      margin-bottom: 4px;
-    }
-
-    .sign-tip {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      font-style: italic;
-      display: block;
-    }
-
-    /* Camera Viewport */
+    /* ── Camera ── */
     .camera-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 540px;
-      aspect-ratio: 4/3;
-      border-radius: 20px;
-      overflow: hidden;
-      background: #1f2937;
-      box-shadow: var(--shadow);
-      border: 2px solid var(--border);
-      transition: border-color 0.3s, box-shadow 0.3s;
+      position: relative; width: 100%; max-width: 540px;
+      aspect-ratio: 4/3; border-radius: 20px; overflow: hidden;
+      background: #1f2937; box-shadow: var(--shadow);
+      border: 2px solid var(--border); transition: border-color 0.3s, box-shadow 0.3s;
     }
-
     .camera-wrap.detecting { border-color: var(--primary); }
     .camera-wrap.success {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(255, 95, 162, 0.3);
+      border-color: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3);
     }
-
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1);
-      display: block;
-    }
-
+    video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
     canvas#overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      transform: scaleX(-1);
+      position: absolute; inset: 0; width: 100%; height: 100%; transform: scaleX(-1);
     }
 
+    /* ── Status Pill ── */
     .status-pill {
-      position: absolute;
-      bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(31, 41, 55, 0.85);
-      color: white;
-      border-radius: 999px;
-      padding: 8px 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      backdrop-filter: blur(4px);
-      transition: all 0.3s;
-      white-space: nowrap;
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(31, 41, 55, 0.85); color: white; border-radius: 999px;
+      padding: 8px 20px; font-size: 0.8rem; font-weight: 700;
+      backdrop-filter: blur(4px); transition: all 0.3s; white-space: nowrap;
     }
-
     .status-pill.ok { background: rgba(255, 95, 162, 0.9); }
-    .status-pill.success { background: rgba(214, 51, 132, 1); }
+    .status-pill.success { background: rgba(34, 197, 94, 0.95); }
+    .status-pill.error { background: rgba(239, 68, 68, 0.9); }
 
+    /* ── Camera Prompt ── */
     .cam-prompt {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      background: #1f2937;
-      z-index: 10;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+      background: #1f2937; z-index: 10;
     }
-
-    .cam-prompt p {
-      color: var(--primary-light);
-      font-size: 0.88rem;
-      text-align: center;
-      padding: 0 20px;
-    }
-
+    .cam-prompt p { color: var(--primary-light); font-size: 0.88rem; text-align: center; padding: 0 20px; }
     .cam-start-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 10px 24px;
-      font-size: 0.88rem;
-      font-weight: 800;
-      cursor: pointer;
+      background: var(--primary); color: white; border: none;
+      border-radius: 12px; padding: 10px 24px;
+      font-size: 0.88rem; font-weight: 800; cursor: pointer;
       transition: background 0.15s ease;
     }
+    .cam-start-btn:hover { background: var(--primary-hover); }
+    .cam-start-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .cam-start-btn:hover {
-      background: var(--primary-hover);
-    }
-
+    /* ── Confidence Bar ── */
     .confidence-bar-wrap {
-      width: 100%;
-      max-width: 540px;
-      background: var(--bg-card);
-      border-radius: 14px;
-      padding: 12px 16px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
+      width: 100%; max-width: 540px; background: var(--bg-card);
+      border-radius: 14px; padding: 12px 16px;
+      box-shadow: var(--shadow); border: 1px solid var(--border);
     }
+    .confidence-label { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
+    .confidence-track { height: 6px; background: var(--primary-light); border-radius: 999px; overflow: hidden; }
+    .confidence-fill { height: 100%; width: 0%; background: var(--primary); border-radius: 999px; transition: width 0.15s; }
+    .confidence-fill.high { background: #22c55e; }
+    .detected-label { margin-top: 6px; font-size: 0.78rem; font-weight: 800; color: var(--primary-hover); text-align: center; }
 
-    .confidence-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    .confidence-track {
-      height: 6px;
-      background: var(--primary-light);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .confidence-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--primary);
-      border-radius: 999px;
-      transition: width 0.15s;
-    }
-
-    .detected-label {
-      margin-top: 6px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      color: var(--primary-hover);
-      text-align: center;
-    }
-
-    .nav-row {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-      max-width: 540px;
-    }
-
+    /* ── Nav Buttons ── */
+    .nav-row { display: flex; gap: 12px; width: 100%; max-width: 540px; }
     .nav-btn {
-      flex: 1;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      cursor: pointer;
+      flex: 1; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px; font-size: 0.85rem;
+      font-weight: 800; color: var(--text-muted); cursor: pointer;
       transition: all 0.15s ease;
     }
-
-    .nav-btn:hover { 
-      background: var(--primary-light); 
-      color: var(--primary-hover); 
-    }
-
+    .nav-btn:hover { background: var(--primary-light); color: var(--primary-hover); }
     .nav-btn.primary {
-      background: var(--primary);
-      color: white;
-      border-color: transparent;
+      background: var(--primary); color: white; border-color: transparent;
       box-shadow: 0 4px 12px rgba(255, 95, 162, 0.25);
     }
+    .nav-btn.primary:hover { background: var(--primary-hover); }
+    .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .nav-btn.primary:hover {
-      background: var(--primary-hover);
-    }
-
+    /* ── Success Flash ── */
     .success-flash {
-      position: fixed;
-      inset: 0;
-      background: rgba(255, 95, 162, 0.15);
-      pointer-events: none;
-      z-index: 50;
-      opacity: 0;
-      transition: opacity 0.15s;
+      position: fixed; inset: 0;
+      background: rgba(34, 197, 94, 0.15);
+      pointer-events: none; z-index: 50;
+      opacity: 0; transition: opacity 0.15s;
     }
-
     .success-flash.show { opacity: 1; }
   </style>
 </head>
 <body>
 
-<div class="success-flash" id="successFlash"></div>
-
-<!-- Sidebar Navigation -->
-<aside class="sidebar">
-  <div>
-    <div class="brand">Ishara</div>
-    <ul class="nav-list">
-      <li class="nav-item" id="navDash"><button onclick="window.location.href='learn.html'">Dashboard</button></li>
-      <li class="nav-item active" id="navPractice"><button onclick="window.location.href='practice.html'">Practice Mode</button></li>
-    </ul>
-  </div>
-</aside>
-
-<!-- Main Workarea -->
-<main class="main-content">
-  <div class="practice-header">
-    <h1 class="page-title">Practice Mode</h1>
-    <div class="sign-counter" id="signCounter">1 / 8</div>
+  <!-- Loading Spinner -->
+  <div class="spinner-overlay" id="spinnerOverlay">
+    <div class="spinner"></div>
+    <div class="spinner-text" id="spinnerText">Starting camera...</div>
   </div>
 
-  <div class="practice-body">
+  <div class="success-flash" id="successFlash"></div>
 
-    <div class="reference-card" id="referenceCard">
-      <div class="sign-preview" id="signPreview"></div>
-      <div class="sign-info">
-        <span class="sign-word" id="signWord">A</span>
-        <div class="sign-desc" id="signDesc"></div>
-        <span class="sign-tip" id="signTip"></span>
-      </div>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">Ishara</div>
+      <ul class="nav-list">
+        <li class="nav-item" id="navDash"><button onclick="window.location.href='learn.html'">Dashboard</button></li>
+        <li class="nav-item active" id="navPractice"><button onclick="window.location.href='collect.html'">Practice Mode</button></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="practice-header">
+      <h1 class="page-title">Practice Mode</h1>
+      <div class="sign-counter" id="signCounter">1 / 8</div>
     </div>
 
-    <div class="camera-wrap" id="cameraWrap">
-      <video id="video" playsinline autoplay muted></video>
-      <canvas id="overlay"></canvas>
-      <div class="status-pill" id="statusPill">Show your hand</div>
-      <div class="cam-prompt" id="camPrompt">
-        <p>Camera permission required for hand landmark detection</p>
-        <button class="cam-start-btn" onclick="startCamera()">Enable Camera</button>
+    <div class="practice-body">
+      <div class="reference-card" id="referenceCard">
+        <div class="sign-preview" id="signPreview"></div>
+        <div class="sign-info">
+          <span class="sign-word" id="signWord">A</span>
+          <div class="sign-desc" id="signDesc"></div>
+          <span class="sign-tip" id="signTip"></span>
+        </div>
       </div>
-    </div>
 
-    <div class="confidence-bar-wrap" id="confWrap" style="display:none">
-      <div class="confidence-label">
-        <span>Detection Confidence</span>
-        <span id="confPct">0%</span>
+      <div class="camera-wrap" id="cameraWrap">
+        <video id="video" playsinline autoplay muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="status-pill" id="statusPill">Show your hand</div>
+        <div class="cam-prompt" id="camPrompt">
+          <p>Camera permission required for hand landmark detection</p>
+          <button class="cam-start-btn" id="camStartBtn" onclick="startCamera()">Enable Camera</button>
+        </div>
       </div>
-      <div class="confidence-track">
-        <div class="confidence-fill" id="confFill"></div>
-      </div>
-      <div class="detected-label" id="detectedLabel">No sign detected</div>
-    </div>
 
-    <div class="nav-row" id="navRow">
-      <button class="nav-btn" onclick="prevSign()">Previous</button>
-      <button class="nav-btn primary" onclick="nextSign()">Next Sign</button>
+      <div class="confidence-bar-wrap" id="confWrap" style="display:none">
+        <div class="confidence-label">
+          <span>Detection Confidence</span>
+          <span id="confPct">0%</span>
+        </div>
+        <div class="confidence-track">
+          <div class="confidence-fill" id="confFill"></div>
+        </div>
+        <div class="detected-label" id="detectedLabel">No sign detected</div>
+      </div>
+
+      <div class="nav-row" id="navRow">
+        <button class="nav-btn" onclick="prevSign()">Previous</button>
+        <button class="nav-btn primary" onclick="nextSign()">Next Sign</button>
+      </div>
     </div>
-  </div>
-</main>
+  </main>
 
 <script>
 const SIGNS = [
@@ -452,14 +308,26 @@ const SIGNS = [
   { word:'V', img:null, desc:'Index and middle fingers up and spread in a V.', tip:'Separate index and middle finger while tucking others.' }
 ];
 
-const SMOOTH_WINDOW  = 10;
-const CONF_THRESHOLD = 0.68;
-const HOLD_FRAMES    = 18;
+const SMOOTH_WINDOW  = 15;     // Slightly larger window for stability
+const CONF_THRESHOLD = 0.60;   // Lowered from 0.68 — model may need tuning
+const HOLD_FRAMES    = 12;     // Slightly faster completion
+const MIN_AGREEMENT  = 0.6;    // 60% of window must agree
 
 let current      = 0;
 let holdCount    = 0;
 const recentPreds = [];
+let isProcessing = false;
 
+/* ── SPINNER UTILS ── */
+function showSpinner(text) {
+  document.getElementById('spinnerText').textContent = text;
+  document.getElementById('spinnerOverlay').classList.add('active');
+}
+function hideSpinner() {
+  document.getElementById('spinnerOverlay').classList.remove('active');
+}
+
+/* ── RENDER SIGN ── */
 function render() {
   const s = SIGNS[current];
   document.getElementById('signCounter').textContent = `${current+1} / ${SIGNS.length}`;
@@ -485,8 +353,9 @@ function nextSign() {
     render(); 
   } else {
     const pill = document.getElementById('statusPill');
-    pill.textContent = 'Practice Complete'; 
+    pill.textContent = 'Practice Complete! 🎉'; 
     pill.classList.add('success');
+    document.getElementById('referenceCard').classList.add('success');
   }
 }
 
@@ -506,6 +375,7 @@ function flashSuccess() {
   setTimeout(() => nextSign(), 900);
 }
 
+/* ── SMOOTHING ── */
 function smoothed() {
   if (!recentPreds.length) return null;
   const counts = {};
@@ -517,20 +387,72 @@ function smoothed() {
   return { label: best, votes: bestN, total: recentPreds.length };
 }
 
-function startCamera() {
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-    .then(stream => {
-      document.getElementById('video').srcObject = stream;
-      document.getElementById('camPrompt').style.display = 'none';
-      document.getElementById('confWrap').style.display  = 'block';
-      initMediaPipe();
-    })
-    .catch(() => {
-      document.getElementById('camPrompt').querySelector('p').textContent =
-        'Camera access denied. Please allow access in your browser settings.';
-    });
+/* ── LANDMARK NORMALIZATION ──
+ * Centers the hand on the wrist (landmark 0) and scales by palm size
+ * This matches typical training preprocessing for sign models
+ */
+function normalizeLandmarks(landmarks) {
+  // landmarks is array of 21 {x,y,z} objects from MediaPipe
+  const wrist = landmarks[0];
+  
+  // Calculate palm size as distance between wrist (0) and middle finger MCP (9)
+  const middleMCP = landmarks[9];
+  const palmSize = Math.sqrt(
+    Math.pow(middleMCP.x - wrist.x, 2) +
+    Math.pow(middleMCP.y - wrist.y, 2) +
+    Math.pow(middleMCP.z - wrist.z, 2)
+  ) || 1; // avoid div by zero
+  
+  const flat = [];
+  for (const lm of landmarks) {
+    // Center on wrist and scale by palm size
+    flat.push((lm.x - wrist.x) / palmSize);
+    flat.push((lm.y - wrist.y) / palmSize);
+    flat.push((lm.z - wrist.z) / palmSize);
+  }
+  return flat;
 }
 
+/* ── CAMERA START ── */
+async function startCamera() {
+  const btn = document.getElementById('camStartBtn');
+  btn.disabled = true;
+  showSpinner('Requesting camera access...');
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { facingMode: 'user', width: 640, height: 480 }, 
+      audio: false 
+    });
+    
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    
+    showSpinner('Loading hand tracking model...');
+    
+    // Wait for video to be ready
+    await new Promise(resolve => {
+      video.onloadedmetadata = () => {
+        video.play();
+        resolve();
+      };
+    });
+
+    document.getElementById('camPrompt').style.display = 'none';
+    document.getElementById('confWrap').style.display  = 'block';
+    
+    initMediaPipe();
+    
+  } catch (err) {
+    console.error('Camera error:', err);
+    document.getElementById('camPrompt').querySelector('p').textContent =
+      'Camera access denied or unavailable. Please check permissions.';
+    btn.disabled = false;
+    hideSpinner();
+  }
+}
+
+/* ── MEDIAPIPE INIT ── */
 function initMediaPipe() {
   const video  = document.getElementById('video');
   const canvas = document.getElementById('overlay');
@@ -538,74 +460,96 @@ function initMediaPipe() {
   const pill   = document.getElementById('statusPill');
   const wrap   = document.getElementById('cameraWrap');
 
-  const hands = new Hands({ locateFile: f =>
-    `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+  const hands = new Hands({ 
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
   });
   
   hands.setOptions({
-    maxNumHands: 2,
+    maxNumHands: 1,              // Only need 1 hand for sign practice
     modelComplexity: 1,
-    minDetectionConfidence: 0.6,
+    minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5
   });
 
   hands.onResults(results => {
-    canvas.width  = video.videoWidth  || canvas.offsetWidth;
-    canvas.height = video.videoHeight || canvas.offsetHeight;
+    // Match canvas to video size
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (results.multiHandLandmarks?.length) {
+      const landmarks = results.multiHandLandmarks[0];
 
-      for (const lm of results.multiHandLandmarks) {
-        drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#ff5fa2', lineWidth: 3 });
-        for (const pt of lm) {
-          const x = pt.x * canvas.width;
-          const y = pt.y * canvas.height;
-          ctx.beginPath();
-          ctx.arc(x, y, 9, 0, 2 * Math.PI);
-          ctx.fillStyle = 'rgba(255,95,162,0.22)';
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(x, y, 4.5, 0, 2 * Math.PI);
-          ctx.fillStyle = '#ff5fa2';
-          ctx.shadowColor = '#ff5fa2';
-          ctx.shadowBlur  = 12;
-          ctx.fill();
-          ctx.shadowBlur  = 0;
-        }
+      // ── DRAW LANDMARKS ──
+      drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#ff5fa2', lineWidth: 3 });
+      for (const pt of landmarks) {
+        const x = pt.x * canvas.width;
+        const y = pt.y * canvas.height;
+        ctx.beginPath();
+        ctx.arc(x, y, 9, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(255,95,162,0.22)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x, y, 4.5, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ff5fa2';
+        ctx.shadowColor = '#ff5fa2';
+        ctx.shadowBlur  = 12;
+        ctx.fill();
+        ctx.shadowBlur  = 0;
       }
 
       wrap.classList.add('detecting');
       pill.classList.add('ok');
 
-      const pred = predictSign(results.multiHandLandmarks[0]);
-      const conf  = pred.confidence;
-      const label = pred.label;
+      // ── NORMALIZE & PREDICT ──
+      const normalized = normalizeLandmarks(landmarks);
+      let pred;
+      try {
+        pred = predictSign(normalized);
+      } catch (e) {
+        console.error('Prediction error:', e);
+        pill.textContent = 'Detection error';
+        return;
+      }
 
+      const conf  = pred.confidence;
+      const label = pred.className;
+
+      // ── SMOOTHING LOGIC ──
+      // Only add to buffer if confidence is reasonable
       if (conf >= CONF_THRESHOLD) {
         recentPreds.push(label);
         if (recentPreds.length > SMOOTH_WINDOW) recentPreds.shift();
-      } else {
-        recentPreds.length = 0;
       }
 
       const sm = smoothed();
-      const DISPLAY_THRESHOLD = 0.72;
-      const strongEnough = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * 0.7) && conf >= DISPLAY_THRESHOLD;
+      // Require at least 60% agreement in the window
+      const hasConsensus = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * MIN_AGREEMENT);
+      
+      // Display confidence based on consensus, not just current frame
+      const dispConf = hasConsensus 
+        ? Math.round((sm.votes / sm.total) * 100) 
+        : Math.round(conf * 100);
+      
+      const strongEnough = hasConsensus;
       const dispLabel = strongEnough ? sm.label : null;
-      const dispConf  = strongEnough ? Math.round((sm.votes / sm.total) * 100) : 0;
 
-      document.getElementById('confFill').style.width      = dispConf + '%';
-      document.getElementById('confPct').textContent       = strongEnough ? dispConf + '%' : '0%';
+      // Update UI
+      const confFill = document.getElementById('confFill');
+      confFill.style.width = dispConf + '%';
+      confFill.classList.toggle('high', dispConf >= 80);
+      
+      document.getElementById('confPct').textContent = dispConf + '%';
       document.getElementById('detectedLabel').textContent = strongEnough
         ? `Detected: ${dispLabel} (${dispConf}% agreement)`
-        : 'No sign detected';
+        : (conf >= CONF_THRESHOLD ? `Seeing: ${label}...` : 'No sign detected');
 
+      // ── CHECK MATCH ──
       const target = SIGNS[current].word;
       const locked = strongEnough && dispLabel === target;
       
       if (locked) {
-        pill.textContent = `Correct: ${target} — Hold position`;
+        pill.textContent = `✓ ${target} — Hold steady!`;
         pill.classList.add('success');
         holdCount++;
         if (holdCount >= HOLD_FRAMES) { 
@@ -613,31 +557,57 @@ function initMediaPipe() {
           flashSuccess(); 
         }
       } else {
-        pill.textContent = strongEnough ? `Detected: ${dispLabel}` : 'Position hand clearly';
+        if (strongEnough) {
+          pill.textContent = `Detected: ${dispLabel}`;
+        } else if (conf >= CONF_THRESHOLD) {
+          pill.textContent = `Tracking: ${label}`;
+        } else {
+          pill.textContent = 'Position hand clearly';
+        }
         pill.classList.remove('success');
-        holdCount = 0;
+        holdCount = Math.max(0, holdCount - 1); // Decay hold count slowly
       }
 
     } else {
+      // No hand detected
       pill.textContent = 'Show your hand';
       pill.classList.remove('ok', 'success');
       wrap.classList.remove('detecting', 'success');
-      document.getElementById('confFill').style.width      = '0%';
-      document.getElementById('confPct').textContent       = '0%';
-      document.getElementById('detectedLabel').textContent = 'No sign detected';
+      document.getElementById('confFill').style.width = '0%';
+      document.getElementById('confFill').classList.remove('high');
+      document.getElementById('confPct').textContent = '0%';
+      document.getElementById('detectedLabel').textContent = 'No hand detected';
       recentPreds.length = 0;
       holdCount = 0;
     }
   });
 
   const cam = new Camera(video, {
-    onFrame: async () => { await hands.send({ image: video }); },
+    onFrame: async () => { 
+      if (!isProcessing) {
+        isProcessing = true;
+        await hands.send({ image: video });
+        isProcessing = false;
+      }
+    },
     width: 640,
     height: 480
   });
-  cam.start();
+  
+  cam.start()
+    .then(() => {
+      hideSpinner();
+      console.log('Camera started successfully');
+    })
+    .catch(err => {
+      console.error('Camera start failed:', err);
+      hideSpinner();
+      pill.textContent = 'Camera failed to start';
+      pill.classList.add('error');
+    });
 }
 
+// Init
 render();
 </script>
 </body>
