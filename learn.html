@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -38,31 +38,6 @@
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
-    }
-
-    /* ── Global Page Spinner ── */
-    #pageLoader {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-body);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      transition: opacity 0.25s ease;
-    }
-
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid var(--primary-light);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
 
     /* ── Shimmer Skeleton System ── */
@@ -529,14 +504,13 @@
 </head>
 <body>
 
-  <div id="pageLoader">
-    <div class="spinner"></div>
-  </div>
+  <!-- Hamburger Toggle Button -->
+  <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
 
-  <button class="hamburger-btn" onclick="toggleSidebar()">&#9776;</button>
-
+  <!-- Sidebar Overlay (Closes drawer on tap outside) -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
+  <!-- Drawer Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div>
       <div class="brand">Ishara</div>
@@ -552,14 +526,17 @@
     </div>
   </aside>
 
+  <!-- Main Workarea -->
   <main class="main-content">
 
+    <!-- DASHBOARD VIEW -->
     <section id="dashboardView" class="view-section active">
       <div class="header-bar">
         <h1 class="page-title">Dashboard</h1>
       </div>
 
       <div class="top-stats">
+        <!-- Circular Progress -->
         <div class="circular-card">
           <div class="circle-wrap">
             <svg>
@@ -612,8 +589,9 @@
       </div>
     </section>
 
+    <!-- LESSON VIEW -->
     <section id="lessonView" class="view-section">
-      <button class="btn btn-secondary" onclick="showDashboard()" style="margin-bottom: 24px;">&larr; Exit Lesson</button>
+      <button class="btn btn-secondary" onclick="showDashboard()" style="margin-bottom: 24px;">← Exit Lesson</button>
 
       <div class="lesson-stage">
         <div class="progress-track">
@@ -630,7 +608,7 @@
         <p class="sign-desc" id="signDesc">Sign description will appear here.</p>
 
         <div class="lesson-action-group">
-          <button class="btn btn-primary btn-full" id="nextBtn" onclick="nextSign()">I Got It &rarr; Next Sign</button>
+          <button class="btn btn-primary btn-full" id="nextBtn" onclick="nextSign()">I Got It → Next Sign</button>
           <button class="btn btn-outline-danger btn-full" onclick="openHelpModal()">Need help with this sign?</button>
         </div>
       </div>
@@ -638,17 +616,18 @@
 
   </main>
 
+  <!-- Help & Clarity Pop-up Modal -->
   <div class="modal-backdrop" id="helpModal">
     <div class="modal-card">
       <h3 class="modal-title" id="helpModalTitle">Learning Tip</h3>
       <div class="modal-body">
         <p id="helpModalText">Take a close look at the finger position and hand orientation.</p>
         <div class="modal-tips">
-          &#128161; <strong>Tip:</strong> You can practice this live with hand-tracking feedback anytime in <strong>Practice Mode</strong>.
+          💡 <strong>Tip:</strong> You can practice this live with hand-tracking feedback anytime in <strong>Practice Mode</strong>.
         </div>
       </div>
       <div class="modal-footer">
-        <a id="videoSearchBtn" href="#" target="_blank" class="btn btn-secondary" style="flex: 1; text-decoration: none;">Watch Video Tutorial &nearr;</a>
+        <a id="videoSearchBtn" href="#" target="_blank" class="btn btn-secondary" style="flex: 1; text-decoration: none;">Watch Video Tutorial ↗</a>
         <button class="btn btn-primary" onclick="closeHelpModal()">Got It</button>
       </div>
     </div>
@@ -656,16 +635,12 @@
 
   <script>
     // ── SUPABASE CONFIG ──
-    var SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
-    
-    var _supabase = null;
-    if (typeof supabase !== 'undefined') {
-      _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
+    const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ── CURRICULUM DATA ──
-    var MODULES = [
+    const MODULES = [
       { id: 'greetings', name: 'Greetings', signs: [
         { word: 'Hello', img: 'assets/hello.gif', desc: 'Raise hand to forehead with flat fingers in a salute motion.', helpTip: 'Keep your dominant hand flat and move outward smoothly from your forehead.' },
         { word: 'Thank You', img: 'assets/thankyou.gif', desc: 'Touch fingers to chin, then extend hand forward towards the receiver.', helpTip: 'Start with fingertips touching your chin, moving gently forward as if blowing a gentle kiss.' }
@@ -690,15 +665,15 @@
     ];
 
     // ── APP STATE ──
-    var currentUser = null;
-    var completedCategoryIds = [];
-    var currentModule = null;
-    var currentStep = 0;
+    let currentUser = null;
+    let completedCategoryIds = [];
+    let currentModule = null;
+    let currentStep = 0;
 
     // ── SIDEBAR DRAWER TOGGLE & CLICK-OUTSIDE ──
     function toggleSidebar() {
-      var sidebar = document.getElementById('sidebar');
-      var overlay = document.getElementById('sidebarOverlay');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
       sidebar.classList.toggle('open');
       overlay.classList.toggle('active');
     }
@@ -710,24 +685,8 @@
 
     // ── INITIALIZATION & AUTH GUARD ──
     async function init() {
-      setTimeout(function() {
-        var loader = document.getElementById('pageLoader');
-        if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(function() { loader.style.display = 'none'; }, 250);
-        }
-      }, 150);
-
-      if (!_supabase) {
-        console.warn('Supabase not loaded yet.');
-        renderDashboard();
-        return;
-      }
-
       try {
-        var sessionRes = await _supabase.auth.getSession();
-        var session = sessionRes.data ? sessionRes.data.session : null;
-
+        const { data: { session } } = await _supabase.auth.getSession();
         if (session) {
           currentUser = session.user;
           document.getElementById('userEmail').innerText = currentUser.email;
@@ -746,26 +705,26 @@
     }
 
     async function fetchUserProgress() {
-      if (!currentUser || !_supabase) return;
-      var res = await _supabase
+      if (!currentUser) return;
+      const { data, error } = await _supabase
         .from('user_progress')
         .select('category_id')
         .eq('user_id', currentUser.id);
 
-      if (!res.error && res.data) {
-        completedCategoryIds = res.data.map(function(r) { return String(r.category_id); });
+      if (!error && data) {
+        completedCategoryIds = data.map(r => String(r.category_id));
       }
     }
 
     async function recordCompletion(catId) {
       catId = String(catId);
-      if (completedCategoryIds.indexOf(catId) === -1) {
+      if (!completedCategoryIds.includes(catId)) {
         completedCategoryIds.push(catId);
       }
       
       renderDashboard();
 
-      if (currentUser && _supabase) {
+      if (currentUser) {
         await _supabase.from('user_progress').insert({
           user_id: currentUser.id,
           category_id: catId,
@@ -776,55 +735,55 @@
 
     // ── RENDER DASHBOARD ──
     function renderDashboard() {
-      var doneCount = completedCategoryIds.length;
-      var totalModules = MODULES.length;
-      var percent = Math.round((doneCount / totalModules) * 100);
+      const doneCount = completedCategoryIds.length;
+      const totalModules = MODULES.length;
+      const percent = Math.round((doneCount / totalModules) * 100);
 
-      var circumference = 283;
-      var offset = circumference - (percent / 100) * circumference;
+      const circumference = 283;
+      const offset = circumference - (percent / 100) * circumference;
       document.getElementById('circleFill').style.strokeDashoffset = offset;
-      document.getElementById('circlePercent').innerText = percent + '%';
+      document.getElementById('circlePercent').innerText = `${percent}%`;
 
-      document.getElementById('statCompleted').innerText = doneCount + ' / ' + totalModules;
+      document.getElementById('statCompleted').innerText = `${doneCount} / ${totalModules}`;
 
-      var totalSignsLearnt = 0;
-      MODULES.forEach(function(m) {
-        if (completedCategoryIds.indexOf(String(m.id)) !== -1) {
+      let totalSignsLearnt = 0;
+      MODULES.forEach(m => {
+        if (completedCategoryIds.includes(String(m.id))) {
           totalSignsLearnt += m.signs.length;
         }
       });
       document.getElementById('statSigns').innerText = totalSignsLearnt;
 
-      var tbody = document.getElementById('moduleTable');
+      const tbody = document.getElementById('moduleTable');
       tbody.innerHTML = '';
 
-      MODULES.forEach(function(mod, idx) {
-        var isDone = completedCategoryIds.indexOf(String(mod.id)) !== -1;
-        var isUnlocked = idx === 0 || completedCategoryIds.indexOf(String(MODULES[idx - 1].id)) !== -1;
+      MODULES.forEach((mod, idx) => {
+        const isDone = completedCategoryIds.includes(String(mod.id));
+        const isUnlocked = idx === 0 || completedCategoryIds.includes(String(MODULES[idx - 1].id));
         
-        var tr = document.createElement('tr');
+        const tr = document.createElement('tr');
         if (!isUnlocked) tr.classList.add('locked-row');
 
-        var statusBadge = '';
-        var actionBtn = '';
+        let statusBadge = '';
+        let actionBtn = '';
 
         if (isDone) {
-          statusBadge = '<span class="status-pill completed">Completed</span>';
-          actionBtn = '<button class="btn btn-secondary" onclick="startLesson(\'' + mod.id + '\')">Review</button>';
+          statusBadge = `<span class="status-pill completed">Completed</span>`;
+          actionBtn = `<button class="btn btn-secondary" onclick="startLesson('${mod.id}')">Review</button>`;
         } else if (isUnlocked) {
-          statusBadge = '<span class="status-pill available">Available</span>';
-          actionBtn = '<button class="btn btn-primary" onclick="startLesson(\'' + mod.id + '\')">Start</button>';
+          statusBadge = `<span class="status-pill available">Available</span>`;
+          actionBtn = `<button class="btn btn-primary" onclick="startLesson('${mod.id}')">Start</button>`;
         } else {
-          statusBadge = '<span class="status-pill locked">Locked</span>';
-          actionBtn = '<button class="btn btn-disabled" disabled>Locked</button>';
+          statusBadge = `<span class="status-pill locked">Locked</span>`;
+          actionBtn = `<button class="btn btn-disabled" disabled>Locked</button>`;
         }
 
-        tr.innerHTML = 
-          '<td style="font-weight: 700;">' + mod.name + '</td>' +
-          '<td>' + mod.signs.length + ' signs</td>' +
-          '<td>' + statusBadge + '</td>' +
-          '<td style="text-align: right;">' + actionBtn + '</td>';
-
+        tr.innerHTML = `
+          <td style="font-weight: 700;">${mod.name}</td>
+          <td>${mod.signs.length} signs</td>
+          <td>${statusBadge}</td>
+          <td style="text-align: right;">${actionBtn}</td>
+        `;
         tbody.appendChild(tr);
       });
     }
@@ -839,7 +798,7 @@
 
     // ── LESSON ENGINE ──
     function startLesson(moduleId) {
-      currentModule = MODULES.find(function(m) { return m.id === moduleId; });
+      currentModule = MODULES.find(m => m.id === moduleId);
       currentStep = 0;
       
       document.getElementById('dashboardView').classList.remove('active');
@@ -850,31 +809,31 @@
     }
 
     function renderLessonStep() {
-      var sign = currentModule.signs[currentStep];
-      var total = currentModule.signs.length;
+      const sign = currentModule.signs[currentStep];
+      const total = currentModule.signs.length;
 
-      document.getElementById('lessonProgress').style.width = (((currentStep + 1) / total) * 100) + '%';
+      document.getElementById('lessonProgress').style.width = `${((currentStep + 1) / total) * 100}%`;
       document.getElementById('lessonCategory').innerText = currentModule.name;
       document.getElementById('signWord').innerText = sign.word;
       document.getElementById('signDesc').innerText = sign.desc;
 
-      var mediaBox = document.getElementById('mediaBox');
+      const mediaBox = document.getElementById('mediaBox');
       if (sign.img) {
-        mediaBox.innerHTML = '<img src="' + sign.img + '" alt="' + sign.word + '" onerror="this.parentNode.innerHTML=\'<span style=\\\x27color: var(--text-muted); font-weight:600;\\\x27>Image missing</span>\'">';
+        mediaBox.innerHTML = `<img src="${sign.img}" alt="${sign.word}" onerror="this.parentNode.innerHTML='<span style=\\'color: var(--text-muted); font-weight:600;\\'>Image missing</span>'">`;
       } else {
-        mediaBox.innerHTML = '<span style="color: var(--text-muted); font-weight:600;">No Image Available</span>';
+        mediaBox.innerHTML = `<span style="color: var(--text-muted); font-weight:600;">No Image Available</span>`;
       }
 
-      var nextBtn = document.getElementById('nextBtn');
+      const nextBtn = document.getElementById('nextBtn');
       if (currentStep === total - 1) {
         nextBtn.innerText = 'Complete Module ✓';
       } else {
-        nextBtn.innerHTML = 'I Got It &rarr; Next Sign';
+        nextBtn.innerText = 'I Got It → Next Sign';
       }
     }
 
     async function nextSign() {
-      var total = currentModule.signs.length;
+      const total = currentModule.signs.length;
       if (currentStep < total - 1) {
         currentStep++;
         renderLessonStep();
@@ -886,11 +845,11 @@
 
     // ── HELP MODAL ENGINE ──
     function openHelpModal() {
-      var sign = currentModule.signs[currentStep];
-      document.getElementById('helpModalTitle').innerText = 'Tips for "' + sign.word + '"';
+      const sign = currentModule.signs[currentStep];
+      document.getElementById('helpModalTitle').innerText = `Tips for "${sign.word}"`;
       document.getElementById('helpModalText').innerText = sign.helpTip || sign.desc;
       
-      var searchUrl = 'https://www.youtube.com/results?search_query=Indian+Sign+Language+' + encodeURIComponent(sign.word) + '+sign';
+      const searchUrl = `https://www.youtube.com/results?search_query=Indian+Sign+Language+${encodeURIComponent(sign.word)}+sign`;
       document.getElementById('videoSearchBtn').href = searchUrl;
 
       document.getElementById('helpModal').classList.add('active');
@@ -901,15 +860,11 @@
     }
 
     async function logout() {
-      if (_supabase) {
-        await _supabase.auth.signOut();
-      }
+      await _supabase.auth.signOut();
       window.location.href = 'login.html';
     }
 
-    document.addEventListener('DOMContentLoaded', init);
+    init();
   </script>
 </body>
 </html>
-
-```
