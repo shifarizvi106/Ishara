@@ -47,16 +47,20 @@
       opacity: 0;
     }
 
-    /* Additional Auth Styles while preserving main structure */
-    .auth-fields {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
+    /* Message Boxes */
+    .msg-box {
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
       margin-bottom: 12px;
-      text-align: left;
+      display: none;
     }
 
-    .input-field {
+    .msg-error { background: #ffe4e6; color: #dc3545; }
+    .msg-success { background: #e6f4ea; color: #137333; }
+
+    .username-input {
       width: 100%;
       padding: 10px 14px;
       border: 1px solid #fbcfe8;
@@ -64,48 +68,8 @@
       font-size: 0.9rem;
       outline: none;
       box-sizing: border-box;
+      margin-bottom: 12px;
     }
-
-    .auth-toggle-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 8px 0 14px 0;
-      font-size: 0.8rem;
-    }
-
-    .auth-toggle-btn, .forgot-link {
-      color: #d63384;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: underline;
-      background: none;
-      border: none;
-      padding: 0;
-    }
-
-    .guest-option-btn {
-      background: none;
-      border: none;
-      color: #a14a76;
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 12px;
-      width: 100%;
-    }
-
-    .error-box, .success-box {
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      display: none;
-    }
-
-    .error-box { background: #ffe4e6; color: #dc3545; }
-    .success-box { background: #e6f4ea; color: #137333; }
   </style>
 </head>
 <body>
@@ -126,18 +90,13 @@
 
       <h1 class="logo">Ishara</h1>
       <p class="subtitle">Learn Indian Sign Language.</p>
-      
-      <div class="error-box" id="error-box"></div>
-      <div class="success-box" id="success-box"></div>
 
+      <div class="msg-box msg-error" id="error-box"></div>
+      <div class="msg-box msg-success" id="success-box"></div>
+      
       <form class="terms-form" id="consent-form">
-        
-        <!-- Auth Fields (Hidden initially until user toggles sign-in/up) -->
-        <div class="auth-fields" id="auth-fields">
-          <input type="text" id="auth-username" class="input-field" placeholder="Username" style="display:none;" />
-          <input type="email" id="auth-email" class="input-field" placeholder="Email address" />
-          <input type="password" id="auth-password" class="input-field" placeholder="Password" />
-        </div>
+        <!-- Optional Username field for profile registration -->
+        <input type="text" id="username-input" class="username-input" placeholder="Choose a Username (Optional)" />
 
         <div class="checkbox-group">
           <label class="checkbox-label">
@@ -153,15 +112,8 @@
           </label>
         </div>
 
-        <div class="auth-toggle-row">
-          <button type="button" class="auth-toggle-btn" id="auth-toggle-btn" onclick="toggleAuthFields()">Have an account? Sign In / Sign Up</button>
-          <span class="forgot-link" id="forgot-link" style="display:none;" onclick="handleForgotPassword()">Forgot password?</span>
-        </div>
-
         <button type="submit" id="start-btn" class="start-btn" disabled>Start Learning</button>
       </form>
-
-      <button type="button" class="guest-option-btn" id="guest-btn" style="display:none;" onclick="continueAsGuest()">Continue without signing in</button>
     </div>
 
   </section>
@@ -171,9 +123,6 @@
     const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    let isAuthActive = false;
-    let authMode = 'signin'; // 'signin' or 'signup'
 
     document.addEventListener("DOMContentLoaded", async () => {
       // 1. GSAP Splash Screen Animation
@@ -202,7 +151,7 @@
         ease: "power2.out"
       }, "-=0.4");
 
-      // Check existing Supabase Session
+      // Check existing user session
       const { data: { session } } = await _supabase.auth.getSession();
       if (session) {
         localStorage.setItem('ishara_user_type', 'authenticated');
@@ -223,134 +172,41 @@
       ageCheck.addEventListener('change', validateForm);
       tosCheck.addEventListener('change', validateForm);
 
-      // Form Submit Handler
+      // Form Submission Logic
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         hideMessages();
 
         if (startBtn.disabled) return;
 
-        // Default Direct Guest Mode if Auth Fields aren't shown
-        if (!isAuthActive) {
-          continueAsGuest();
-          return;
+        const usernameVal = document.getElementById('username-input').value.trim() || 'Learner';
+
+        // Set Guest mode details so learn.html functions seamlessly
+        localStorage.setItem('ishara_guest', 'true');
+        localStorage.setItem('ishara_user_type', 'guest');
+        localStorage.setItem('ishara_username', usernameVal);
+
+        if (!localStorage.getItem('sp_completed')) {
+          localStorage.setItem('sp_completed', JSON.stringify([]));
         }
 
-        // Supabase Auth Handling
-        const email = document.getElementById('auth-email').value.trim();
-        const password = document.getElementById('auth-password').value;
-        const username = document.getElementById('auth-username').value.trim();
-
-        if (!email || !password) {
-          showError('Please fill in all required auth fields.');
-          return;
-        }
-
-        startBtn.disabled = true;
-        startBtn.innerText = 'Processing...';
-
+        // Sync username to database if session exists, else proceed directly
         try {
-          if (authMode === 'signin') {
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-
-            localStorage.setItem('ishara_user_type', 'authenticated');
-            localStorage.removeItem('ishara_guest');
-            window.location.href = 'learn.html';
-          } else {
-            // Sign Up Flow
-            if (!username) {
-              showError('Please enter a username.');
-              startBtn.disabled = false;
-              startBtn.innerText = 'Sign Up';
-              return;
-            }
-
-            const { data, error } = await _supabase.auth.signUp({
-              email,
-              password,
-              options: { data: { display_name: username } }
+          const { data: { user } } = await _supabase.auth.getUser();
+          if (user) {
+            await _supabase.from('profiles').upsert({
+              id: user.id,
+              username: usernameVal,
+              updated_at: new Date()
             });
-            if (error) throw error;
-
-            // Sync to profiles table
-            if (data?.user) {
-              await _supabase.from('profiles').upsert({
-                id: data.user.id,
-                username: username,
-                email: email,
-                updated_at: new Date()
-              });
-            }
-
-            // Email confirmation required check
-            if (data?.user && !data?.session) {
-              startBtn.disabled = false;
-              startBtn.innerText = 'Sign Up';
-              showSuccess('Account created! Please check your email to confirm before signing in.');
-              return;
-            }
-
-            localStorage.setItem('ishara_username', username);
-            localStorage.setItem('ishara_user_type', 'authenticated');
-            localStorage.removeItem('ishara_guest');
-            window.location.href = 'learn.html';
           }
         } catch (err) {
-          showError(err.message || 'Authentication error');
-          startBtn.disabled = false;
-          validateForm();
-          startBtn.innerText = authMode === 'signin' ? 'Sign In' : 'Sign Up';
+          console.warn('Proceeding in offline/guest mode:', err);
         }
+
+        window.location.href = 'learn.html';
       });
     });
-
-    function toggleAuthFields() {
-      const authFields = document.getElementById('auth-fields');
-      const toggleBtn = document.getElementById('auth-toggle-btn');
-      const guestBtn = document.getElementById('guest-btn');
-      const forgotLink = document.getElementById('forgot-link');
-      const startBtn = document.getElementById('start-btn');
-      const usernameInput = document.getElementById('auth-username');
-
-      isAuthActive = !isAuthActive;
-
-      if (isAuthActive) {
-        authFields.style.display = 'flex';
-        guestBtn.style.display = 'block';
-        forgotLink.style.display = 'inline';
-        toggleBtn.innerText = 'Switch to Sign Up';
-        startBtn.innerText = 'Sign In';
-      } else {
-        authFields.style.display = 'none';
-        guestBtn.style.display = 'none';
-        forgotLink.style.display = 'none';
-        toggleBtn.innerText = 'Have an account? Sign In / Sign Up';
-        startBtn.innerText = 'Start Learning';
-      }
-    }
-
-    function continueAsGuest() {
-      localStorage.setItem('ishara_guest', 'true');
-      localStorage.setItem('ishara_user_type', 'guest');
-      localStorage.setItem('ishara_username', 'Guest Learner');
-      if (!localStorage.getItem('sp_completed')) {
-        localStorage.setItem('sp_completed', JSON.stringify([]));
-      }
-      window.location.href = 'learn.html';
-    }
-
-    async function handleForgotPassword() {
-      hideMessages();
-      const email = document.getElementById('auth-email').value.trim();
-      if (!email) {
-        showError('Please enter your email above to reset password.');
-        return;
-      }
-      const { error } = await _supabase.auth.resetPasswordForEmail(email);
-      if (error) showError(error.message);
-      else showSuccess('Password reset link sent to your email.');
-    }
 
     function showError(msg) {
       const eb = document.getElementById('error-box');
