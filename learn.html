@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ishara - Dashboard</title>
+  <title>Ishara – Dashboard</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,139 +15,381 @@
     :root {
       --primary: #ff5fa2;
       --primary-dark: #d63384;
-      --primary-light: #ffe6f2;
-      --bg-body: #fff0f6;
+      --primary-light: #ffe3f1;
+      --bg-body: #fdf6f9;
       --bg-card: #ffffff;
-      --text-main: #1f2937;
-      --text-muted: #833a5c;
-      --text-faint: #64748b;
-      --border: #fbcfe8;
+      --text-main: #2d1b28;
+      --text-muted: #7a5a6e;
+      --text-faint: #b395a8;
+      --border: #f0d6e4;
       --success: #15803d;
-      --danger: #dc2626;
-      --shadow: 0 4px 12px rgba(255, 95, 162, 0.05);
-      --radius: 20px;
-      --radius-sm: 12px;
-      --radius-xs: 8px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(214, 51, 132, 0.08);
+      --radius: 16px;
+      --radius-sm: 10px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Crossiont One' , 'Plus Jakarta Sans' ;
+      background: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+    }
 
     .sidebar {
-      width: 240px; background: var(--bg-card); padding: 24px 16px;
-      display: flex; flex-direction: column; justify-content: space-between;
-      border-right: 1px solid var(--border); flex-shrink: 0;
+      width: 220px;
+      background: var(--bg-card);
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
     }
-    .brand { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 24px; padding-left: 8px; }
-    .nav-menu { display: flex; flex-direction: column; gap: 8px; list-style: none; }
+
+    .brand {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 32px;
+      padding-left: 8px;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      list-style: none;
+    }
+
     .nav-item a {
-      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-      border-radius: var(--radius-sm); color: var(--text-muted); text-decoration: none;
-      font-weight: 700; font-size: 0.95rem; transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background 0.2s, color 0.2s;
     }
-    .nav-item a:hover { background: var(--primary-light); color: var(--primary-dark); }
-    .nav-item.active a { background: var(--primary); color: #fff; }
+
+    .nav-item a:hover {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .nav-item.active a {
+      background: var(--primary);
+      color: #fff;
+    }
+
     .logout-btn {
-      color: var(--text-muted); background: none; border: none; padding: 12px 16px;
-      font-weight: 700; font-size: 0.9rem; cursor: pointer; text-align: left;
-      border-radius: var(--radius-sm); transition: background 0.2s, color 0.2s;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      border-radius: var(--radius-sm);
+      transition: background 0.2s, color 0.2s;
+      width: 100%;
     }
-    .logout-btn:hover { background: var(--primary-light); color: var(--primary-dark); }
 
-    .main-content { flex: 1; padding: 32px; display: flex; flex-direction: column; gap: 24px; max-width: calc(100vw - 240px); }
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; }
-    .dashboard-header h1 { font-size: 1.8rem; font-weight: 800; }
-    .user-badge { display: flex; align-items: center; gap: 12px; }
+    .logout-btn:hover {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      max-width: calc(100vw - 220px);
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dashboard-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .avatar {
-      width: 40px; height: 40px; background: var(--primary); color: #fff;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 1rem;
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
-    .user-name { font-weight: 800; }
 
-    .dashboard-grid { display: grid; grid-template-columns: 1.2fr 1.8fr 1.2fr; gap: 20px; }
-    .grid-row-bottom { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .user-name {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1.8fr 1.2fr;
+      gap: 20px;
+    }
+
+    .grid-row-bottom {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
 
     @media (max-width: 1100px) {
       .dashboard-grid { grid-template-columns: 1fr 1fr; }
       .dashboard-grid > *:first-child { grid-column: 1 / -1; }
       .grid-row-bottom { grid-template-columns: 1fr; }
     }
+
     @media (max-width: 768px) {
       body { flex-direction: column; }
-      .sidebar { width: 100%; flex-direction: row; padding: 16px; }
-      .sidebar > div:first-child { display: flex; gap: 16px; align-items: center; }
-      .nav-menu { flex-direction: row; }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        flex-direction: row;
+        padding: 16px 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .sidebar > div:first-child { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+      .brand { margin-bottom: 0; }
+      .nav-menu { flex-direction: row; gap: 4px; flex-wrap: wrap; }
+      .nav-item a { padding: 8px 12px; font-size: 0.8rem; }
       .main-content { max-width: 100%; padding: 20px; }
       .dashboard-grid { grid-template-columns: 1fr; }
     }
 
     .card {
-      background: var(--bg-card); border-radius: var(--radius); padding: 24px;
-      border: 1px solid var(--border); box-shadow: var(--shadow);
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
     }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
     .highlight-card {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 180px;
+      border: none;
     }
-    .card-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
-    .card-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; font-weight: 600; line-height: 1.4; }
-    .big-number { font-size: 2.8rem; font-weight: 800; }
-    .streak-number { font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin: 12px 0; }
 
-    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .progress-bar-container { background: var(--primary-light); height: 16px; border-radius: 999px; overflow: hidden; margin-top: 12px; }
-    .progress-bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    .highlight-card .card-title {
+      color: rgba(255,255,255,0.9);
+    }
 
-    .lessons-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    .lessons-table th, .lessons-table td { padding: 14px 8px; text-align: left; border-bottom: 1px solid var(--border); }
-    .lessons-table th { font-weight: 700; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    .status-badge { font-weight: 800; font-size: 0.9rem; }
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .big-number {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+
+    .highlight-card .big-number {
+      color: #fff;
+    }
+
+    .streak-number {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin: 8px 0;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-container {
+      background: var(--primary-light);
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar-fill {
+      background: var(--primary);
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 999px;
+    }
+
+    .percent-text {
+      font-weight: 800;
+      color: var(--primary-dark);
+      font-size: 0.95rem;
+    }
+
+    .lessons-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    .lessons-table th {
+      padding: 12px 8px 10px 8px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .lessons-table td {
+      padding: 14px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .lessons-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-badge {
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
     .status-completed { color: var(--success); }
     .status-available { color: var(--primary-dark); }
     .status-locked { color: var(--text-faint); }
 
     .btn-action {
-      background: var(--primary); color: #fff; text-decoration: none; padding: 8px 16px;
-      border-radius: var(--radius-xs); font-weight: 700; font-size: 0.85rem; display: inline-block;
-      border: none; cursor: pointer; transition: background 0.2s, transform 0.1s;
+      background: var(--primary);
+      color: #fff;
+      text-decoration: none;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn-action:hover { background: var(--primary-dark); }
-    .btn-action:active { transform: scale(0.97); }
-    .btn-action:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+    .btn-action:hover {
+      background: var(--primary-dark);
+    }
 
     .btn-secondary {
-      background: #f1f5f9; color: var(--text-muted); padding: 8px 16px;
-      border-radius: var(--radius-xs); font-weight: 700; font-size: 0.85rem;
-      border: 1px solid var(--border); cursor: pointer; transition: background 0.2s;
+      background: #f1f5f9;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
     }
-    .btn-secondary:hover { background: var(--primary-light); color: var(--primary-dark); }
+
+    .btn-secondary:hover {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
 
     .toast-container {
-      position: fixed; top: 20px; right: 20px; z-index: 1000;
-      display: flex; flex-direction: column; gap: 10px;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .toast {
-      background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary);
-      border-radius: var(--radius-xs); padding: 14px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      font-weight: 600; font-size: 0.9rem; animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-      max-width: 320px;
-    }
-    .toast.success { border-left-color: var(--success); }
-    .toast.error { border-left-color: var(--danger); }
-    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateX(20px); } }
 
-    .debug-panel {
-      background: #1e1e2e; color: #cdd6f4; border-radius: var(--radius-sm);
-      padding: 16px; font-family: 'SF Mono', monospace; font-size: 0.8rem;
-      max-height: 200px; overflow-y: auto; margin-top: 12px;
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 14px 20px;
+      box-shadow: var(--shadow-md);
+      font-weight: 600;
+      font-size: 0.85rem;
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+      max-width: 340px;
     }
-    .debug-panel .ok { color: #a6e3a1; }
-    .debug-panel .err { color: #f38ba8; }
-    .debug-panel .warn { color: #f9e2af; }
+
+    .toast.success { border-left-color: var(--success); }
+    .toast.error { border-left-color: #dc2626; }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(20px); }
+    }
   </style>
-<base target="_blank">
 </head>
 <body>
 
@@ -155,12 +397,11 @@
 
   <aside class="sidebar">
     <div>
-      <div class="brand">ISHARA</div>
+      <div class="brand">SignPath</div>
       <nav>
         <ul class="nav-menu">
           <li class="nav-item active"><a href="learn.html">Dashboard</a></li>
-          <li class="nav-item"><a href="collect.html">Practice Mode</a></li>
-          <li class="nav-item"><a href="profile.html">Profile Settings</a></li>
+          <li class="nav-item"><a href="lesson.html">Practice</a></li>
         </ul>
       </nav>
     </div>
@@ -169,7 +410,7 @@
 
   <main class="main-content">
     <header class="dashboard-header">
-      <h1>Learn & Overview</h1>
+      <h1>Dashboard</h1>
       <div class="user-badge">
         <div class="avatar" id="userAvatar">?</div>
         <span class="user-name" id="userName">Guest</span>
@@ -179,56 +420,61 @@
     <section class="dashboard-grid">
       <div class="card highlight-card">
         <div>
-          <h2 class="card-title">Total Signs Mastered</h2>
+          <div class="card-title">Signs Mastered</div>
           <div class="big-number" id="totalSignsValue">0</div>
         </div>
-        <span id="completionRateText" style="font-weight:700;">0% core curriculum completed</span>
+        <span id="completionRateText" style="font-weight:600; font-size:0.9rem; opacity:0.9;">0% complete</span>
       </div>
 
       <div class="card">
         <div class="progress-header">
-          <h2 class="card-title">Curriculum Progress</h2>
-          <span id="modulePercentText" style="font-weight:800; color:var(--primary-dark);">0%</span>
+          <div class="card-title">Curriculum Progress</div>
+          <span class="percent-text" id="modulePercentText">0%</span>
         </div>
         <div class="progress-bar-container">
           <div class="progress-bar-fill" id="moduleProgressFill"></div>
         </div>
-        <p class="card-subtitle">Real-time tracking of unlocked lessons across all core modules.</p>
+        <p class="card-subtitle">Complete each module to unlock the next one.</p>
       </div>
 
-      <div class="card" style="text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-        <h2 class="card-title">Current Streak</h2>
+      <div class="card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+        <div class="card-title">Current Streak</div>
         <div class="streak-number" id="streakBadge">0</div>
-        <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Days active</span>
+        <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">days active</span>
       </div>
     </section>
 
     <section class="grid-row-bottom">
       <div class="card">
-        <h2 class="card-title" style="margin-bottom:12px;">Sign Language Modules</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <div class="card-title">Modules</div>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;" id="moduleCount">0 / 0</span>
+        </div>
         <table class="lessons-table">
-          <thead><tr><th>Module</th><th>Status</th><th>Action</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Status</th>
+              <th style="text-align:right;">Action</th>
+            </tr>
+          </thead>
           <tbody id="lessonsTableBody">
-            <tr><td colspan="3" style="text-align:center; padding:32px; color:var(--text-faint);">Loading modules...</td></tr>
+            <!-- Populated by JS -->
           </tbody>
         </table>
-        <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-secondary" onclick="testSave('greetings')">Test Save Greetings</button>
-          <button class="btn-secondary" onclick="testSave('relations')">Test Save Relations</button>
-          <button class="btn-secondary" onclick="runDiagnostics()">Run Diagnostics</button>
+        <div style="margin-top:16px;">
+          <button class="btn-secondary" onclick="window.forceRefresh()">Refresh</button>
         </div>
-        <div class="debug-panel" id="debugPanel" style="display:none;"></div>
       </div>
 
       <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
         <div>
-          <h2 class="card-title">Practice Mode</h2>
-          <p class="card-subtitle" style="margin-top:8px;">Test your sign recognition live using web camera recognition.</p>
+          <div class="card-title">Practice Mode</div>
+          <p class="card-subtitle" style="margin-top:8px;">Test your sign recognition with interactive lessons.</p>
         </div>
-        <a href="collect.html" class="btn-action" style="text-align:center; margin-top:16px;">Start Practice Mode</a>
+        <a href="lesson.html" class="btn-action" style="text-align:center; margin-top:16px; padding:12px;">Start Practice</a>
       </div>
     </section>
-
   </main>
 
   <script>
@@ -236,13 +482,13 @@
     const CONFIG = {
       SUPABASE_URL: 'https://xxijjaiytnqrdbqjegjr.supabase.co',
       SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8',
-      SIGNS_PER_MODULE: 10,
+      SIGNS_PER_MODULE: 5,
       CATEGORIES: [
-        { id: 'greetings',  name: '#1 : Greetings' },
-        { id: 'relations', name: '#2 : Relationships' },
-        { id: 'emotions',   name: '#3 : Emotions' },
-        { id: 'general',    name: '#4 : General' },
-        { id: 'abc',        name: '#5 : ABC Basics' }
+        { id: 'greetings', name: 'Greetings', signs: 4 },
+        { id: 'relations', name: 'Relationships', signs: 5 },
+        { id: 'emotions', name: 'Emotions', signs: 5 },
+        { id: 'general', name: 'General', signs: 5 },
+        { id: 'abc', name: 'ABC Basics', signs: 26 }
       ]
     };
 
@@ -251,34 +497,15 @@
       user: null,
       completedCategories: [],
       streak: 0,
-      realtimeChannel: null,
-      isSaving: false,
-      saveQueue: [],
-      initialized: false,
-      logs: []
+      channel: null,
+      initialized: false
     };
 
-    // ── SUPABASE CLIENT ──
-    const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {
-      realtime: { params: { eventsPerSecond: 10 } }
-    });
+    // ── SUPABASE ──
+    const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
 
-    // ── DOM HELPERS ──
+    // ── HELPERS ──
     const $ = (sel) => document.querySelector(sel);
-
-    function log(msg, type = 'info') {
-      const line = `[${new Date().toLocaleTimeString()}] ${msg}`;
-      state.logs.push({ msg, type });
-      console.log(line);
-      const panel = $('#debugPanel');
-      if (panel && panel.style.display !== 'none') {
-        const div = document.createElement('div');
-        div.className = type;
-        div.textContent = line;
-        panel.appendChild(div);
-        panel.scrollTop = panel.scrollHeight;
-      }
-    }
 
     function showToast(message, type = 'info') {
       const container = $('#toastContainer');
@@ -289,8 +516,11 @@
       setTimeout(() => toast.remove(), 3000);
     }
 
-    // ── UUID GENERATOR (for id column) ──
-    function generateUUID() {
+    function log(msg) {
+      console.log(`[SignPath] ${msg}`);
+    }
+
+    function uuid() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
         const v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -301,201 +531,30 @@
     // ── AUTH ──
     async function getSession() {
       const { data, error } = await supabase.auth.getSession();
-      if (error) { log('Session error: ' + error.message, 'err'); return null; }
+      if (error) { log('Session error: ' + error.message); return null; }
       return data?.session ?? null;
     }
 
     async function getUserProfile(userId) {
       const { data, error } = await supabase
         .from('profiles')
-        .select('streak, full_name, last_active')
+        .select('streak, full_name')
         .eq('id', userId)
         .maybeSingle();
-      if (error) { log('Profile fetch error: ' + error.message, 'err'); return { streak: 0, full_name: null }; }
+      if (error) { log('Profile fetch error: ' + error.message); return { streak: 0, full_name: null }; }
       return data ?? { streak: 0, full_name: null };
     }
 
     async function getUserProgress(userId) {
       const { data, error } = await supabase
         .from('user_progress')
-        .select('category_id, completed_at')
+        .select('category_id')
         .eq('user_id', userId);
-      if (error) { log('Progress fetch error: ' + error.message, 'err'); return []; }
+      if (error) { log('Progress fetch error: ' + error.message); return []; }
       return data ?? [];
     }
 
-    // ── PROGRESS SAVING ──
-    async function saveCategoryProgress(categoryId) {
-      if (!state.user) {
-        showToast('Please log in to save progress', 'error');
-        log('Save failed: not authenticated', 'err');
-        return { success: false, error: 'Not authenticated' };
-      }
-      if (state.completedCategories.includes(categoryId)) {
-        log(`Category ${categoryId} already completed`, 'warn');
-        return { success: true, alreadyDone: true };
-      }
-
-      if (state.isSaving) {
-        if (!state.saveQueue.includes(categoryId)) state.saveQueue.push(categoryId);
-        log(`Save queued: ${categoryId}`, 'warn');
-        return { success: false, error: 'Queued' };
-      }
-
-      state.isSaving = true;
-      showToast(`Saving ${categoryId}...`);
-      log(`Starting save for ${categoryId}...`);
-
-      try {
-        const now = new Date().toISOString();
-        const newId = generateUUID();
-
-        // 1. Save progress with explicit id
-        log(`Inserting with id=${newId.substring(0,8)}...`);
-        const { data: progressData, error: progressError } = await supabase
-          .from('user_progress')
-          .insert({
-            id: newId,
-            user_id: state.user.id,
-            category_id: categoryId,
-            completed_at: now
-          })
-          .select();
-
-        if (progressError) {
-          log('Insert error: ' + JSON.stringify(progressError), 'err');
-          throw progressError;
-        }
-        log(`Insert returned: ${JSON.stringify(progressData)}`, 'ok');
-
-        // 2. Update streak
-        const newStreak = (state.streak || 0) + 1;
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: state.user.id,
-            streak: newStreak,
-            last_active: now
-          }, { onConflict: 'id' })
-          .select();
-
-        if (profileError) {
-          log('Profile upsert error: ' + JSON.stringify(profileError), 'err');
-        } else {
-          log(`Profile upsert returned: ${JSON.stringify(profileData)}`, 'ok');
-          state.streak = newStreak;
-        }
-
-        // 3. Update local state
-        state.completedCategories.push(categoryId);
-        updateDashboardUI();
-        showToast(`${categoryId} saved! 🎉`, 'success');
-        log(`Save complete for ${categoryId}`, 'ok');
-
-        return { success: true };
-
-      } catch (err) {
-        log(`Save failed for ${categoryId}: ${err.message || err}`, 'err');
-        showToast('Save failed. Retrying...', 'error');
-        setTimeout(() => saveCategoryProgress(categoryId), 2000);
-        return { success: false, error: err.message || String(err) };
-      } finally {
-        state.isSaving = false;
-        if (state.saveQueue.length > 0) {
-          const next = state.saveQueue.shift();
-          setTimeout(() => saveCategoryProgress(next), 100);
-        }
-      }
-    }
-
-    // ── UI RENDERING ──
-    function updateDashboardUI() {
-      const completed = state.completedCategories;
-      const totalModules = CONFIG.CATEGORIES.length;
-      const percent = Math.round((completed.length / totalModules) * 100);
-      const totalSigns = completed.length * CONFIG.SIGNS_PER_MODULE;
-
-      $('#totalSignsValue').textContent = totalSigns;
-      $('#completionRateText').textContent = `${percent}% core curriculum completed`;
-      $('#modulePercentText').textContent = `${percent}%`;
-      $('#moduleProgressFill').style.width = `${percent}%`;
-      $('#streakBadge').textContent = state.streak;
-
-      renderTable();
-    }
-
-    function renderTable() {
-      const tbody = $('#lessonsTableBody');
-      const completed = state.completedCategories;
-      tbody.innerHTML = '';
-
-      CONFIG.CATEGORIES.forEach((cat, idx) => {
-        const isDone = completed.includes(cat.id);
-        const isUnlocked = idx === 0 || completed.includes(CONFIG.CATEGORIES[idx - 1].id);
-
-        const tr = document.createElement('tr');
-        let statusClass, statusText;
-        if (isDone) { statusClass = 'status-completed'; statusText = '✓ Completed'; }
-        else if (isUnlocked) { statusClass = 'status-available'; statusText = 'Available'; }
-        else { statusClass = 'status-locked'; statusText = 'Locked'; }
-
-        let actionCell;
-        if (isUnlocked) {
-          actionCell = `<a href="lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}" class="btn-action">${isDone ? 'Review' : 'Start'}</a>`;
-        } else {
-          actionCell = '<span style="color:#94a3b8; font-weight:700;">Locked</span>';
-        }
-
-        tr.innerHTML = `
-          <td style="font-weight:700;">${cat.name}</td>
-          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-          <td>${actionCell}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ── REALTIME LISTENER ──
-    async function initRealtimeListener() {
-      if (!state.user) { log('No user, skipping realtime', 'warn'); return; }
-      if (state.realtimeChannel) {
-        await supabase.removeChannel(state.realtimeChannel);
-        state.realtimeChannel = null;
-      }
-
-      log(`Initializing realtime for user ${state.user.id.substring(0,8)}...`);
-
-      state.realtimeChannel = supabase
-        .channel('dashboard-progress')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'user_progress', filter: `user_id=eq.${state.user.id}` },
-          (payload) => {
-            log(`Realtime event on user_progress: ${payload.eventType}`, 'ok');
-            log(`Payload: ${JSON.stringify(payload.new || payload)}`, 'ok');
-            refreshData();
-          }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${state.user.id}` },
-          (payload) => {
-            log(`Realtime event on profiles: ${payload.eventType}`, 'ok');
-            refreshData();
-          }
-        )
-        .subscribe((status, err) => {
-          log(`Realtime status: ${status}${err ? ' | Error: ' + err.message : ''}`, status === 'SUBSCRIBED' ? 'ok' : 'warn');
-          if (status === 'SUBSCRIBED') {
-            showToast('Real-time connected', 'success');
-          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            showToast('Realtime error. Check console.', 'error');
-            setTimeout(initRealtimeListener, 5000);
-          }
-        });
-    }
-
-    // ── DATA REFRESH ──
+    // ── REFRESH DATA ──
     async function refreshData() {
       const session = await getSession();
 
@@ -512,8 +571,7 @@
 
         state.streak = profile.streak ?? 0;
         state.completedCategories = progressData.map(i => i.category_id);
-        log(`Loaded ${progressData.length} completed categories, streak=${state.streak}`, 'ok');
-
+        log(`Loaded ${progressData.length} completed categories`);
       } else {
         state.user = null;
         state.streak = 0;
@@ -522,131 +580,193 @@
         $('#userAvatar').textContent = '?';
       }
 
-      updateDashboardUI();
+      updateUI();
     }
 
-    // ── CROSS-TAB / LESSON COMMUNICATION ──
+    // ── UPDATE UI ──
+    function updateUI() {
+      const completed = state.completedCategories;
+      const total = CONFIG.CATEGORIES.length;
+      const percent = Math.round((completed.length / total) * 100);
+      
+      // Calculate total signs learned
+      const totalSigns = CONFIG.CATEGORIES
+        .filter(c => completed.includes(c.id))
+        .reduce((sum, c) => sum + c.signs, 0);
+
+      $('#totalSignsValue').textContent = totalSigns;
+      $('#completionRateText').textContent = `${percent}% complete`;
+      $('#modulePercentText').textContent = `${percent}%`;
+      $('#moduleProgressFill').style.width = `${percent}%`;
+      $('#streakBadge').textContent = state.streak;
+      $('#moduleCount').textContent = `${completed.length} / ${total}`;
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = $('#lessonsTableBody');
+      const completed = state.completedCategories;
+      tbody.innerHTML = '';
+
+      CONFIG.CATEGORIES.forEach((cat, idx) => {
+        const isDone = completed.includes(cat.id);
+        const isUnlocked = idx === 0 || completed.includes(CONFIG.CATEGORIES[idx - 1].id);
+
+        const tr = document.createElement('tr');
+        let statusClass, statusText;
+        if (isDone) {
+          statusClass = 'status-completed';
+          statusText = 'Completed';
+        } else if (isUnlocked) {
+          statusClass = 'status-available';
+          statusText = 'Available';
+        } else {
+          statusClass = 'status-locked';
+          statusText = 'Locked';
+        }
+
+        let actionHtml;
+        if (isUnlocked) {
+          const link = `lesson.html?cat=${cat.id}${isDone ? '&replay=1' : ''}`;
+          actionHtml = `<a href="${link}" class="btn-action">${isDone ? 'Review' : 'Start'}</a>`;
+        } else {
+          actionHtml = '<span style="color:#94a3b8; font-weight:600; font-size:0.8rem;">Locked</span>';
+        }
+
+        tr.innerHTML = `
+          <td style="font-weight:600;">${cat.name}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td style="text-align:right;">${actionHtml}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ── REALTIME ──
+    async function initRealtime() {
+      if (!state.user) return;
+      if (state.channel) {
+        await supabase.removeChannel(state.channel);
+        state.channel = null;
+      }
+
+      state.channel = supabase
+        .channel('dashboard-updates')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'user_progress', filter: `user_id=eq.${state.user.id}` },
+          () => { log('Realtime: progress updated'); refreshData(); }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${state.user.id}` },
+          () => { log('Realtime: profile updated'); refreshData(); }
+        )
+        .subscribe((status) => {
+          log(`Realtime: ${status}`);
+        });
+    }
+
+    // ── SAVE PROGRESS ──
+    async function saveProgress(categoryId) {
+      if (!state.user) {
+        showToast('Please log in to save progress', 'error');
+        return;
+      }
+      if (state.completedCategories.includes(categoryId)) {
+        showToast('Already completed', 'info');
+        return;
+      }
+
+      try {
+        const now = new Date().toISOString();
+        const newId = uuid();
+
+        const { error: progressError } = await supabase
+          .from('user_progress')
+          .insert({
+            id: newId,
+            user_id: state.user.id,
+            category_id: categoryId,
+            completed_at: now
+          });
+
+        if (progressError) throw progressError;
+
+        const newStreak = state.streak + 1;
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: state.user.id,
+            streak: newStreak,
+            last_active: now
+          }, { onConflict: 'id' });
+
+        if (profileError) throw profileError;
+
+        state.streak = newStreak;
+        state.completedCategories.push(categoryId);
+        updateUI();
+        showToast(`${categoryId} completed!`, 'success');
+        log(`Saved: ${categoryId}`);
+
+      } catch (err) {
+        showToast('Save failed: ' + err.message, 'error');
+        log('Save error: ' + err.message);
+      }
+    }
+
+    // ── POSTMESSAGE LISTENER ──
     window.addEventListener('message', async (event) => {
       if (event.origin !== window.location.origin) return;
       const { type, categoryId } = event.data || {};
       if (type === 'LESSON_COMPLETE' && categoryId) {
-        log(`postMessage received: LESSON_COMPLETE ${categoryId}`, 'ok');
-        await saveCategoryProgress(categoryId);
+        await saveProgress(categoryId);
       }
     });
 
-    function checkUrlParams() {
-      const params = new URLSearchParams(window.location.search);
-      const completedCat = params.get('completed');
-      if (completedCat) {
-        log(`URL param detected: completed=${completedCat}`, 'ok');
-        saveCategoryProgress(completedCat);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
-
-    // ── DIAGNOSTICS ──
-    async function runDiagnostics() {
-      const panel = $('#debugPanel');
-      panel.innerHTML = '';
-      panel.style.display = 'block';
-      state.logs = [];
-
-      log('=== DIAGNOSTICS START ===');
-
-      // 1. Check auth
-      const session = await getSession();
-      if (!session) {
-        log('No active session. You must be logged in.', 'err');
-        return;
-      }
-      log(`Authenticated as: ${session.user.email}`, 'ok');
-
-      // 2. Check user_progress table exists
-      try {
-        const { data: cols, error: colsErr } = await supabase
-          .from('user_progress')
-          .select('*')
-          .limit(0);
-        if (colsErr) {
-          log(`user_progress table error: ${colsErr.message}`, 'err');
-          log('Hint: Create table with columns: id (uuid), user_id (uuid), category_id (text), completed_at (timestamptz)', 'warn');
-        } else {
-          log('user_progress table exists and is accessible', 'ok');
-        }
-      } catch (e) {
-        log(`Exception checking table: ${e.message}`, 'err');
-      }
-
-      // 3. Check profiles table
-      try {
-        const { data: pcols, error: pcolsErr } = await supabase
-          .from('profiles')
-          .select('*')
-          .limit(0);
-        if (pcolsErr) {
-          log(`profiles table error: ${pcolsErr.message}`, 'err');
-        } else {
-          log('profiles table exists and is accessible', 'ok');
-        }
-      } catch (e) {
-        log(`Exception checking profiles: ${e.message}`, 'err');
-      }
-
-      // 4. Try a test insert
-      log('Attempting test insert...');
-      const testResult = await saveCategoryProgress('greetings');
-      if (testResult.success) {
-        log('Test insert succeeded!', 'ok');
-      } else {
-        log(`Test insert failed: ${testResult.error}`, 'err');
-      }
-
-      // 5. Check realtime connection
-      log('Checking realtime connection...');
-      if (state.realtimeChannel) {
-        log('Realtime channel exists', 'ok');
-      } else {
-        log('No realtime channel. Will try to initialize...', 'warn');
-        await initRealtimeListener();
-      }
-
-      log('=== DIAGNOSTICS END ===');
-    }
-
-    // Expose for buttons
-    window.testSave = (cat) => saveCategoryProgress(cat);
-    window.runDiagnostics = runDiagnostics;
-
-    // ── VISIBILITY ──
-    window.addEventListener('focus', () => { if (state.initialized) refreshData(); });
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && state.initialized) refreshData();
-    });
+    // ── FORCE REFRESH ──
+    window.forceRefresh = function() {
+      refreshData();
+      showToast('Refreshed', 'info');
+    };
 
     // ── LOGOUT ──
     $('#logoutBtn').addEventListener('click', async () => {
-      if (state.realtimeChannel) await supabase.removeChannel(state.realtimeChannel);
+      if (state.channel) await supabase.removeChannel(state.channel);
       await supabase.auth.signOut();
       window.location.href = 'login.html';
     });
 
+    // ── URL PARAMS ──
+    function checkUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const completed = params.get('completed');
+      if (completed) {
+        saveProgress(completed);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
     // ── INIT ──
     document.addEventListener('DOMContentLoaded', async () => {
-      log('Dashboard initializing...');
       await refreshData();
-      await initRealtimeListener();
+      await initRealtime();
       checkUrlParams();
       state.initialized = true;
-      log('Dashboard ready', 'ok');
+      log('Dashboard ready');
     });
 
-    // ── EXPOSE API ──
-    window.IsharaDashboard = {
-      saveProgress: saveCategoryProgress,
-      refresh: refreshData,
-      getState: () => ({ ...state })
-    };
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && state.initialized) refreshData();
+    });
+
+    window.addEventListener('focus', () => {
+      if (state.initialized) refreshData();
+    });
+
+    window.Ishara = { refreshData, saveProgress, getState: () => ({ ...state }) };
   </script>
 </body>
 </html>
