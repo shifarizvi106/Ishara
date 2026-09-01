@@ -3,171 +3,490 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SignPath – Profile</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Ishara – Profile</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    body { padding-bottom: 80px; }
-    .profile-page { padding: 24px 22px; }
+    :root {
+      --bg-body: #fff0f6;
+      --bg-card: #ffffff;
+      --primary: #ff5fa2;
+      --primary-hover: #d63384;
+      --primary-light: #ffe6f2;
+      --border: #fbcfe8;
+      --text-main: #1f2937;
+      --text-muted: #833a5c;
+      --radius: 16px;
+      --shadow: 0 4px 20px rgba(255, 95, 162, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── Global Page Spinner ── */
+    #pageLoader {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-body);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      transition: opacity 0.25s ease;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid var(--primary-light);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Shimmer Skeleton System ── */
+    .skeleton-box {
+      background: linear-gradient(90deg, #ffe6f2 25%, #fff0f6 50%, #ffe6f2 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ── Hamburger Toggle Button ── */
+    .hamburger-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 40;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--primary-hover);
+      font-size: 1.1rem;
+      font-weight: 800;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Backdrop Overlay for Click-Outside Closing ── */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(31, 41, 55, 0.4);
+      backdrop-filter: blur(2px);
+      z-index: 25;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── Collapsible Drawer Sidebar ── */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 64px 20px 32px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: -260px;
+      z-index: 30;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .brand {
+      font-family: 'Croissant One', cursive;
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 32px;
+      padding-left: 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-item button {
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      border-radius: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-item.active button, .nav-item button:hover {
+      background: var(--primary-light);
+      color: var(--primary-hover);
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .user-info {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: #e11d48;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    /* ── Profile Main Layout ── */
+    .main-content {
+      flex: 1;
+      padding: 40px 20px;
+      padding-top: 72px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
     .profile-hero {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 10px;
-      margin-bottom: 28px; text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 32px;
+      text-align: center;
     }
+
     .avatar {
-      width: 88px; height: 88px; border-radius: 50%;
-      background: linear-gradient(135deg, #ff5fa2, #d63384);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; color: white; font-weight: 900;
-      border: 3px solid #ff5fa2;
-      box-shadow: 0 6px 20px rgba(255,95,162,0.25);
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: white;
+      font-weight: 800;
+      border: 4px solid var(--bg-card);
+      box-shadow: 0 8px 24px rgba(255, 95, 162, 0.25);
     }
-    .display-name  { font-size: 1.3rem; font-weight: 900; color: #3a2a33; }
-    .display-email { font-size: 0.78rem; color: #a14a76; }
+
+    .display-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .display-email {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
     .guest-tag {
-      background: #fff0f6; color: #d63384;
-      border-radius: 999px; padding: 3px 12px;
-      font-size: 0.72rem; font-weight: 700;
+      background: var(--primary-light);
+      color: var(--primary-hover);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin-top: 4px;
     }
 
+    /* ── Stat Cards ── */
     .stat-row {
-      display: flex; gap: 10px; margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
     }
-    .stat-pill {
-      flex: 1; background: white; border-radius: 20px;
-      padding: 14px 10px; text-align: center;
-      box-shadow: 0 4px 16px rgba(255,95,162,0.12);
-    }
-    .stat-pill .num { font-size: 1.6rem; font-weight: 900; color: #d63384; display: block; }
-    .stat-pill .lbl { font-size: 0.68rem; color: #a14a76; font-weight: 600; display: block; }
 
+    .stat-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 12px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-pill .num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--primary-hover);
+      display: block;
+    }
+
+    .stat-pill .lbl {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* ── Actions List ── */
     .section-title {
-      font-size: 0.72rem; font-weight: 700; color: #c77aa0;
-      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      padding-left: 4px;
     }
-    .action-list {
-      background: white; border-radius: 20px; overflow: hidden;
-      box-shadow: 0 4px 16px rgba(255,95,162,0.1); margin-bottom: 16px;
+
+    .action-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 24px;
     }
+
     .action-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 18px; cursor: pointer;
-      border-bottom: 1px solid #fff0f6;
-      font-size: 0.9rem; font-weight: 700; color: #3a2a33;
-      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      transition: background 0.15s ease;
     }
+
     .action-item:last-child { border-bottom: none; }
-    .action-item:hover { background: #fff0f6; }
-    .action-item.danger { color: #dc3545; }
+    .action-item:hover { background: var(--primary-light); }
+    .action-item.danger { color: #e11d48; }
 
     .signin-btn {
       width: 100%;
-      background: linear-gradient(135deg, #ff5fa2, #d63384);
-      color: white; border: none; border-radius: 999px;
-      padding: 15px; font-size: 1rem; font-weight: 800;
-      cursor: pointer; box-shadow: 0 8px 24px rgba(255,95,162,0.3);
-      margin-bottom: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255, 95, 162, 0.3);
+      transition: background 0.15s ease;
     }
+
+    .signin-btn:hover { background: var(--primary-hover); }
   </style>
 </head>
 <body>
 
-<header class="top-bar">
-  <span>Profile</span>
-</header>
-
-<div class="profile-page">
-
-  <div class="profile-hero">
-    <div class="avatar" id="avatarEl">?</div>
-    <div class="display-name" id="displayName">Guest</div>
-    <div class="display-email" id="displayEmail"></div>
-    <div class="guest-tag" id="guestTag" style="display:none">Guest mode</div>
+  <div id="pageLoader">
+    <div class="spinner"></div>
   </div>
 
-  <div class="stat-row">
-    <div class="stat-pill">
-      <span class="num" id="starsEl">0</span>
-      <span class="lbl">★ stars</span>
-    </div>
-    <div class="stat-pill">
-      <span class="num" id="signsEl">0</span>
-      <span class="lbl">signs learned</span>
-    </div>
-    <div class="stat-pill">
-      <span class="num" id="streakEl">0</span>
-      <span class="lbl">🔥 streak</span>
-    </div>
-  </div>
+  <button class="hamburger-btn" onclick="toggleSidebar()">MENU</button>
 
-  <div id="guestSection" style="display:none">
-    <button class="signin-btn" onclick="location.href='login.html'">
-      Sign in to save progress
-    </button>
-  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-  <div id="accountSection" style="display:none">
-    <div class="section-title">Account</div>
-    <div class="action-list">
-      <div class="action-item danger" onclick="signOut()">
-        Sign out <span>→</span>
+  <aside class="sidebar" id="sidebar">
+    <div>
+      <div class="brand">Ishara</div>
+      <ul class="nav-list">
+        <li class="nav-item" id="navDash"><button onclick="window.location.href='learn.html'">Dashboard</button></li>
+        <li class="nav-item" id="navPractice"><button onclick="window.location.href='collect.html'">Practice Mode</button></li>
+        <li class="nav-item active" id="navProfile"><button onclick="window.location.href='profile.html'">Profile</button></li>
+      </ul>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info" id="sidebarUserEmail"><span class="skeleton-box" style="width: 100px; height: 16px;"></span></div>
+      <button class="logout-btn" onclick="signOut()">Log out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="profile-hero">
+      <div class="avatar" id="avatarEl">?</div>
+      <div class="display-name" id="displayName"><span class="skeleton-box" style="width: 140px; height: 28px;"></span></div>
+      <div class="display-email" id="displayEmail"><span class="skeleton-box" style="width: 180px; height: 16px; margin-top: 4px;"></span></div>
+      <div class="guest-tag" id="guestTag" style="display:none">Guest Mode</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-pill">
+        <span class="num" id="modulesEl">0</span>
+        <span class="lbl">Modules Completed</span>
+      </div>
+      <div class="stat-pill">
+        <span class="num" id="signsEl">0</span>
+        <span class="lbl">Signs Learned</span>
       </div>
     </div>
-  </div>
 
-</div>
+    <div id="guestSection" style="display:none">
+      <button class="signin-btn" onclick="location.href='login.html'">
+        Sign In to Save Progress
+      </button>
+    </div>
 
-<nav class="bottom-nav">
-  <div class="nav" onclick="location.href='learn.html'">Learn</div>
-  <div class="nav" onclick="location.href='progress.html'">Progress</div>
-  <div class="nav active">Profile</div>
-</nav>
+    <div id="accountSection" style="display:none">
+      <div class="section-title">Account Settings</div>
+      <div class="action-card">
+        <div class="action-item danger" onclick="signOut()">
+          Sign out <span>&rarr;</span>
+        </div>
+      </div>
+    </div>
 
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  </main>
 
-  const supabase = createClient(
-    'https://xxijjaiytnqrdbqjegjr.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8'
-  );
+  <script>
+    // ── SUPABASE CONFIG ──
+    const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function getStats() {
-    const completed = JSON.parse(localStorage.getItem('sp_completed') || '[]');
-    const counts = { greetings:4, relations:5, emotions:5, general:5, abc:26 };
-    return {
-      stars:  parseInt(localStorage.getItem('sp_stars')  || '0'),
-      streak: parseInt(localStorage.getItem('sp_streak') || '0'),
-      signs:  completed.reduce((s,c) => s + (counts[c]||0), 0),
+    const MODULE_COUNTS = {
+      greetings: 2,
+      relations: 3,
+      emotions: 2,
+      general: 2,
+      abc: 2
     };
-  }
 
-  const { data: { session } } = await supabase.auth.getSession();
-  const stats = getStats();
-
-  document.getElementById('starsEl').textContent  = stats.stars;
-  document.getElementById('streakEl').textContent = stats.streak;
-  document.getElementById('signsEl').textContent  = stats.signs;
-
-  if (session) {
-    const user = session.user;
-    const name = user.user_metadata?.full_name || user.email.split('@')[0];
-    document.getElementById('displayName').textContent  = name;
-    document.getElementById('displayEmail').textContent = user.email;
-    document.getElementById('avatarEl').textContent     = name[0].toUpperCase();
-    document.getElementById('accountSection').style.display = 'block';
-  } else {
-    document.getElementById('guestTag').style.display     = 'block';
-    document.getElementById('guestSection').style.display = 'block';
-    document.getElementById('avatarEl').textContent = '(^.^)';
-  }
-
-  window.signOut = async () => {
-    if (confirm('Sign out of SignPath?')) {
-      await supabase.auth.signOut();
-      localStorage.removeItem('sp_guest');
-      window.location.href = 'login.html';
+    // ── DRAWER SIDEBAR TOGGLE ──
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
     }
-  };
-</script>
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('active');
+    }
+
+    // ── INITIALIZATION ──
+    async function init() {
+      setTimeout(() => {
+        const loader = document.getElementById('pageLoader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => loader.style.display = 'none', 250);
+        }
+      }, 150);
+
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+
+        if (session) {
+          const user = session.user;
+          const name = user.user_metadata?.full_name || user.email.split('@')[0];
+
+          document.getElementById('displayName').innerText = name;
+          document.getElementById('displayEmail').innerText = user.email;
+          document.getElementById('sidebarUserEmail').innerText = user.email;
+          document.getElementById('avatarEl').innerText = name[0].toUpperCase();
+
+          document.getElementById('accountSection').style.display = 'block';
+
+          await loadUserStats(user.id);
+        } else {
+          document.getElementById('displayName').innerText = 'Guest Learner';
+          document.getElementById('displayEmail').innerText = 'Progress is not saved';
+          document.getElementById('sidebarUserEmail').innerText = 'Guest Mode';
+          document.getElementById('guestTag').style.display = 'inline-block';
+          document.getElementById('guestSection').style.display = 'block';
+          document.getElementById('avatarEl').innerText = 'G';
+        }
+      } catch (err) {
+        console.error('Profile initialization error:', err);
+      }
+    }
+
+    async function loadUserStats(userId) {
+      const { data, error } = await _supabase
+        .from('user_progress')
+        .select('category_id')
+        .eq('user_id', userId);
+
+      if (!error && data) {
+        let signsLearned = 0;
+        data.forEach(row => {
+          signsLearned += (MODULE_COUNTS[row.category_id] || 0);
+        });
+
+        document.getElementById('signsEl').innerText = signsLearned;
+        document.getElementById('modulesEl').innerText = data.length;
+      }
+    }
+
+    async function signOut() {
+      if (confirm('Are you sure you want to sign out?')) {
+        await _supabase.auth.signOut();
+        window.location.href = 'login.html';
+      }
+    }
+
+    init();
+  </script>
 </body>
 </html>
