@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ishara – Learn</title>
 
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -81,18 +79,58 @@
       100% { background-position: 200% 0; }
     }
 
-    /* ── Sidebar Navigation ── */
+    /* ── Hamburger Toggle Button ── */
+    .hamburger-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 40;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--primary-hover);
+      font-size: 1.2rem;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Backdrop Overlay for Click-Outside Closing ── */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(31, 41, 55, 0.4);
+      backdrop-filter: blur(2px);
+      z-index: 25;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── Collapsible Drawer Sidebar ── */
     .sidebar {
       width: 240px;
       background: var(--bg-card);
       border-right: 1px solid var(--border);
-      padding: 32px 20px;
+      padding: 64px 20px 32px 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       height: 100vh;
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: -260px;
+      z-index: 30;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.open {
+      left: 0;
     }
 
     .brand {
@@ -160,7 +198,9 @@
     .main-content {
       flex: 1;
       padding: 40px;
+      padding-top: 72px;
       max-width: 960px;
+      margin: 0 auto;
     }
 
     .view-section { display: none; }
@@ -301,6 +341,15 @@
 
     tr:last-child td { border-bottom: none; }
 
+    tr.locked-row {
+      background: #f9fafb;
+      color: #9ca3af;
+    }
+
+    tr.locked-row td {
+      color: #9ca3af;
+    }
+
     .status-pill {
       padding: 4px 10px;
       border-radius: 999px;
@@ -310,6 +359,7 @@
 
     .status-pill.completed { background: #dcfce7; color: #15803d; }
     .status-pill.available { background: var(--primary-light); color: var(--primary-hover); }
+    .status-pill.locked { background: #e5e7eb; color: #6b7280; }
 
     /* ── Buttons ── */
     .btn {
@@ -320,6 +370,10 @@
       border: none;
       cursor: pointer;
       transition: transform 0.1s ease, background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .btn:active { transform: scale(0.98); }
@@ -327,11 +381,14 @@
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-secondary { background: var(--primary-light); color: var(--primary-hover); }
     .btn-secondary:hover { background: #fbcfe8; }
-    .btn-full { width: 100%; padding: 16px; font-size: 1rem; }
+    .btn-outline-danger { background: #fff; border: 1.5px solid #f43f5e; color: #e11d48; }
+    .btn-outline-danger:hover { background: #fff1f2; }
+    .btn-disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; box-shadow: none; }
+    .btn-full { width: 100%; padding: 14px; font-size: 0.95rem; }
 
     /* ── Lesson Stage ── */
     .lesson-stage {
-      max-width: 440px;
+      max-width: 460px;
       margin: 20px auto 0;
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -396,6 +453,78 @@
       line-height: 1.5;
       margin-bottom: 24px;
     }
+
+    .lesson-action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ── Pop-up Help Modal ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(31, 41, 55, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      transform: translateY(10px);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-backdrop.active .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .modal-body {
+      font-size: 0.92rem;
+      color: #4b5563;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .modal-tips {
+      background: var(--primary-light);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+    }
   </style>
 </head>
 <body>
@@ -405,13 +534,20 @@
     <div class="spinner"></div>
   </div>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
+  <!-- Hamburger Toggle Button -->
+  <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+
+  <!-- Sidebar Overlay (Closes drawer on tap outside) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- Drawer Sidebar -->
+  <aside class="sidebar" id="sidebar">
     <div>
       <div class="brand">Ishara</div>
       <ul class="nav-list">
         <li class="nav-item active" id="navDash"><button onclick="showDashboard()">Dashboard</button></li>
-        <li class="nav-item" id="navPractice"><button onclick="startPracticeMode()">Practice Mode</button></li>
+        <li class="nav-item" id="navPractice"><button onclick="window.location.href='collect.html'">Practice Mode</button></li>
+        <li class="nav-item" id="navProfile"><button onclick="window.location.href='profile.html'">Profile</button></li>
       </ul>
     </div>
     <div class="sidebar-footer">
@@ -466,7 +602,6 @@
             </tr>
           </thead>
           <tbody id="moduleTable">
-            <!-- Table Skeleton Rows -->
             <tr>
               <td><span class="skeleton-box" style="width: 100px; height: 18px;"></span></td>
               <td><span class="skeleton-box" style="width: 60px; height: 18px;"></span></td>
@@ -475,12 +610,6 @@
             </tr>
             <tr>
               <td><span class="skeleton-box" style="width: 120px; height: 18px;"></span></td>
-              <td><span class="skeleton-box" style="width: 60px; height: 18px;"></span></td>
-              <td><span class="skeleton-box" style="width: 80px; height: 18px;"></span></td>
-              <td style="text-align: right;"><span class="skeleton-box" style="width: 70px; height: 32px;"></span></td>
-            </tr>
-            <tr>
-              <td><span class="skeleton-box" style="width: 90px; height: 18px;"></span></td>
               <td><span class="skeleton-box" style="width: 60px; height: 18px;"></span></td>
               <td><span class="skeleton-box" style="width: 80px; height: 18px;"></span></td>
               <td style="text-align: right;"><span class="skeleton-box" style="width: 70px; height: 32px;"></span></td>
@@ -508,11 +637,31 @@
 
         <p class="sign-desc" id="signDesc">Sign description will appear here.</p>
 
-        <button class="btn btn-primary btn-full" id="nextBtn" onclick="nextSign()">Did you get it? Next Sign →</button>
+        <div class="lesson-action-group">
+          <button class="btn btn-primary btn-full" id="nextBtn" onclick="nextSign()">I Got It → Next Sign</button>
+          <button class="btn btn-outline-danger btn-full" onclick="openHelpModal()">Need help with this sign?</button>
+        </div>
       </div>
     </section>
 
   </main>
+
+  <!-- Help & Clarity Pop-up Modal -->
+  <div class="modal-backdrop" id="helpModal">
+    <div class="modal-card">
+      <h3 class="modal-title" id="helpModalTitle">Learning Tip</h3>
+      <div class="modal-body">
+        <p id="helpModalText">Take a close look at the finger position and hand orientation.</p>
+        <div class="modal-tips">
+          💡 <strong>Tip:</strong> You can practice this live with hand-tracking feedback anytime in <strong>Practice Mode</strong>.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a id="videoSearchBtn" href="#" target="_blank" class="btn btn-secondary" style="flex: 1; text-decoration: none;">Watch Video Tutorial ↗</a>
+        <button class="btn btn-primary" onclick="closeHelpModal()">Got It</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ── SUPABASE CONFIG ──
@@ -523,25 +672,25 @@
     // ── CURRICULUM DATA ──
     const MODULES = [
       { id: 'greetings', name: 'Greetings', signs: [
-        { word: 'Hello', img: 'assets/hello.gif', desc: 'Raise hand to forehead with flat fingers in a salute motion.' },
-        { word: 'Thank You', img: 'assets/thankyou.gif', desc: 'Touch fingers to chin, then extend hand forward towards the receiver.' }
+        { word: 'Hello', img: 'assets/hello.gif', desc: 'Raise hand to forehead with flat fingers in a salute motion.', helpTip: 'Keep your dominant hand flat and move outward smoothly from your forehead.' },
+        { word: 'Thank You', img: 'assets/thankyou.gif', desc: 'Touch fingers to chin, then extend hand forward towards the receiver.', helpTip: 'Start with fingertips touching your chin, moving gently forward as if blowing a gentle kiss.' }
       ]},
       { id: 'relations', name: 'Relationships', signs: [
-        { word: 'Mother', desc: 'Touch index finger to your nose.' },
-        { word: 'Father', desc: 'Twirl index finger near mustache area.' },
-        { word: 'Friend', desc: 'Hook index fingers together gently.' }
+        { word: 'Mother', desc: 'Touch index finger to your nose.', helpTip: 'Gently tap the side or tip of your nose with your index finger.' },
+        { word: 'Father', desc: 'Twirl index finger near mustache area.', helpTip: 'Make a small circular motion near the upper lip/mustache area.' },
+        { word: 'Friend', desc: 'Hook index fingers together gently.', helpTip: 'Hook your right index finger over your left, then reverse the hook.' }
       ]},
       { id: 'emotions', name: 'Emotions', signs: [
-        { word: 'Happy', desc: 'Sweep open palm upwards along chest.' },
-        { word: 'Sad', desc: 'Move open palm downwards over face.' }
+        { word: 'Happy', desc: 'Sweep open palm upwards along chest.', helpTip: 'Use one or both flat hands to make upward brushing motions against your chest.' },
+        { word: 'Sad', desc: 'Move open palm downwards over face.', helpTip: 'Place open hand near face and move it slowly downwards while slightly tilting head.' }
       ]},
       { id: 'general', name: 'General', signs: [
-        { word: 'Yes', desc: 'Nod closed fist up and down.' },
-        { word: 'No', desc: 'Snap index and middle finger to thumb.' }
+        { word: 'Yes', desc: 'Nod closed fist up and down.', helpTip: 'Form a fist and tilt it up and down at the wrist, mimicking a head nod.' },
+        { word: 'No', desc: 'Snap index and middle finger to thumb.', helpTip: 'Bring index and middle finger together to touch the thumb repeatedly.' }
       ]},
       { id: 'abc', name: 'ABC Basics', signs: [
-        { word: 'A', img: 'assets/a.png', desc: 'Fist with thumb resting against index finger.' },
-        { word: 'B', img: 'assets/b.png', desc: 'Flat palm up, thumb tucked across.' }
+        { word: 'A', img: 'assets/a.png', desc: 'Fist with thumb resting against index finger.', helpTip: 'Make a tight fist, resting thumb upright against the side of index finger.' },
+        { word: 'B', img: 'assets/b.png', desc: 'Flat palm up, thumb tucked across.', helpTip: 'Keep 4 fingers straight up touching together, with thumb folded across palm.' }
       ]}
     ];
 
@@ -550,11 +699,22 @@
     let completedCategoryIds = [];
     let currentModule = null;
     let currentStep = 0;
-    let isPracticeMode = false;
 
-    // ── INITIALIZATION & SKELETON LIFECYCLE ──
+    // ── SIDEBAR DRAWER TOGGLE & CLICK-OUTSIDE ──
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('active');
+    }
+
+    // ── INITIALIZATION & AUTH GUARD ──
     async function init() {
-      // Hide full overlay loader quickly so skeleton screen can be visible
       setTimeout(() => {
         const loader = document.getElementById('pageLoader');
         if (loader) {
@@ -570,13 +730,16 @@
           document.getElementById('userEmail').innerText = currentUser.email;
           await fetchUserProgress();
         } else {
-          document.getElementById('userEmail').innerText = 'Guest Mode';
+          window.location.href = 'login.html';
+          return;
         }
       } catch (err) {
         console.error('Session load error:', err);
-      } finally {
-        renderDashboard();
+        window.location.href = 'login.html';
+        return;
       }
+
+      renderDashboard();
     }
 
     async function fetchUserProgress() {
@@ -597,7 +760,7 @@
         completedCategoryIds.push(catId);
       }
       
-      renderDashboard(); // Re-render local state immediately
+      renderDashboard();
 
       if (currentUser) {
         await _supabase.from('user_progress').insert({
@@ -608,13 +771,12 @@
       }
     }
 
-    // ── RENDER DASHBOARD & CALC PROGRESS ──
+    // ── RENDER DASHBOARD ──
     function renderDashboard() {
       const doneCount = completedCategoryIds.length;
       const totalModules = MODULES.length;
       const percent = Math.round((doneCount / totalModules) * 100);
 
-      // SVG Circular Fill
       const circumference = 283;
       const offset = circumference - (percent / 100) * circumference;
       document.getElementById('circleFill').style.strokeDashoffset = offset;
@@ -622,7 +784,6 @@
 
       document.getElementById('statCompleted').innerText = `${doneCount} / ${totalModules}`;
 
-      // Calculate Total Learnt Signs
       let totalSignsLearnt = 0;
       MODULES.forEach(m => {
         if (completedCategoryIds.includes(String(m.id))) {
@@ -631,61 +792,57 @@
       });
       document.getElementById('statSigns').innerText = totalSignsLearnt;
 
-      // Table Render
       const tbody = document.getElementById('moduleTable');
       tbody.innerHTML = '';
 
-      MODULES.forEach(mod => {
+      MODULES.forEach((mod, idx) => {
         const isDone = completedCategoryIds.includes(String(mod.id));
+        const isUnlocked = idx === 0 || completedCategoryIds.includes(String(MODULES[idx - 1].id));
+        
         const tr = document.createElement('tr');
+        if (!isUnlocked) tr.classList.add('locked-row');
+
+        let statusBadge = '';
+        let actionBtn = '';
+
+        if (isDone) {
+          statusBadge = `<span class="status-pill completed">Completed</span>`;
+          actionBtn = `<button class="btn btn-secondary" onclick="startLesson('${mod.id}')">Review</button>`;
+        } else if (isUnlocked) {
+          statusBadge = `<span class="status-pill available">Available</span>`;
+          actionBtn = `<button class="btn btn-primary" onclick="startLesson('${mod.id}')">Start</button>`;
+        } else {
+          statusBadge = `<span class="status-pill locked">Locked</span>`;
+          actionBtn = `<button class="btn btn-disabled" disabled>Locked</button>`;
+        }
 
         tr.innerHTML = `
           <td style="font-weight: 700;">${mod.name}</td>
           <td>${mod.signs.length} signs</td>
-          <td><span class="status-pill ${isDone ? 'completed' : 'available'}">${isDone ? 'Completed' : 'Available'}</span></td>
-          <td style="text-align: right;">
-            <button class="btn ${isDone ? 'btn-secondary' : 'btn-primary'}" onclick="startLesson('${mod.id}')">
-              ${isDone ? 'Review' : 'Start'}
-            </button>
-          </td>
+          <td>${statusBadge}</td>
+          <td style="text-align: right;">${actionBtn}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
     function showDashboard() {
-      isPracticeMode = false;
       document.getElementById('dashboardView').classList.add('active');
       document.getElementById('lessonView').classList.remove('active');
       document.getElementById('navDash').classList.add('active');
-      document.getElementById('navPractice').classList.remove('active');
+      closeSidebar();
       renderDashboard();
     }
 
     // ── LESSON ENGINE ──
     function startLesson(moduleId) {
-      isPracticeMode = false;
       currentModule = MODULES.find(m => m.id === moduleId);
       currentStep = 0;
       
       document.getElementById('dashboardView').classList.remove('active');
       document.getElementById('lessonView').classList.add('active');
+      closeSidebar();
       
-      renderLessonStep();
-    }
-
-    function startPracticeMode() {
-      isPracticeMode = true;
-      document.getElementById('navDash').classList.remove('active');
-      document.getElementById('navPractice').classList.add('active');
-
-      const allSigns = MODULES.flatMap(m => m.signs);
-      currentModule = { id: 'practice', name: 'Practice Mode', signs: allSigns };
-      currentStep = 0;
-
-      document.getElementById('dashboardView').classList.remove('active');
-      document.getElementById('lessonView').classList.add('active');
-
       renderLessonStep();
     }
 
@@ -707,9 +864,9 @@
 
       const nextBtn = document.getElementById('nextBtn');
       if (currentStep === total - 1) {
-        nextBtn.innerText = isPracticeMode ? 'Finish Practice' : 'Complete Module ✓';
+        nextBtn.innerText = 'Complete Module ✓';
       } else {
-        nextBtn.innerText = 'Did you get it? Next Sign →';
+        nextBtn.innerText = 'I Got It → Next Sign';
       }
     }
 
@@ -719,16 +876,30 @@
         currentStep++;
         renderLessonStep();
       } else {
-        if (!isPracticeMode) {
-          await recordCompletion(currentModule.id);
-        }
+        await recordCompletion(currentModule.id);
         showDashboard();
       }
     }
 
+    // ── HELP MODAL ENGINE ──
+    function openHelpModal() {
+      const sign = currentModule.signs[currentStep];
+      document.getElementById('helpModalTitle').innerText = `Tips for "${sign.word}"`;
+      document.getElementById('helpModalText').innerText = sign.helpTip || sign.desc;
+      
+      const searchUrl = `https://www.youtube.com/results?search_query=Indian+Sign+Language+${encodeURIComponent(sign.word)}+sign`;
+      document.getElementById('videoSearchBtn').href = searchUrl;
+
+      document.getElementById('helpModal').classList.add('active');
+    }
+
+    function closeHelpModal() {
+      document.getElementById('helpModal').classList.remove('active');
+    }
+
     async function logout() {
       await _supabase.auth.signOut();
-      window.location.reload();
+      window.location.href = 'login.html';
     }
 
     init();
