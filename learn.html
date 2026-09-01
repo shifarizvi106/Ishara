@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -37,31 +38,6 @@
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
-    }
-
-    /* ── Global Page Spinner ── */
-    #pageLoader {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-body);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      transition: opacity 0.25s ease;
-    }
-
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid var(--primary-light);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
 
     /* ── Shimmer Skeleton System ── */
@@ -94,7 +70,7 @@
       box-shadow: var(--shadow);
     }
 
-    /* ── Backdrop Overlay for Click-Outside Closing ── */
+    /* ── Sidebar & Overlay ── */
     .sidebar-overlay {
       position: fixed;
       inset: 0;
@@ -111,7 +87,6 @@
       pointer-events: auto;
     }
 
-    /* ── Collapsible Drawer Sidebar ── */
     .sidebar {
       width: 240px;
       background: var(--bg-card);
@@ -215,7 +190,7 @@
       color: var(--text-main);
     }
 
-    /* ── Dashboard Stats & Circular Progress ── */
+    /* ── Dashboard Stats ── */
     .top-stats {
       display: grid;
       grid-template-columns: 220px 1fr;
@@ -340,14 +315,7 @@
 
     tr:last-child td { border-bottom: none; }
 
-    tr.locked-row {
-      background: #f9fafb;
-      color: #9ca3af;
-    }
-
-    tr.locked-row td {
-      color: #9ca3af;
-    }
+    tr.locked-row td { color: #9ca3af; }
 
     .status-pill {
       padding: 4px 10px;
@@ -459,7 +427,7 @@
       gap: 10px;
     }
 
-    /* ── Pop-up Help Modal ── */
+    /* ── Modal ── */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -488,54 +456,23 @@
       width: 100%;
       max-width: 440px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      transform: translateY(10px);
-      transition: transform 0.25s ease;
     }
 
-    .modal-backdrop.active .modal-card {
-      transform: translateY(0);
-    }
-
-    .modal-title {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-bottom: 8px;
-    }
-
-    .modal-body {
-      font-size: 0.92rem;
-      color: #4b5563;
-      line-height: 1.5;
-      margin-bottom: 24px;
-      text-align: left;
-    }
-
-    .modal-tips {
-      background: var(--primary-light);
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 12px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: 12px;
-    }
+    .modal-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+    .modal-body { font-size: 0.92rem; color: #4b5563; line-height: 1.5; margin-bottom: 24px; }
+    .modal-tips { background: var(--primary-light); border-radius: 12px; padding: 14px; margin-top: 12px; font-size: 0.85rem; color: var(--text-muted); }
+    .modal-footer { display: flex; gap: 12px; }
   </style>
 </head>
 <body>
 
-  <div id="pageLoader">
-    <div class="spinner"></div>
-  </div>
-
+  <!-- Hamburger Button -->
   <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
 
+  <!-- Sidebar Overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div>
       <div class="brand">Ishara</div>
@@ -551,8 +488,10 @@
     </div>
   </aside>
 
+  <!-- Main Content Area -->
   <main class="main-content">
 
+    <!-- DASHBOARD VIEW -->
     <section id="dashboardView" class="view-section active">
       <div class="header-bar">
         <h1 class="page-title">Dashboard</h1>
@@ -565,7 +504,7 @@
               <circle class="circle-bg" cx="55" cy="55" r="45"></circle>
               <circle class="circle-progress" id="circleFill" cx="55" cy="55" r="45"></circle>
             </svg>
-            <div class="circle-text" id="circlePercent">--</div>
+            <div class="circle-text" id="circlePercent">0%</div>
           </div>
           <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted); margin-top: 12px;">OVERALL PROGRESS</div>
         </div>
@@ -573,11 +512,11 @@
         <div class="stats-card-group">
           <div class="stat-box">
             <div class="stat-label">Modules Finished</div>
-            <div class="stat-value" id="statCompleted"><span class="skeleton-box" style="width: 60px; height: 32px;"></span></div>
+            <div class="stat-value" id="statCompleted">0 / 5</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Total Signs Learnt</div>
-            <div class="stat-value" id="statSigns"><span class="skeleton-box" style="width: 40px; height: 32px;"></span></div>
+            <div class="stat-value" id="statSigns">0</div>
           </div>
         </div>
       </div>
@@ -593,24 +532,12 @@
               <th style="text-align: right;">Action</th>
             </tr>
           </thead>
-          <tbody id="moduleTable">
-            <tr>
-              <td><span class="skeleton-box" style="width: 100px; height: 18px;"></span></td>
-              <td><span class="skeleton-box" style="width: 60px; height: 18px;"></span></td>
-              <td><span class="skeleton-box" style="width: 80px; height: 18px;"></span></td>
-              <td style="text-align: right;"><span class="skeleton-box" style="width: 70px; height: 32px;"></span></td>
-            </tr>
-            <tr>
-              <td><span class="skeleton-box" style="width: 120px; height: 18px;"></span></td>
-              <td><span class="skeleton-box" style="width: 60px; height: 18px;"></span></td>
-              <td><span class="skeleton-box" style="width: 80px; height: 18px;"></span></td>
-              <td style="text-align: right;"><span class="skeleton-box" style="width: 70px; height: 32px;"></span></td>
-            </tr>
-          </tbody>
+          <tbody id="moduleTable"></tbody>
         </table>
       </div>
     </section>
 
+    <!-- LESSON VIEW -->
     <section id="lessonView" class="view-section">
       <button class="btn btn-secondary" onclick="showDashboard()" style="margin-bottom: 24px;">← Exit Lesson</button>
 
@@ -637,6 +564,7 @@
 
   </main>
 
+  <!-- Help Modal -->
   <div class="modal-backdrop" id="helpModal">
     <div class="modal-card">
       <h3 class="modal-title" id="helpModalTitle">Learning Tip</h3>
@@ -691,12 +619,9 @@
     let currentModule = null;
     let currentStep = 0;
 
-    // ── SIDEBAR DRAWER TOGGLE & CLICK-OUTSIDE ──
     function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
     }
 
     function closeSidebar() {
@@ -704,18 +629,16 @@
       document.getElementById('sidebarOverlay').classList.remove('active');
     }
 
-    // ── INITIALIZATION & AUTH GUARD ──
     async function init() {
-      setTimeout(() => {
-        const loader = document.getElementById('pageLoader');
-        if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(() => loader.style.display = 'none', 250);
-        }
-      }, 150);
-
-      // Check if entering in Guest Mode
       isGuest = localStorage.getItem('ishara_guest') === 'true';
+
+      // Load local progress first for immediate display
+      const localDone = localStorage.getItem('sp_completed');
+      if (localDone) {
+        try { completedCategoryIds = JSON.parse(localDone); } catch(e) {}
+      }
+
+      renderDashboard();
 
       try {
         const { data: { session } } = await _supabase.auth.getSession();
@@ -728,26 +651,13 @@
           const guestName = localStorage.getItem('ishara_username') || 'Guest Learner';
           document.getElementById('userEmail').innerText = guestName;
           document.getElementById('logoutBtn').innerText = 'Exit Guest Mode';
-          
-          // Load progress from local storage for Guest users
-          const localDone = localStorage.getItem('sp_completed');
-          if (localDone) {
-            try { completedCategoryIds = JSON.parse(localDone); } catch(e) {}
-          }
         } else {
-          // Neither authenticated nor guest -> redirect back to index.html
           window.location.href = 'index.html';
           return;
         }
       } catch (err) {
-        console.error('Session load error:', err);
-        if (!isGuest) {
-          window.location.href = 'index.html';
-          return;
-        }
+        console.error('Session check error:', err);
       }
-
-      renderDashboard();
     }
 
     async function fetchUserProgress() {
@@ -759,6 +669,7 @@
 
       if (!error && data) {
         completedCategoryIds = data.map(r => String(r.category_id));
+        renderDashboard();
       }
     }
 
@@ -768,12 +679,9 @@
         completedCategoryIds.push(catId);
       }
 
-      // Always save local storage copy
       localStorage.setItem('sp_completed', JSON.stringify(completedCategoryIds));
-      
       renderDashboard();
 
-      // Sync to Supabase if authenticated user
       if (currentUser) {
         await _supabase.from('user_progress').upsert({
           user_id: currentUser.id,
@@ -783,7 +691,6 @@
       }
     }
 
-    // ── RENDER DASHBOARD ──
     function renderDashboard() {
       const doneCount = completedCategoryIds.length;
       const totalModules = MODULES.length;
@@ -846,7 +753,6 @@
       renderDashboard();
     }
 
-    // ── LESSON ENGINE ──
     function startLesson(moduleId) {
       currentModule = MODULES.find(m => m.id === moduleId);
       currentStep = 0;
@@ -893,7 +799,6 @@
       }
     }
 
-    // ── HELP MODAL ENGINE ──
     function openHelpModal() {
       const sign = currentModule.signs[currentStep];
       document.getElementById('helpModalTitle').innerText = `Tips for "${sign.word}"`;
