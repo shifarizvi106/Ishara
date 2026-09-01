@@ -47,8 +47,135 @@
       opacity: 0;
     }
 
-    /* Message Boxes */
-    .msg-box {
+    /* ====== AUTH VIEW ====== */
+    .auth-card {
+      display: none;
+    }
+
+    .auth-card.active {
+      display: block;
+    }
+
+    .tab-switcher {
+      display: flex;
+      background: #fff0f6;
+      border-radius: 999px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: none;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #a14a76;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: #d63384;
+      box-shadow: 0 2px 8px rgba(255, 95, 162, 0.15);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #fbcfe8;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .input-field:focus {
+      border-color: #ff5fa2;
+    }
+
+    #username-container {
+      display: none;
+    }
+
+    /* ====== TOS HIGHLIGHT & STYLE ====== */
+    .inline-link {
+      color: #d63384;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .inline-link:hover {
+      color: #ff5fa2;
+    }
+
+    .pwd-strength-meter {
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-top: -6px;
+      display: none;
+    }
+
+    .pwd-weak { color: #dc3545; }
+    .pwd-good { color: #137333; }
+
+    .forgot-link {
+      font-size: 0.78rem;
+      color: #d63384;
+      text-align: right;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: -4px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 18px 0;
+      color: #a14a76;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #fbcfe8;
+    }
+
+    .divider span {
+      padding: 0 10px;
+    }
+
+    .guest-btn {
+      background: none;
+      border: none;
+      color: #a14a76;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+
+    .guest-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .error-box, .success-box {
       border-radius: 8px;
       padding: 10px;
       font-size: 0.8rem;
@@ -57,31 +184,36 @@
       display: none;
     }
 
-    .msg-error { background: #ffe4e6; color: #dc3545; }
-    .msg-success { background: #e6f4ea; color: #137333; }
+    .error-box { background: #ffe4e6; color: #dc3545; }
+    .success-box { background: #e6f4ea; color: #137333; }
 
-    .username-input {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1px solid #fbcfe8;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      outline: none;
-      box-sizing: border-box;
-      margin-bottom: 12px;
+    .btn-loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
 
-  <!-- ====== SPLASH SCREEN ====== -->
+  <!-- ====== SINGLE SPLASH SCREEN ====== -->
   <div id="splash-screen">
     <h1 class="splash-text">Ishara</h1>
   </div>
 
-  <!-- ====== MAIN LANDING ====== -->
+  <!-- ====== MAIN CONTENT ====== -->
   <section class="landing" id="main-content">
-    <div class="landing-card">
+    
+    <!-- 1. FIRST LANDING PAGE (GET STARTED) -->
+    <div class="landing-card" id="landing-view">
       <div class="butterfly">
         <div class="wing left"></div>
         <div class="wing right"></div>
@@ -91,13 +223,7 @@
       <h1 class="logo">Ishara</h1>
       <p class="subtitle">Learn Indian Sign Language.</p>
 
-      <div class="msg-box msg-error" id="error-box"></div>
-      <div class="msg-box msg-success" id="success-box"></div>
-      
       <form class="terms-form" id="consent-form">
-        <!-- Optional Username field for profile registration -->
-        <input type="text" id="username-input" class="username-input" placeholder="Choose a Username (Optional)" />
-
         <div class="checkbox-group">
           <label class="checkbox-label">
             <input type="checkbox" id="age-check" class="custom-checkbox">
@@ -112,8 +238,49 @@
           </label>
         </div>
 
-        <button type="submit" id="start-btn" class="start-btn" disabled>Start Learning</button>
+        <button type="submit" id="get-started-btn" class="start-btn" disabled>Start Learning</button>
       </form>
+    </div>
+
+    <!-- 2. LOGIN / SIGN UP PAGE (USERNAME LIVES HERE) -->
+    <div class="landing-card auth-card" id="auth-view">
+      <div class="butterfly">
+        <div class="wing left"></div>
+        <div class="wing right"></div>
+        <div class="body"></div>
+      </div>
+
+      <h1 class="logo" style="font-size: 2rem; margin-bottom: 16px;">Ishara</h1>
+
+      <div class="tab-switcher">
+        <button class="tab-btn active" id="tab-signin" type="button" onclick="switchTab('signin')">Sign In</button>
+        <button class="tab-btn" id="tab-signup" type="button" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <div class="error-box" id="error-box"></div>
+      <div class="success-box" id="success-box"></div>
+
+      <form class="auth-form" id="auth-form">
+        <!-- Username input appears here when on Sign Up tab -->
+        <div id="username-container">
+          <input type="text" id="auth-username" class="input-field" placeholder="Username / Display Name" />
+        </div>
+
+        <input type="email" id="auth-email" class="input-field" placeholder="Email address" required />
+        <input type="password" id="auth-password" class="input-field" placeholder="Password" required oninput="evaluatePasswordStrength()" />
+        
+        <div class="pwd-strength-meter" id="pwd-meter"></div>
+
+        <span class="forgot-link" id="forgot-link" onclick="handleForgotPassword()">Forgot password?</span>
+
+        <button type="submit" id="submit-auth-btn" class="start-btn">Sign In</button>
+      </form>
+
+      <div class="divider">
+        <span>or</span>
+      </div>
+
+      <button type="button" class="guest-btn" id="guest-btn" onclick="continueAsGuest()">Continue without signing in</button>
     </div>
 
   </section>
@@ -124,8 +291,10 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    let authMode = 'signin';
+
     document.addEventListener("DOMContentLoaded", async () => {
-      // 1. GSAP Splash Screen Animation
+      // 1. Single GSAP Splash Screen
       const tl = gsap.timeline();
 
       tl.to(".splash-text", {
@@ -151,7 +320,7 @@
         ease: "power2.out"
       }, "-=0.4");
 
-      // Check existing user session
+      // Auto Session Check
       const { data: { session } } = await _supabase.auth.getSession();
       if (session) {
         localStorage.setItem('ishara_user_type', 'authenticated');
@@ -159,65 +328,203 @@
         return;
       }
 
-      // 2. Checkbox Validation Logic
+      // 2. Landing Page Consent Checkbox Validation
       const ageCheck = document.getElementById('age-check');
       const tosCheck = document.getElementById('tos-check');
-      const startBtn = document.getElementById('start-btn');
-      const form = document.getElementById('consent-form');
+      const getStartedBtn = document.getElementById('get-started-btn');
+      const consentForm = document.getElementById('consent-form');
 
-      function validateForm() {
-        startBtn.disabled = !(ageCheck.checked && tosCheck.checked);
+      function validateConsent() {
+        getStartedBtn.disabled = !(ageCheck.checked && tosCheck.checked);
       }
 
-      ageCheck.addEventListener('change', validateForm);
-      tosCheck.addEventListener('change', validateForm);
+      ageCheck.addEventListener('change', validateConsent);
+      tosCheck.addEventListener('change', validateConsent);
 
-      // Form Submission Logic
-      form.addEventListener('submit', async (e) => {
+      consentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!getStartedBtn.disabled) {
+          // Transitions seamlessly from landing view to login/signup page without second splash
+          document.getElementById('landing-view').style.display = 'none';
+          document.getElementById('auth-view').classList.add('active');
+        }
+      });
+
+      // 3. Login/Signup Auth Form
+      const authForm = document.getElementById('auth-form');
+      authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         hideMessages();
 
-        if (startBtn.disabled) return;
+        const submitBtn = document.getElementById('submit-auth-btn');
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        const username = document.getElementById('auth-username').value.trim();
 
-        const usernameVal = document.getElementById('username-input').value.trim() || 'Learner';
-
-        // Set Guest mode details so learn.html functions seamlessly
-        localStorage.setItem('ishara_guest', 'true');
-        localStorage.setItem('ishara_user_type', 'guest');
-        localStorage.setItem('ishara_username', usernameVal);
-
-        if (!localStorage.getItem('sp_completed')) {
-          localStorage.setItem('sp_completed', JSON.stringify([]));
+        if (authMode === 'signup') {
+          if (!username) {
+            showError('Please choose a username.');
+            return;
+          }
+          if (!validatePasswordStrength(password)) {
+            showError('Password must be at least 8 characters long and contain both letters and numbers.');
+            return;
+          }
         }
 
-        // Sync username to database if session exists, else proceed directly
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-loader"></span>';
+
         try {
-          const { data: { user } } = await _supabase.auth.getUser();
-          if (user) {
-            await _supabase.from('profiles').upsert({
-              id: user.id,
-              username: usernameVal,
-              updated_at: new Date()
+          if (authMode === 'signin') {
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+
+            localStorage.setItem('ishara_user_type', 'authenticated');
+            localStorage.removeItem('ishara_guest');
+            window.location.href = 'learn.html';
+          } else {
+            // Sign Up Process
+            const { data, error } = await _supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: { display_name: username }
+              }
             });
+            if (error) throw error;
+
+            // Sync username directly to profiles table
+            if (data?.user) {
+              await _supabase
+                .from('profiles')
+                .upsert({
+                  id: data.user.id,
+                  username: username,
+                  email: email,
+                  updated_at: new Date()
+                });
+            }
+
+            // Check if user needs email confirmation
+            if (data?.user && !data?.session) {
+              submitBtn.disabled = false;
+              submitBtn.innerText = 'Sign Up';
+              showSuccess('Account created! Please check your email to confirm before logging in.');
+              return;
+            }
+
+            localStorage.setItem('ishara_username', username);
+            localStorage.setItem('ishara_user_type', 'authenticated');
+            localStorage.removeItem('ishara_guest');
+            window.location.href = 'learn.html';
           }
         } catch (err) {
-          console.warn('Proceeding in offline/guest mode:', err);
+          showError(err.message || 'Authentication failed.');
+          submitBtn.disabled = false;
+          submitBtn.innerText = authMode === 'signin' ? 'Sign In' : 'Sign Up';
         }
-
-        window.location.href = 'learn.html';
       });
     });
 
+    function continueAsGuest() {
+      localStorage.setItem('ishara_guest', 'true');
+      localStorage.setItem('ishara_user_type', 'guest');
+      localStorage.setItem('ishara_username', 'Guest Learner');
+      
+      if (!localStorage.getItem('ishara_guest_progress')) {
+        localStorage.setItem('ishara_guest_progress', JSON.stringify([]));
+      }
+      if (!localStorage.getItem('sp_completed')) {
+        localStorage.setItem('sp_completed', JSON.stringify([]));
+      }
+
+      window.location.href = 'learn.html';
+    }
+
+    function evaluatePasswordStrength() {
+      if (authMode !== 'signup') return;
+      
+      const pwd = document.getElementById('auth-password').value;
+      const pwdMeter = document.getElementById('pwd-meter');
+
+      if (!pwd) {
+        pwdMeter.style.display = 'none';
+        return;
+      }
+
+      pwdMeter.style.display = 'block';
+      if (validatePasswordStrength(pwd)) {
+        pwdMeter.className = 'pwd-strength-meter pwd-good';
+        pwdMeter.innerText = 'Strong password';
+      } else {
+        pwdMeter.className = 'pwd-strength-meter pwd-weak';
+        pwdMeter.innerText = 'Must be 8+ chars with letters & numbers';
+      }
+    }
+
+    function validatePasswordStrength(pwd) {
+      return pwd.length >= 8 && /[a-zA-Z]/.test(pwd) && /[0-9]/.test(pwd);
+    }
+
+    function switchTab(targetMode) {
+      authMode = targetMode;
+      const signinTab = document.getElementById('tab-signin');
+      const signupTab = document.getElementById('tab-signup');
+      const submitBtn = document.getElementById('submit-auth-btn');
+      const forgotLink = document.getElementById('forgot-link');
+      const pwdMeter = document.getElementById('pwd-meter');
+      const usernameContainer = document.getElementById('username-container');
+      const usernameInput = document.getElementById('auth-username');
+
+      hideMessages();
+
+      if (authMode === 'signin') {
+        signinTab.classList.add('active');
+        signupTab.classList.remove('active');
+        submitBtn.innerText = 'Sign In';
+        forgotLink.style.display = 'block';
+        pwdMeter.style.display = 'none';
+        usernameContainer.style.display = 'none';
+        usernameInput.removeAttribute('required');
+      } else {
+        signupTab.classList.add('active');
+        signinTab.classList.remove('active');
+        submitBtn.innerText = 'Sign Up';
+        forgotLink.style.display = 'none';
+        usernameContainer.style.display = 'block';
+        usernameInput.setAttribute('required', 'true');
+        evaluatePasswordStrength();
+      }
+    }
+
+    async function handleForgotPassword() {
+      hideMessages();
+      const email = document.getElementById('auth-email').value.trim();
+
+      if (!email) {
+        showError('Please enter your email address to reset password.');
+        return;
+      }
+
+      const { error } = await _supabase.auth.resetPasswordForEmail(email);
+      if (error) {
+        showError(error.message);
+      } else {
+        showSuccess('Password reset link sent to your email.');
+      }
+    }
+
     function showError(msg) {
-      const eb = document.getElementById('error-box');
-      eb.innerText = msg;
-      eb.style.display = 'block';
+      const errorBox = document.getElementById('error-box');
+      errorBox.innerText = msg;
+      errorBox.style.display = 'block';
     }
 
     function showSuccess(msg) {
-      const sb = document.getElementById('success-box');
-      sb.innerText = msg;
-      sb.style.display = 'block';
+      const successBox = document.getElementById('success-box');
+      successBox.innerText = msg;
+      successBox.style.display = 'block';
     }
 
     function hideMessages() {
