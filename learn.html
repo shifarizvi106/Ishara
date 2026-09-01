@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -504,13 +503,10 @@
 </head>
 <body>
 
-  <!-- Hamburger Toggle Button -->
   <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
 
-  <!-- Sidebar Overlay (Closes drawer on tap outside) -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-  <!-- Drawer Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div>
       <div class="brand">Ishara</div>
@@ -522,21 +518,18 @@
     </div>
     <div class="sidebar-footer">
       <div class="user-info" id="userEmail"><span class="skeleton-box" style="width: 100px; height: 16px;"></span></div>
-      <button class="logout-btn" onclick="logout()">Log out</button>
+      <button class="logout-btn" id="logoutBtn" onclick="logout()">Log out</button>
     </div>
   </aside>
 
-  <!-- Main Workarea -->
   <main class="main-content">
 
-    <!-- DASHBOARD VIEW -->
     <section id="dashboardView" class="view-section active">
       <div class="header-bar">
         <h1 class="page-title">Dashboard</h1>
       </div>
 
       <div class="top-stats">
-        <!-- Circular Progress -->
         <div class="circular-card">
           <div class="circle-wrap">
             <svg>
@@ -589,7 +582,6 @@
       </div>
     </section>
 
-    <!-- LESSON VIEW -->
     <section id="lessonView" class="view-section">
       <button class="btn btn-secondary" onclick="showDashboard()" style="margin-bottom: 24px;">← Exit Lesson</button>
 
@@ -616,7 +608,6 @@
 
   </main>
 
-  <!-- Help & Clarity Pop-up Modal -->
   <div class="modal-backdrop" id="helpModal">
     <div class="modal-card">
       <h3 class="modal-title" id="helpModalTitle">Learning Tip</h3>
@@ -666,6 +657,7 @@
 
     // ── APP STATE ──
     let currentUser = null;
+    let isGuest = false;
     let completedCategoryIds = [];
     let currentModule = null;
     let currentStep = 0;
@@ -685,20 +677,37 @@
 
     // ── INITIALIZATION & AUTH GUARD ──
     async function init() {
+      // Check if entering in Guest Mode
+      isGuest = localStorage.getItem('ishara_guest') === 'true';
+
       try {
         const { data: { session } } = await _supabase.auth.getSession();
         if (session) {
           currentUser = session.user;
           document.getElementById('userEmail').innerText = currentUser.email;
+          document.getElementById('logoutBtn').innerText = 'Log out';
           await fetchUserProgress();
+        } else if (isGuest) {
+          const guestName = localStorage.getItem('ishara_username') || 'Guest Learner';
+          document.getElementById('userEmail').innerText = guestName;
+          document.getElementById('logoutBtn').innerText = 'Exit Guest Mode';
+          
+          // Load progress from local storage for Guest users
+          const localDone = localStorage.getItem('sp_completed');
+          if (localDone) {
+            try { completedCategoryIds = JSON.parse(localDone); } catch(e) {}
+          }
         } else {
-          window.location.href = 'login.html';
+          // Neither authenticated nor guest -> redirect back to index.html
+          window.location.href = 'index.html';
           return;
         }
       } catch (err) {
         console.error('Session load error:', err);
-        window.location.href = 'login.html';
-        return;
+        if (!isGuest) {
+          window.location.href = 'index.html';
+          return;
+        }
       }
 
       renderDashboard();
@@ -721,11 +730,15 @@
       if (!completedCategoryIds.includes(catId)) {
         completedCategoryIds.push(catId);
       }
+
+      // Always save local storage copy
+      localStorage.setItem('sp_completed', JSON.stringify(completedCategoryIds));
       
       renderDashboard();
 
+      // Sync to Supabase if authenticated user
       if (currentUser) {
-        await _supabase.from('user_progress').insert({
+        await _supabase.from('user_progress').upsert({
           user_id: currentUser.id,
           category_id: catId,
           completed_at: new Date().toISOString()
@@ -860,8 +873,12 @@
     }
 
     async function logout() {
-      await _supabase.auth.signOut();
-      window.location.href = 'login.html';
+      if (currentUser) {
+        await _supabase.auth.signOut();
+      }
+      localStorage.removeItem('ishara_guest');
+      localStorage.removeItem('ishara_user_type');
+      window.location.href = 'index.html';
     }
 
     init();
