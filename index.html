@@ -170,11 +170,6 @@
       text-align: center;
     }
 
-    .guest-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
     .error-box, .success-box {
       border-radius: 8px;
       padding: 10px;
@@ -212,7 +207,7 @@
   <!-- ====== MAIN CONTENT ====== -->
   <section class="landing" id="main-content">
     
-    <!-- 1. FIRST LANDING PAGE (GET STARTED) -->
+    <!-- 1. LANDING PAGE VIEW -->
     <div class="landing-card" id="landing-view">
       <div class="butterfly">
         <div class="wing left"></div>
@@ -242,7 +237,7 @@
       </form>
     </div>
 
-    <!-- 2. LOGIN / SIGN UP PAGE (USERNAME LIVES HERE) -->
+    <!-- 2. LOGIN / SIGN UP CARD -->
     <div class="landing-card auth-card" id="auth-view">
       <div class="butterfly">
         <div class="wing left"></div>
@@ -261,7 +256,7 @@
       <div class="success-box" id="success-box"></div>
 
       <form class="auth-form" id="auth-form">
-        <!-- Username input appears here when on Sign Up tab -->
+        <!-- Username input appears here only under Sign Up tab -->
         <div id="username-container">
           <input type="text" id="auth-username" class="input-field" placeholder="Username / Display Name" />
         </div>
@@ -294,7 +289,7 @@
     let authMode = 'signin';
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // 1. Single GSAP Splash Screen
+      // 1. Single GSAP Splash Screen Animation
       const tl = gsap.timeline();
 
       tl.to(".splash-text", {
@@ -320,15 +315,16 @@
         ease: "power2.out"
       }, "-=0.4");
 
-      // Auto Session Check
+      // Session Check
       const { data: { session } } = await _supabase.auth.getSession();
       if (session) {
         localStorage.setItem('ishara_user_type', 'authenticated');
+        localStorage.setItem('ishara_skip_splash', 'true');
         window.location.href = 'learn.html';
         return;
       }
 
-      // 2. Landing Page Consent Checkbox Validation
+      // Checkbox Validation
       const ageCheck = document.getElementById('age-check');
       const tosCheck = document.getElementById('tos-check');
       const getStartedBtn = document.getElementById('get-started-btn');
@@ -344,13 +340,12 @@
       consentForm.addEventListener('submit', (e) => {
         e.preventDefault();
         if (!getStartedBtn.disabled) {
-          // Transitions seamlessly from landing view to login/signup page without second splash
           document.getElementById('landing-view').style.display = 'none';
           document.getElementById('auth-view').classList.add('active');
         }
       });
 
-      // 3. Login/Signup Auth Form
+      // Login/Signup Form Handling
       const authForm = document.getElementById('auth-form');
       authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -381,10 +376,10 @@
             if (error) throw error;
 
             localStorage.setItem('ishara_user_type', 'authenticated');
+            localStorage.setItem('ishara_skip_splash', 'true');
             localStorage.removeItem('ishara_guest');
             window.location.href = 'learn.html';
           } else {
-            // Sign Up Process
             const { data, error } = await _supabase.auth.signUp({
               email,
               password,
@@ -394,7 +389,6 @@
             });
             if (error) throw error;
 
-            // Sync username directly to profiles table
             if (data?.user) {
               await _supabase
                 .from('profiles')
@@ -406,7 +400,6 @@
                 });
             }
 
-            // Check if user needs email confirmation
             if (data?.user && !data?.session) {
               submitBtn.disabled = false;
               submitBtn.innerText = 'Sign Up';
@@ -416,6 +409,7 @@
 
             localStorage.setItem('ishara_username', username);
             localStorage.setItem('ishara_user_type', 'authenticated');
+            localStorage.setItem('ishara_skip_splash', 'true');
             localStorage.removeItem('ishara_guest');
             window.location.href = 'learn.html';
           }
@@ -427,10 +421,12 @@
       });
     });
 
+    // Directly redirects as Guest and signals learn.html to skip duplicate splash cards
     function continueAsGuest() {
       localStorage.setItem('ishara_guest', 'true');
       localStorage.setItem('ishara_user_type', 'guest');
       localStorage.setItem('ishara_username', 'Guest Learner');
+      localStorage.setItem('ishara_skip_splash', 'true');
       
       if (!localStorage.getItem('ishara_guest_progress')) {
         localStorage.setItem('ishara_guest_progress', JSON.stringify([]));
