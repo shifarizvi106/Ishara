@@ -17,6 +17,7 @@
 
   <link rel="stylesheet" href="style.css">
   <script src="assets/animation.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     /* ====== SPLASH SCREEN ====== */
@@ -44,18 +45,217 @@
       visibility: hidden;
       opacity: 0;
     }
+
+    /* ====== AUTH CARD & MODAL ====== */
+    .auth-card {
+      display: none;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .auth-card.active {
+      display: block;
+    }
+
+    .tab-switcher {
+      display: flex;
+      background: #fff0f6;
+      border-radius: 999px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: none;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #a14a76;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: #d63384;
+      box-shadow: 0 2px 8px rgba(255, 95, 162, 0.15);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #fbcfe8;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .input-field:focus {
+      border-color: #ff5fa2;
+    }
+
+    #username-container {
+      display: none;
+    }
+
+    .pwd-strength-meter {
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-top: -6px;
+      display: none;
+    }
+
+    .pwd-weak { color: #dc3545; }
+    .pwd-good { color: #137333; }
+
+    .forgot-link {
+      font-size: 0.78rem;
+      color: #d63384;
+      text-align: right;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: -4px;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 18px 0;
+      color: #a14a76;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #fbcfe8;
+    }
+
+    .divider span {
+      padding: 0 10px;
+    }
+
+    .guest-btn {
+      background: none;
+      border: none;
+      color: #a14a76;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+
+    .guest-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .error-box {
+      background: #ffe4e6;
+      color: #dc3545;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .success-box {
+      background: #e6f4ea;
+      color: #137333;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    /* ====== INLINE TOS MODAL ====== */
+    .tos-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(31, 41, 55, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .tos-modal.active {
+      display: flex;
+    }
+
+    .tos-content {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 70vh;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    .tos-title {
+      font-family: 'Croissant One', cursive;
+      color: #ff5fa2;
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+    }
+
+    .tos-text {
+      font-size: 0.85rem;
+      color: #374151;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .btn-loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
-  <!-- ====== SPLASH SCREEN ====== -->
   <div id="splash-screen">
     <h1 class="splash-text">Ishara</h1>
   </div>
 
-  <!-- ====== MAIN LANDING ====== -->
   <section class="landing" id="main-content">
-    <div class="landing-card">
+    
+    <div class="landing-card" id="landing-view">
       <div class="butterfly">
         <div class="wing left"></div>
         <div class="wing right"></div>
@@ -64,32 +264,90 @@
 
       <h1 class="logo">Ishara</h1>
       <p class="subtitle">Learn Indian Sign Language.</p>
-      
-      <form class="terms-form" id="consent-form">
-        <div class="checkbox-group">
+
+      <button type="button" id="get-started-btn" class="start-btn">Start Learning</button>
+    </div>
+
+    <div class="landing-card auth-card" id="auth-view">
+      <h1 class="logo" style="font-size: 2rem; margin-bottom: 16px;">Ishara</h1>
+
+      <div class="tab-switcher">
+        <button class="tab-btn active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+        <button class="tab-btn" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <div class="error-box" id="error-box"></div>
+      <div class="success-box" id="success-box"></div>
+
+      <form class="auth-form" id="auth-form">
+        <div id="username-container">
+          <input type="text" id="auth-username" class="input-field" placeholder="Username / Display Name" />
+        </div>
+
+        <input type="email" id="auth-email" class="input-field" placeholder="Email address" required />
+        <input type="password" id="auth-password" class="input-field" placeholder="Password" required oninput="evaluatePasswordStrength()" />
+        
+        <div class="pwd-strength-meter" id="pwd-meter"></div>
+
+        <span class="forgot-link" id="forgot-link" onclick="handleForgotPassword()">Forgot password?</span>
+
+        <div class="checkbox-group" style="margin-top: 8px;">
           <label class="checkbox-label">
             <input type="checkbox" id="age-check" class="custom-checkbox">
             <span>I am at least 13 years old</span>
           </label>
 
           <br>
-          
+
           <label class="checkbox-label">
             <input type="checkbox" id="tos-check" class="custom-checkbox">
-            <span>I have read the <a href="tos.html" target="_blank" class="inline-link">Terms of Service</a></span>
+            <span>I have read the <a href="#" onclick="openTosModal(event)" class="inline-link">Terms of Service</a></span>
           </label>
         </div>
 
-        <button type="submit" id="start-btn" class="start-btn" disabled>Start Learning</button>
+        <button type="submit" id="submit-auth-btn" class="start-btn" disabled>Sign In</button>
       </form>
+
+      <div class="divider">
+        <span>or</span>
+      </div>
+
+      <button type="button" class="guest-btn" id="guest-btn" onclick="continueAsGuest()" disabled>Continue without signing in</button>
     </div>
 
   </section>
 
-  <!-- ====== LOGIC & ANIMATION ====== -->
+  <div class="tos-modal" id="tos-modal">
+    <div class="tos-content">
+      <h2 class="tos-title">Terms of Service</h2>
+      <div class="tos-text">
+        Welcome to Ishara. By using our platform, you agree to participate responsibly in learning Indian Sign Language. 
+        <br><br>
+        1. <strong>Age Limit:</strong> You must be at least 13 years old to create an account.<br>
+        2. <strong>Camera Access:</strong> Live practice modes require camera input processed strictly on your browser.<br>
+        3. <strong>Data Privacy:</strong> Progress data for signed-in users is synced to secure cloud storage. Guest mode progress is stored locally on your device.
+      </div>
+      <button type="button" class="start-btn" onclick="closeTosModal()">I Understand</button>
+    </div>
+  </div>
+
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // 1. GSAP Splash Screen Animation
+    const SUPABASE_URL = 'https://xxijjaiytnqrdbqjegjr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4aWpqYWl5dG5xcmRicWplZ2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxODEzNzQsImV4cCI6MjA4Nzc1NzM3NH0.Vx5B2bmtGgkE7laaQtfdbhUodWB_CqLwfJEFgy6eSn8';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let authMode = 'signin';
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Auto Session Check
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session) {
+        localStorage.setItem('ishara_user_type', 'authenticated');
+        window.location.href = 'learn.html';
+        return;
+      }
+
+      // GSAP Splash Screen Animation
       const tl = gsap.timeline();
 
       tl.to(".splash-text", {
@@ -115,26 +373,222 @@
         ease: "power2.out"
       }, "-=0.4");
 
-      // 2. Checkbox Validation Logic
+      // View Transitions
+      const getStartedBtn = document.getElementById('get-started-btn');
+      const landingView = document.getElementById('landing-view');
+      const authView = document.getElementById('auth-view');
+
+      getStartedBtn.addEventListener('click', () => {
+        landingView.style.display = 'none';
+        authView.classList.add('active');
+      });
+
+      // Consent Checkboxes
       const ageCheck = document.getElementById('age-check');
       const tosCheck = document.getElementById('tos-check');
-      const startBtn = document.getElementById('start-btn');
-      const form = document.getElementById('consent-form');
+      const submitBtn = document.getElementById('submit-auth-btn');
+      const guestBtn = document.getElementById('guest-btn');
 
-      function validateForm() {
-        startBtn.disabled = !(ageCheck.checked && tosCheck.checked);
+      function validateConsent() {
+        const isValid = ageCheck.checked && tosCheck.checked;
+        submitBtn.disabled = !isValid;
+        guestBtn.disabled = !isValid;
       }
 
-      ageCheck.addEventListener('change', validateForm);
-      tosCheck.addEventListener('change', validateForm);
+      ageCheck.addEventListener('change', validateConsent);
+      tosCheck.addEventListener('change', validateConsent);
 
-      form.addEventListener('submit', (e) => {
+      // Auth Handlers
+      const authForm = document.getElementById('auth-form');
+      authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!startBtn.disabled) {
-          window.location.href = 'learn.html';
+        hideMessages();
+
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        const username = document.getElementById('auth-username').value.trim();
+
+        if (authMode === 'signup') {
+          if (!username) {
+            showError('Please choose a username.');
+            return;
+          }
+          if (!validatePasswordStrength(password)) {
+            showError('Password must be at least 8 characters long and contain both letters and numbers.');
+            return;
+          }
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-loader"></span>';
+
+        try {
+          if (authMode === 'signin') {
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+
+            localStorage.setItem('ishara_user_type', 'authenticated');
+            localStorage.removeItem('ishara_guest');
+            window.location.href = 'learn.html';
+          } else {
+            // Sign Up Flow
+            const { data, error } = await _supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: { display_name: username }
+              }
+            });
+            if (error) throw error;
+
+            // 1. Sync Username to Supabase "profiles" table if user ID is present
+            if (data?.user) {
+              await _supabase
+                .from('profiles')
+                .upsert({
+                  id: data.user.id,
+                  username: username,
+                  email: email,
+                  updated_at: new Date()
+                });
+            }
+
+            // 2. Email Confirmation Handling
+            if (data?.user && !data?.session) {
+              submitBtn.disabled = false;
+              submitBtn.innerText = 'Sign Up';
+              showSuccess('Account created! Please check your email to confirm your account before logging in.');
+              return;
+            }
+
+            localStorage.setItem('ishara_username', username);
+            localStorage.setItem('ishara_user_type', 'authenticated');
+            localStorage.removeItem('ishara_guest');
+            window.location.href = 'learn.html';
+          }
+        } catch (err) {
+          showError(err.message || 'Authentication failed.');
+          submitBtn.disabled = false;
+          validateConsent();
+          submitBtn.innerText = authMode === 'signin' ? 'Sign In' : 'Sign Up';
         }
       });
     });
+
+    function evaluatePasswordStrength() {
+      if (authMode !== 'signup') return;
+      
+      const pwd = document.getElementById('auth-password').value;
+      const pwdMeter = document.getElementById('pwd-meter');
+
+      if (!pwd) {
+        pwdMeter.style.display = 'none';
+        return;
+      }
+
+      pwdMeter.style.display = 'block';
+      if (validatePasswordStrength(pwd)) {
+        pwdMeter.className = 'pwd-strength-meter pwd-good';
+        pwdMeter.innerText = 'Strong password';
+      } else {
+        pwdMeter.className = 'pwd-strength-meter pwd-weak';
+        pwdMeter.innerText = 'Must be 8+ chars with letters & numbers';
+      }
+    }
+
+    function validatePasswordStrength(pwd) {
+      const hasMinLength = pwd.length >= 8;
+      const hasLetter = /[a-zA-Z]/.test(pwd);
+      const hasNumber = /[0-9]/.test(pwd);
+      return hasMinLength && hasLetter && hasNumber;
+    }
+
+    function switchTab(targetMode) {
+      authMode = targetMode;
+      const signinTab = document.getElementById('tab-signin');
+      const signupTab = document.getElementById('tab-signup');
+      const submitBtn = document.getElementById('submit-auth-btn');
+      const forgotLink = document.getElementById('forgot-link');
+      const pwdMeter = document.getElementById('pwd-meter');
+      const usernameContainer = document.getElementById('username-container');
+      const usernameInput = document.getElementById('auth-username');
+
+      hideMessages();
+
+      if (authMode === 'signin') {
+        signinTab.classList.add('active');
+        signupTab.classList.remove('active');
+        submitBtn.innerText = 'Sign In';
+        forgotLink.style.display = 'block';
+        pwdMeter.style.display = 'none';
+        usernameContainer.style.display = 'none';
+        usernameInput.removeAttribute('required');
+      } else {
+        signupTab.classList.add('active');
+        signinTab.classList.remove('active');
+        submitBtn.innerText = 'Sign Up';
+        forgotLink.style.display = 'none';
+        usernameContainer.style.display = 'block';
+        usernameInput.setAttribute('required', 'true');
+        evaluatePasswordStrength();
+      }
+    }
+
+    async function handleForgotPassword() {
+      hideMessages();
+      const email = document.getElementById('auth-email').value.trim();
+
+      if (!email) {
+        showError('Please enter your email address to reset password.');
+        return;
+      }
+
+      const { error } = await _supabase.auth.resetPasswordForEmail(email);
+      if (error) {
+        showError(error.message);
+      } else {
+        showSuccess('Password reset link sent to your email.');
+      }
+    }
+
+    function continueAsGuest() {
+      localStorage.setItem('ishara_guest', 'true');
+      localStorage.setItem('ishara_user_type', 'guest');
+      localStorage.setItem('ishara_username', 'Guest Learner');
+      if (!localStorage.getItem('ishara_guest_progress')) {
+        localStorage.setItem('ishara_guest_progress', JSON.stringify([]));
+      }
+      if (!localStorage.getItem('sp_completed')) {
+        localStorage.setItem('sp_completed', JSON.stringify([]));
+      }
+      window.location.href = 'learn.html';
+    }
+
+    function openTosModal(e) {
+      e.preventDefault();
+      document.getElementById('tos-modal').classList.add('active');
+    }
+
+    function closeTosModal() {
+      document.getElementById('tos-modal').classList.remove('active');
+    }
+
+    function showError(msg) {
+      const errorBox = document.getElementById('error-box');
+      errorBox.innerText = msg;
+      errorBox.style.display = 'block';
+    }
+
+    function showSuccess(msg) {
+      const successBox = document.getElementById('success-box');
+      successBox.innerText = msg;
+      successBox.style.display = 'block';
+    }
+
+    function hideMessages() {
+      document.getElementById('error-box').style.display = 'none';
+      document.getElementById('success-box').style.display = 'none';
+    }
   </script>
 
 </body>
