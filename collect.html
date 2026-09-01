@@ -69,6 +69,27 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── Hand Indicator ── */
+    .hand-indicator {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 6px;
+      z-index: 15;
+    }
+    .hand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4b5563;
+      transition: all 0.3s;
+    }
+    .hand-dot.active {
+      background: var(--primary);
+      box-shadow: 0 0 6px rgba(255, 95, 162, 0.6);
+    }
+
     /* ── Sidebar ── */
     .sidebar {
       width: 240px;
@@ -229,6 +250,7 @@
     }
     .success-flash.show { opacity: 1; }
   </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -255,7 +277,7 @@
   <main class="main-content">
     <div class="practice-header">
       <h1 class="page-title">Practice Mode</h1>
-      <div class="sign-counter" id="signCounter">1 / 8</div>
+      <div class="sign-counter" id="signCounter">1 / 36</div>
     </div>
 
     <div class="practice-body">
@@ -271,7 +293,14 @@
       <div class="camera-wrap" id="cameraWrap">
         <video id="video" playsinline autoplay muted></video>
         <canvas id="overlay"></canvas>
-        <div class="status-pill" id="statusPill">Show your hand</div>
+
+        <!-- Hand tracking indicators -->
+        <div class="hand-indicator" id="handIndicator">
+          <div class="hand-dot" id="hand1" title="Hand 1"></div>
+          <div class="hand-dot" id="hand2" title="Hand 2"></div>
+        </div>
+
+        <div class="status-pill" id="statusPill">Show your hands</div>
         <div class="cam-prompt" id="camPrompt">
           <p>Camera permission required for hand landmark detection</p>
           <button class="cam-start-btn" id="camStartBtn" onclick="startCamera()">Enable Camera</button>
@@ -297,21 +326,52 @@
   </main>
 
 <script>
+// ============================================
+// ISL SIGNS: A-Z and 0-9 (36 signs)
+// ============================================
 const SIGNS = [
-  { word:'A', img:'assets/a.png', desc:'Make a fist with thumb resting on the side.', tip:'Keep your thumb flat against the side of your index finger.' },
-  { word:'B', img:'assets/b.png', desc:'Hold four fingers up together, thumb tucked across palm.', tip:'Keep all four fingers straight and flush together.' },
-  { word:'C', img:'assets/c.png', desc:'Curve your hand into a C shape.', tip:'Form an arc with your fingers and thumb.' },
-  { word:'D', img:'assets/d.png', desc:'Index finger points up, other fingers form a circle.', tip:'Touch your thumb to your middle finger to form the loop.' },
-  { word:'0', img:null, desc:'Curve all fingers and thumb to touch, forming an O.', tip:'Align your fingertips to create an open oval.' },
-  { word:'1', img:null, desc:'Hold up your index finger, all other fingers closed.', tip:'Extend only your index finger upwards.' },
-  { word:'Y', img:null, desc:'Thumb and pinky extended, other fingers closed.', tip:'Extend your thumb and pinky outward completely.' },
-  { word:'V', img:null, desc:'Index and middle fingers up and spread in a V.', tip:'Separate index and middle finger while tucking others.' }
+  { word:'A', img:'assets/a.png', desc:'Fist with thumb on side of index finger.', tip:'Make a tight fist, thumb rests against index finger side.' },
+  { word:'B', img:'assets/b.png', desc:'Flat palm up, 4 fingers together, thumb across palm.', tip:'Keep fingers straight and touching, thumb tucked flat.' },
+  { word:'C', img:'assets/c.png', desc:'Curve fingers and thumb into a C shape.', tip:'Form a smooth arc, like holding a large cup.' },
+  { word:'D', img:'assets/d.png', desc:'Index up, others curved, thumb touches middle.', tip:'Point index finger up, rest form a circle with thumb.' },
+  { word:'E', img:null, desc:'All fingers curled in, thumb across fingertips.', tip:'Curl fingers tight, lay thumb over the top.' },
+  { word:'F', img:null, desc:'Index and thumb touch, others extended up.', tip:'Make an OK sign with index and thumb, rest fingers up.' },
+  { word:'G', img:null, desc:'Index points forward, thumb up, others closed.', tip:'Point index straight ahead like a gun, thumb points up.' },
+  { word:'H', img:null, desc:'Index and middle extended together, pointing sideways.', tip:'Two fingers side by side, pointing to the side like a peace sign turned.' },
+  { word:'I', img:null, desc:'Pinky finger extended up, others closed in fist.', tip:'Extend only the pinky finger straight up.' },
+  { word:'J', img:null, desc:'Pinky traces a J shape in the air.', tip:'Draw a J motion with your pinky finger.' },
+  { word:'K', img:null, desc:'Index and middle up in V, thumb between them.', tip:'Peace sign with thumb sticking out between the two fingers.' },
+  { word:'L', img:null, desc:'Index up, thumb out to side forming an L.', tip:'Make an L shape with thumb and index finger.' },
+  { word:'M', img:null, desc:'Three fingers over thumb, tucked under.', tip:'Thumb tucked, three fingers fold over it.' },
+  { word:'N', img:null, desc:'Two fingers over thumb, tucked under.', tip:'Similar to M but with only two fingers over thumb.' },
+  { word:'O', img:null, desc:'Fingertips touch thumb, forming an O.', tip:'All fingertips meet the thumb tip in a circle.' },
+  { word:'P', img:null, desc:'Index down, thumb up, hand tilted.', tip:'K shape but tilted downward, index points down.' },
+  { word:'Q', img:null, desc:'Index and thumb pinch, pointing down.', tip:'Pinch index and thumb together, point them downward.' },
+  { word:'R', img:null, desc:'Index and middle crossed.', tip:'Cross your index and middle fingers like an R.' },
+  { word:'S', img:null, desc:'Fist with thumb over fingers.', tip:'Standard fist, wrap thumb over index and middle.' },
+  { word:'T', img:null, desc:'Thumb between index and middle finger.', tip:'Insert thumb between index and middle fingers.' },
+  { word:'U', img:null, desc:'Index and middle fingers up together.', tip:'Two fingers straight up, touching each other.' },
+  { word:'V', img:null, desc:'Index and middle up spread in a V.', tip:'Peace sign — two fingers up and separated.' },
+  { word:'W', img:null, desc:'Index, middle, and ring fingers up spread.', tip:'Three fingers up and spread like a W.' },
+  { word:'X', img:null, desc:'Index finger bent like a hook.', tip:'Bend index finger at the knuckle like a hook.' },
+  { word:'Y', img:null, desc:'Thumb and pinky out, others closed.', tip:'Hang loose — thumb and pinky extended, rest closed.' },
+  { word:'Z', img:null, desc:'Index finger traces a Z in the air.', tip:'Draw a Z shape in the air with your index finger.' },
+  { word:'0', img:null, desc:'Fingertips touch to form an O shape.', tip:'All fingers curve to meet the thumb in a circle.' },
+  { word:'1', img:null, desc:'Index finger up, others closed.', tip:'Point index finger straight up, rest in fist.' },
+  { word:'2', img:null, desc:'Index and middle up.', tip:'Two fingers up like a peace sign.' },
+  { word:'3', img:null, desc:'Index, middle, thumb extended.', tip:'Three fingers out — index, middle, and thumb.' },
+  { word:'4', img:null, desc:'All four fingers up, thumb closed.', tip:'Extend all four fingers, keep thumb tucked.' },
+  { word:'5', img:null, desc:'All five fingers spread open.', tip:'Open hand, all five fingers spread wide.' },
+  { word:'6', img:null, desc:'Thumb touches pinky side, others closed.', tip:'Touch thumb to pinky finger side, rest closed.' },
+  { word:'7', img:null, desc:'Thumb touches ring finger, others closed.', tip:'Touch thumb to ring finger, rest fingers closed.' },
+  { word:'8', img:null, desc:'Thumb touches middle finger, others closed.', tip:'Touch thumb to middle finger, rest closed.' },
+  { word:'9', img:null, desc:'Thumb touches index finger, others closed.', tip:'Touch thumb to index finger, forming a circle.' }
 ];
 
-const SMOOTH_WINDOW  = 15;     // Slightly larger window for stability
-const CONF_THRESHOLD = 0.60;   // Lowered from 0.68 — model may need tuning
-const HOLD_FRAMES    = 12;     // Slightly faster completion
-const MIN_AGREEMENT  = 0.6;    // 60% of window must agree
+const SMOOTH_WINDOW  = 12;
+const CONF_THRESHOLD = 0.50;
+const HOLD_FRAMES    = 10;
+const MIN_AGREEMENT  = 0.55;
 
 let current      = 0;
 let holdCount    = 0;
@@ -338,7 +398,7 @@ function render() {
   document.getElementById('cameraWrap').classList.remove('success');
   holdCount = 0; 
   recentPreds.length = 0;
-  
+
   const preview = document.getElementById('signPreview');
   if (s.img) {
     preview.innerHTML = `<img src="${s.img}" alt="${s.word}" onerror="this.parentElement.textContent='${s.word}'">`;
@@ -387,30 +447,61 @@ function smoothed() {
   return { label: best, votes: bestN, total: recentPreds.length };
 }
 
-/* ── LANDMARK NORMALIZATION ──
- * Centers the hand on the wrist (landmark 0) and scales by palm size
- * This matches typical training preprocessing for sign models
+/* ── NORMALIZE SINGLE HAND ──
+ * Centers on wrist (landmark 0) and scales by palm size
+ * Returns flat array of 63 floats
  */
-function normalizeLandmarks(landmarks) {
-  // landmarks is array of 21 {x,y,z} objects from MediaPipe
+function normalizeHand(landmarks) {
   const wrist = landmarks[0];
-  
-  // Calculate palm size as distance between wrist (0) and middle finger MCP (9)
   const middleMCP = landmarks[9];
   const palmSize = Math.sqrt(
     Math.pow(middleMCP.x - wrist.x, 2) +
     Math.pow(middleMCP.y - wrist.y, 2) +
     Math.pow(middleMCP.z - wrist.z, 2)
-  ) || 1; // avoid div by zero
-  
+  ) || 1;
+
   const flat = [];
   for (const lm of landmarks) {
-    // Center on wrist and scale by palm size
     flat.push((lm.x - wrist.x) / palmSize);
     flat.push((lm.y - wrist.y) / palmSize);
     flat.push((lm.z - wrist.z) / palmSize);
   }
   return flat;
+}
+
+/* ── BUILD 63-FEATURE VECTOR FROM 1 OR 2 HANDS ──
+ * Strategy: If 2 hands detected, pick the one that gives 
+ * the highest confidence prediction. If 1 hand, use it.
+ * This works with your existing 63-feature model.
+ */
+function getBestHandFeatures(multiHandLandmarks) {
+  if (!multiHandLandmarks || multiHandLandmarks.length === 0) {
+    return null;
+  }
+
+  // If only one hand, use it directly
+  if (multiHandLandmarks.length === 1) {
+    return normalizeHand(multiHandLandmarks[0]);
+  }
+
+  // If two hands, try both and return the one with higher model confidence
+  let bestFeatures = null;
+  let bestConf = -1;
+
+  for (const hand of multiHandLandmarks) {
+    try {
+      const features = normalizeHand(hand);
+      const pred = predictSign(features);
+      if (pred.confidence > bestConf) {
+        bestConf = pred.confidence;
+        bestFeatures = features;
+      }
+    } catch (e) {
+      // Skip if this hand fails
+    }
+  }
+
+  return bestFeatures || normalizeHand(multiHandLandmarks[0]);
 }
 
 /* ── CAMERA START ── */
@@ -424,13 +515,12 @@ async function startCamera() {
       video: { facingMode: 'user', width: 640, height: 480 }, 
       audio: false 
     });
-    
+
     const video = document.getElementById('video');
     video.srcObject = stream;
-    
+
     showSpinner('Loading hand tracking model...');
-    
-    // Wait for video to be ready
+
     await new Promise(resolve => {
       video.onloadedmetadata = () => {
         video.play();
@@ -440,16 +530,25 @@ async function startCamera() {
 
     document.getElementById('camPrompt').style.display = 'none';
     document.getElementById('confWrap').style.display  = 'block';
-    
+
     initMediaPipe();
-    
+
   } catch (err) {
     console.error('Camera error:', err);
     document.getElementById('camPrompt').querySelector('p').textContent =
-      'Camera access denied or unavailable. Please check permissions.';
+      'Camera access denied. Please allow camera in browser settings.';
     btn.disabled = false;
     hideSpinner();
   }
+}
+
+/* ── UPDATE HAND INDICATORS ── */
+function updateHandIndicators(numHands) {
+  const h1 = document.getElementById('hand1');
+  const h2 = document.getElementById('hand2');
+
+  h1.classList.toggle('active', numHands >= 1);
+  h2.classList.toggle('active', numHands >= 2);
 }
 
 /* ── MEDIAPIPE INIT ── */
@@ -463,93 +562,101 @@ function initMediaPipe() {
   const hands = new Hands({ 
     locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
   });
-  
+
   hands.setOptions({
-    maxNumHands: 1,              // Only need 1 hand for sign practice
+    maxNumHands: 2,
     modelComplexity: 1,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5
   });
 
   hands.onResults(results => {
-    // Match canvas to video size
     canvas.width  = video.videoWidth  || 640;
     canvas.height = video.videoHeight || 480;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (results.multiHandLandmarks?.length) {
-      const landmarks = results.multiHandLandmarks[0];
+    const numHands = results.multiHandLandmarks?.length || 0;
+    updateHandIndicators(numHands);
 
-      // ── DRAW LANDMARKS ──
-      drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#ff5fa2', lineWidth: 3 });
-      for (const pt of landmarks) {
-        const x = pt.x * canvas.width;
-        const y = pt.y * canvas.height;
-        ctx.beginPath();
-        ctx.arc(x, y, 9, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(255,95,162,0.22)';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x, y, 4.5, 0, 2 * Math.PI);
-        ctx.fillStyle = '#ff5fa2';
-        ctx.shadowColor = '#ff5fa2';
-        ctx.shadowBlur  = 12;
-        ctx.fill();
-        ctx.shadowBlur  = 0;
+    if (numHands > 0) {
+      // ── DRAW ALL HANDS IN PINK ──
+      for (const landmarks of results.multiHandLandmarks) {
+        drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#ff5fa2', lineWidth: 3 });
+        for (const pt of landmarks) {
+          const x = pt.x * canvas.width;
+          const y = pt.y * canvas.height;
+          ctx.beginPath();
+          ctx.arc(x, y, 10, 0, 2 * Math.PI);
+          ctx.fillStyle = 'rgba(255,95,162,0.25)';
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ff5fa2';
+          ctx.shadowColor = '#ff5fa2';
+          ctx.shadowBlur  = 14;
+          ctx.fill();
+          ctx.shadowBlur  = 0;
+        }
       }
 
       wrap.classList.add('detecting');
       pill.classList.add('ok');
 
-      // ── NORMALIZE & PREDICT ──
-      const normalized = normalizeLandmarks(landmarks);
+      // ── GET BEST HAND FEATURES ──
+      const features = getBestHandFeatures(results.multiHandLandmarks);
+
+      if (!features) {
+        pill.textContent = 'No clear hand detected';
+        return;
+      }
+
+      // ── PREDICT ──
       let pred;
       try {
-        pred = predictSign(normalized);
+        pred = predictSign(features);
       } catch (e) {
         console.error('Prediction error:', e);
-        pill.textContent = 'Detection error';
+        pill.textContent = 'Model error — try repositioning hands';
+        pill.classList.add('error');
         return;
       }
 
       const conf  = pred.confidence;
       const label = pred.className;
 
-      // ── SMOOTHING LOGIC ──
-      // Only add to buffer if confidence is reasonable
+      // ── SMOOTHING ──
       if (conf >= CONF_THRESHOLD) {
         recentPreds.push(label);
         if (recentPreds.length > SMOOTH_WINDOW) recentPreds.shift();
       }
 
       const sm = smoothed();
-      // Require at least 60% agreement in the window
       const hasConsensus = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * MIN_AGREEMENT);
-      
-      // Display confidence based on consensus, not just current frame
+
       const dispConf = hasConsensus 
         ? Math.round((sm.votes / sm.total) * 100) 
         : Math.round(conf * 100);
-      
+
       const strongEnough = hasConsensus;
       const dispLabel = strongEnough ? sm.label : null;
 
-      // Update UI
+      // Update confidence UI
       const confFill = document.getElementById('confFill');
       confFill.style.width = dispConf + '%';
       confFill.classList.toggle('high', dispConf >= 80);
-      
+
       document.getElementById('confPct').textContent = dispConf + '%';
       document.getElementById('detectedLabel').textContent = strongEnough
         ? `Detected: ${dispLabel} (${dispConf}% agreement)`
-        : (conf >= CONF_THRESHOLD ? `Seeing: ${label}...` : 'No sign detected');
+        : (conf >= CONF_THRESHOLD ? `Tracking: ${label}...` : 'Analyzing hand shape...');
 
       // ── CHECK MATCH ──
       const target = SIGNS[current].word;
       const locked = strongEnough && dispLabel === target;
-      
+
       if (locked) {
         pill.textContent = `✓ ${target} — Hold steady!`;
+        pill.classList.remove('error');
         pill.classList.add('success');
         holdCount++;
         if (holdCount >= HOLD_FRAMES) { 
@@ -560,23 +667,23 @@ function initMediaPipe() {
         if (strongEnough) {
           pill.textContent = `Detected: ${dispLabel}`;
         } else if (conf >= CONF_THRESHOLD) {
-          pill.textContent = `Tracking: ${label}`;
+          pill.textContent = `Seeing: ${label}`;
         } else {
-          pill.textContent = 'Position hand clearly';
+          pill.textContent = numHands === 2 ? '2 hands tracked — analyzing...' : 'Position hand clearly';
         }
-        pill.classList.remove('success');
-        holdCount = Math.max(0, holdCount - 1); // Decay hold count slowly
+        pill.classList.remove('success', 'error');
+        holdCount = Math.max(0, holdCount - 2);
       }
 
     } else {
-      // No hand detected
-      pill.textContent = 'Show your hand';
-      pill.classList.remove('ok', 'success');
+      // No hands
+      pill.textContent = 'Show your hands';
+      pill.classList.remove('ok', 'success', 'error');
       wrap.classList.remove('detecting', 'success');
       document.getElementById('confFill').style.width = '0%';
       document.getElementById('confFill').classList.remove('high');
       document.getElementById('confPct').textContent = '0%';
-      document.getElementById('detectedLabel').textContent = 'No hand detected';
+      document.getElementById('detectedLabel').textContent = 'No hands detected';
       recentPreds.length = 0;
       holdCount = 0;
     }
@@ -593,16 +700,16 @@ function initMediaPipe() {
     width: 640,
     height: 480
   });
-  
+
   cam.start()
     .then(() => {
       hideSpinner();
-      console.log('Camera started successfully');
+      console.log('Camera + 2-hand tracking active');
     })
     .catch(err => {
       console.error('Camera start failed:', err);
       hideSpinner();
-      pill.textContent = 'Camera failed to start';
+      pill.textContent = 'Camera failed';
       pill.classList.add('error');
     });
 }
