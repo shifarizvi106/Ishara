@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ishara – Learn</title>
 
+  <!-- Google Fonts: Plus Jakarta Sans & Croissant One -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -39,7 +41,7 @@
       display: flex;
     }
 
-    /* ── Global Loader & Skeleton ── */
+    /* ── Global Loader ── */
     #pageLoader {
       position: fixed;
       inset: 0;
@@ -48,12 +50,12 @@
       align-items: center;
       justify-content: center;
       z-index: 999;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
     .spinner {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border: 4px solid var(--primary-light);
       border-top-color: var(--primary);
       border-radius: 50%;
@@ -64,7 +66,11 @@
       to { transform: rotate(360deg); }
     }
 
-    .skeleton {
+    /* ── Skeleton Loading Effect ── */
+    .skeleton-line {
+      display: inline-block;
+      width: 100%;
+      height: 20px;
       background: linear-gradient(90deg, #ffe6f2 25%, #fff0f6 50%, #ffe6f2 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
@@ -91,9 +97,9 @@
     }
 
     .brand {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--primary-hover);
+      font-family: 'Croissant One', cursive;
+      font-size: 1.8rem;
+      color: var(--primary);
       margin-bottom: 32px;
       padding-left: 8px;
     }
@@ -151,7 +157,7 @@
       text-align: left;
     }
 
-    /* ── Main Content ── */
+    /* ── Main Workarea ── */
     .main-content {
       flex: 1;
       padding: 40px;
@@ -161,11 +167,8 @@
     .view-section { display: none; }
     .view-section.active { display: block; }
 
-    /* ── Dashboard Cards & Circular Progress ── */
+    /* ── Dashboard & Circular Progress ── */
     .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       margin-bottom: 32px;
     }
 
@@ -398,10 +401,12 @@
 </head>
 <body>
 
+  <!-- Full Page Loader -->
   <div id="pageLoader">
     <div class="spinner"></div>
   </div>
 
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div>
       <div class="brand">Ishara</div>
@@ -416,14 +421,17 @@
     </div>
   </aside>
 
+  <!-- Main Area -->
   <main class="main-content">
 
+    <!-- DASHBOARD VIEW -->
     <section id="dashboardView" class="view-section active">
       <div class="header-bar">
         <h1 class="page-title">Dashboard</h1>
       </div>
 
       <div class="top-stats">
+        <!-- Circular Progress Bar -->
         <div class="circular-card">
           <div class="circle-wrap">
             <svg>
@@ -459,17 +467,16 @@
             </tr>
           </thead>
           <tbody id="moduleTable">
-            <tr>
-              <td colspan="4"><div class="skeleton" style="height: 24px;"></div></td>
-            </tr>
-            <tr>
-              <td colspan="4"><div class="skeleton" style="height: 24px;"></div></td>
-            </tr>
+            <!-- Skeleton Rows -->
+            <tr><td colspan="4"><div class="skeleton-line"></div></td></tr>
+            <tr><td colspan="4"><div class="skeleton-line"></div></td></tr>
+            <tr><td colspan="4"><div class="skeleton-line"></div></td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
+    <!-- LESSON VIEW -->
     <section id="lessonView" class="view-section">
       <button class="btn btn-secondary" onclick="showDashboard()" style="margin-bottom: 24px;">← Exit Lesson</button>
 
@@ -533,6 +540,9 @@
 
     // ── INITIALIZATION ──
     async function init() {
+      // Allow skeleton to render visually briefly before data populate
+      await new Promise(res => setTimeout(res, 500));
+
       try {
         const { data: { session } } = await _supabase.auth.getSession();
         if (session) {
@@ -545,12 +555,17 @@
       } catch (err) {
         console.error('Session error:', err);
       } finally {
-        // Hide global page loader
-        const loader = document.getElementById('pageLoader');
-        loader.style.opacity = '0';
-        setTimeout(() => loader.style.display = 'none', 250);
+        hideLoader();
         renderDashboard();
       }
+    }
+
+    function hideLoader() {
+      const loader = document.getElementById('pageLoader');
+      loader.style.opacity = '0';
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 300);
     }
 
     async function fetchUserProgress() {
@@ -630,6 +645,7 @@
 
     // ── LESSON & PRACTICE ENGINE ──
     function startLesson(moduleId) {
+      isPracticeMode = false;
       currentModule = MODULES.find(m => m.id === moduleId);
       currentStep = 0;
       
@@ -644,9 +660,8 @@
       document.getElementById('navDash').classList.remove('active');
       document.getElementById('navPractice').classList.add('active');
 
-      // Aggregate all signs into one pool
       const allSigns = MODULES.flatMap(m => m.signs);
-      currentModule = { name: 'Practice Mode', signs: allSigns };
+      currentModule = { id: 'practice', name: 'Practice Mode', signs: allSigns };
       currentStep = 0;
 
       document.getElementById('dashboardView').classList.remove('active');
@@ -679,13 +694,15 @@
       }
     }
 
-    function nextSign() {
+    async function nextSign() {
       const total = currentModule.signs.length;
       if (currentStep < total - 1) {
         currentStep++;
         renderLessonStep();
       } else {
-        if (!isPracticeMode) recordCompletion(currentModule.id);
+        if (!isPracticeMode) {
+          await recordCompletion(currentModule.id);
+        }
         showDashboard();
       }
     }
