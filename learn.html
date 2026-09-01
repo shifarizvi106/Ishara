@@ -1,14 +1,4 @@
-Here is your full SaaS-styled dashboard code completely cleaned up and fixed for **GitHub Pages**.
 
-### What was broken & how this fixes it:
-
-1. **GitHub Pages Jekyll Crash:** The code was using JavaScript template literals inside inline HTML generation strings (e.g. `${percent}%`, `${mod.name}`). GitHub’s default Liquid parser interprets `${...}` inside `.html` files as Liquid template syntax, causing the site build to fail silently or fail deployment.
-2. **Safer Supabase Initialization:** Added checks so the script doesn't fail if the Supabase CDN takes a moment to load or if a network glitch occurs.
-3. **Escaped Characters & Clean Syntax:** Replaced raw Unicode arrows with clean HTML entities (`&rarr;`, `&larr;`, `&nearr;`).
-
-Here is the entire updated, deployment-safe code:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
