@@ -3,208 +3,379 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SignPath – Practice</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Ishara – Practice</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Croissant One -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Croissant+One&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- MediaPipe Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
   <script src="sign_model.js"></script>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-body: #fff0f6;
+      --bg-card: #ffffff;
+      --primary: #ff5fa2;
+      --primary-hover: #d63384;
+      --primary-light: #ffe6f2;
+      --border: #fbcfe8;
+      --text-main: #1f2937;
+      --text-muted: #833a5c;
+      --radius: 16px;
+      --shadow: 0 4px 20px rgba(255, 95, 162, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
     body {
+      background: var(--bg-body);
+      color: var(--text-main);
       min-height: 100vh;
-      background: linear-gradient(180deg, #ffe3f1, #fde6f2);
-      font-family: system-ui, sans-serif;
-      display: flex; flex-direction: column;
-      color: #3a2a33;
+      display: flex;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 32px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      font-family: 'Croissant One', cursive;
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 32px;
+      padding-left: 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-item button {
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      border-radius: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-item.active button, .nav-item button:hover {
+      background: var(--primary-light);
+      color: var(--primary-hover);
+    }
+
+    /* Main Area */
+    .main-content {
+      flex: 1;
+      padding: 32px 40px;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     .practice-header {
-      display: flex; align-items: center;
-      padding: 18px 22px 12px; gap: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .back-btn {
-      background: white; border: 2px solid #f4b6d2;
-      border-radius: 999px; padding: 8px 16px;
-      font-size: 0.82rem; font-weight: 700;
-      color: #a14a76; cursor: pointer; text-decoration: none;
+
+    .page-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
     }
-    .practice-title {
-      flex: 1; text-align: center;
-      font-size: 1rem; font-weight: 900; color: #d63384;
+
+    .sign-counter {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary-hover);
+      background: var(--primary-light);
+      padding: 6px 14px;
+      border-radius: 999px;
     }
-    .sign-counter { font-size: 0.78rem; font-weight: 700; color: #c77aa0; }
 
     .practice-body {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; gap: 14px;
-      padding: 8px 16px 24px;
-    }
-
-    .mode-toggle {
-      display: flex; gap: 8px;
-      width: 100%; max-width: 480px;
-    }
-    .mode-btn {
-      flex: 1; padding: 9px; border-radius: 999px;
-      font-size: 0.8rem; font-weight: 800; cursor: pointer;
-      border: 2px solid #f4b6d2; background: white; color: #a14a76;
-      transition: all 0.15s;
-    }
-    .mode-btn.active {
-      background: linear-gradient(135deg, #ff5fa2, #d63384);
-      color: white; border-color: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
     }
 
     .reference-card {
-      background: white; border-radius: 24px;
-      padding: 16px; width: 100%; max-width: 480px;
-      box-shadow: 0 8px 28px rgba(255,95,162,0.15);
-      display: flex; align-items: center; gap: 14px;
-      border: 2px solid #fde6f2; transition: all 0.3s;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 20px;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
     }
-    .reference-card.success { border-color: #ff5fa2; box-shadow: 0 8px 28px rgba(255,95,162,0.35); }
-    .sign-preview {
-      width: 80px; height: 80px; flex-shrink: 0;
-      background: #fff0f6; border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.4rem; overflow: hidden;
-    }
-    .sign-preview img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
-    .sign-info { flex: 1; }
-    .sign-word { font-size: 1.3rem; font-weight: 900; color: #d63384; display: block; margin-bottom: 4px; }
-    .sign-desc { font-size: 0.72rem; color: #a14a76; line-height: 1.5; }
-    .sign-tip  { font-size: 0.68rem; color: #c77aa0; font-style: italic; margin-top: 4px; display: block; }
 
+    .reference-card.success {
+      border-color: var(--primary);
+      box-shadow: 0 4px 20px rgba(255, 95, 162, 0.3);
+    }
+
+    .sign-preview {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+      background: var(--bg-body);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--primary-hover);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .sign-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px;
+    }
+
+    .sign-info { flex: 1; }
+    
+    .sign-word {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary-hover);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .sign-desc {
+      font-size: 0.85rem;
+      color: #4b5563;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .sign-tip {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-style: italic;
+      display: block;
+    }
+
+    /* Camera Viewport */
     .camera-wrap {
       position: relative;
-      width: 100%; max-width: 900px;
+      width: 100%;
+      max-width: 540px;
       aspect-ratio: 4/3;
-      border-radius: 24px; overflow: hidden;
-      background: #2a1a22;
-      box-shadow: 0 8px 32px rgba(255,95,162,0.2);
-      border: 3px solid #f4b6d2;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #1f2937;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
       transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .camera-wrap.detecting { border-color: #ff5fa2; }
-    .camera-wrap.success {
-      border-color: #ff5fa2;
-      box-shadow: 0 0 0 4px rgba(255,95,162,0.4), 0 8px 32px rgba(255,95,162,0.3);
-    }
-    video {
-      width: 100%; height: 100%;
-      object-fit: cover; transform: scaleX(-1); display: block;
-    }
-    canvas#overlay {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; transform: scaleX(-1);
-    }
-    .status-pill {
-      position: absolute; bottom: 12px; left: 50%;
-      transform: translateX(-50%);
-      background: rgba(42,26,34,0.75);
-      color: white; border-radius: 999px;
-      padding: 6px 16px; font-size: 0.75rem; font-weight: 700;
-      backdrop-filter: blur(4px); transition: all 0.3s; white-space: nowrap;
-    }
-    .status-pill.ok      { background: rgba(255,95,162,0.85); }
-    .status-pill.success { background: rgba(214,51,132,0.9); }
 
-    /* Hold progress ring */
-    .hold-ring {
-      position: absolute; top: 12px; right: 12px;
-      width: 48px; height: 48px;
+    .camera-wrap.detecting { border-color: var(--primary); }
+    .camera-wrap.success {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(255, 95, 162, 0.3);
     }
-    .hold-ring svg { transform: rotate(-90deg); }
-    .ring-label {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 900; color: white;
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      display: block;
     }
+
+    canvas#overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: scaleX(-1);
+    }
+
+    .status-pill {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(31, 41, 55, 0.85);
+      color: white;
+      border-radius: 999px;
+      padding: 8px 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .status-pill.ok { background: rgba(255, 95, 162, 0.9); }
+    .status-pill.success { background: rgba(214, 51, 132, 1); }
 
     .cam-prompt {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 10px; background: #2a1a22; z-index: 10;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #1f2937;
+      z-index: 10;
     }
-    .cam-prompt p { color: #f4b6d2; font-size: 0.85rem; text-align: center; padding: 0 20px; }
+
+    .cam-prompt p {
+      color: var(--primary-light);
+      font-size: 0.88rem;
+      text-align: center;
+      padding: 0 20px;
+    }
+
     .cam-start-btn {
-      background: linear-gradient(135deg, #ff5fa2, #d63384);
-      color: white; border: none; border-radius: 999px;
-      padding: 10px 24px; font-size: 0.88rem; font-weight: 800; cursor: pointer;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 24px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .cam-start-btn:hover {
+      background: var(--primary-hover);
     }
 
     .confidence-bar-wrap {
-      width: 100%; max-width: 500px;
-      background: white; border-radius: 16px;
+      width: 100%;
+      max-width: 540px;
+      background: var(--bg-card);
+      border-radius: 14px;
       padding: 12px 16px;
-      box-shadow: 0 4px 16px rgba(255,95,162,0.1);
-      border: 2px solid #fde6f2;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
     }
-    .confidence-label {
-      display: flex; justify-content: space-between;
-      font-size: 0.72rem; font-weight: 700; color: #a14a76; margin-bottom: 6px;
-    }
-    .confidence-track { height: 8px; background: #f4b6d2; border-radius: 999px; overflow: hidden; }
-    .confidence-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #ff5fa2, #d63384);
-      border-radius: 999px; transition: width 0.15s;
-    }
-    .detected-label { margin-top: 6px; font-size: 0.78rem; font-weight: 800; color: #d63384; text-align: center; }
 
-    /* Finger spelling */
-    .fingerspell-wrap {
-      width: 100%; max-width: 480px;
-      background: white; border-radius: 20px;
-      padding: 16px; border: 2px solid #fde6f2;
-      box-shadow: 0 4px 16px rgba(255,95,162,0.1);
+    .confidence-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
-    .fingerspell-label {
-      font-size: 0.7rem; font-weight: 800; color: #c77aa0;
-      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+
+    .confidence-track {
+      height: 6px;
+      background: var(--primary-light);
+      border-radius: 999px;
+      overflow: hidden;
     }
-    .fingerspell-sentence {
-      font-size: 1.8rem; font-weight: 900; color: #d63384;
-      min-height: 48px; letter-spacing: 0.1em;
-      word-break: break-all; line-height: 1.3; margin-bottom: 12px;
+
+    .confidence-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      border-radius: 999px;
+      transition: width 0.15s;
     }
-    .cursor {
-      display: inline-block;
-      animation: blink 1s step-end infinite; color: #ff5fa2;
+
+    .detected-label {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--primary-hover);
+      text-align: center;
     }
-    @keyframes blink { 50% { opacity: 0; } }
-    .fs-actions { display: flex; gap: 8px; }
-    .fs-btn {
-      flex: 1; background: white; border: 2px solid #f4b6d2;
-      border-radius: 999px; padding: 8px;
-      font-size: 0.78rem; font-weight: 800; color: #a14a76; cursor: pointer;
-    }
-    .fs-btn:hover { border-color: #ff5fa2; color: #d63384; }
 
     .nav-row {
-      display: flex; gap: 10px; width: 100%; max-width: 480px;
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 540px;
     }
+
     .nav-btn {
-      flex: 1; background: white;
-      border: 2px solid #f4b6d2; border-radius: 999px;
-      padding: 12px; font-size: 0.85rem; font-weight: 800;
-      color: #a14a76; cursor: pointer; transition: all 0.15s;
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
-    .nav-btn:hover { border-color: #ff5fa2; color: #d63384; }
+
+    .nav-btn:hover { 
+      background: var(--primary-light); 
+      color: var(--primary-hover); 
+    }
+
     .nav-btn.primary {
-      background: linear-gradient(135deg, #ff5fa2, #d63384);
-      color: white; border-color: transparent;
-      box-shadow: 0 6px 20px rgba(255,95,162,0.3);
+      background: var(--primary);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(255, 95, 162, 0.25);
+    }
+
+    .nav-btn.primary:hover {
+      background: var(--primary-hover);
     }
 
     .success-flash {
-      position: fixed; inset: 0;
-      background: rgba(255,95,162,0.15);
-      pointer-events: none; z-index: 50;
-      opacity: 0; transition: opacity 0.15s;
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 95, 162, 0.15);
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 0.15s;
     }
+
     .success-flash.show { opacity: 1; }
   </style>
 </head>
@@ -212,146 +383,119 @@
 
 <div class="success-flash" id="successFlash"></div>
 
-<div class="practice-header">
-  <a href="learn.html" class="back-btn">← Home</a>
-  <div class="practice-title">Practice Mode</div>
-  <div class="sign-counter" id="signCounter">1 / 8</div>
-</div>
+<!-- Sidebar Navigation -->
+<aside class="sidebar">
+  <div>
+    <div class="brand">Ishara</div>
+    <ul class="nav-list">
+      <li class="nav-item" id="navDash"><button onclick="window.location.href='learn.html'">Dashboard</button></li>
+      <li class="nav-item active" id="navPractice"><button onclick="window.location.href='practice.html'">Practice Mode</button></li>
+    </ul>
+  </div>
+</aside>
 
-<div class="practice-body">
-
-  <div class="mode-toggle">
-    <button class="mode-btn active" id="btnPractice" onclick="setMode('practice')">📖 Practice Signs</button>
-    <button class="mode-btn" id="btnSpell" onclick="setMode('spell')">Finger Spell</button>
+<!-- Main Workarea -->
+<main class="main-content">
+  <div class="practice-header">
+    <h1 class="page-title">Practice Mode</h1>
+    <div class="sign-counter" id="signCounter">1 / 8</div>
   </div>
 
-  <div class="reference-card" id="referenceCard">
-    <div class="sign-preview" id="signPreview"></div>
-    <div class="sign-info">
-      <span class="sign-word" id="signWord">A</span>
-      <div class="sign-desc" id="signDesc"></div>
-      <span class="sign-tip" id="signTip"></span>
+  <div class="practice-body">
+
+    <div class="reference-card" id="referenceCard">
+      <div class="sign-preview" id="signPreview"></div>
+      <div class="sign-info">
+        <span class="sign-word" id="signWord">A</span>
+        <div class="sign-desc" id="signDesc"></div>
+        <span class="sign-tip" id="signTip"></span>
+      </div>
+    </div>
+
+    <div class="camera-wrap" id="cameraWrap">
+      <video id="video" playsinline autoplay muted></video>
+      <canvas id="overlay"></canvas>
+      <div class="status-pill" id="statusPill">Show your hand</div>
+      <div class="cam-prompt" id="camPrompt">
+        <p>Camera permission required for hand landmark detection</p>
+        <button class="cam-start-btn" onclick="startCamera()">Enable Camera</button>
+      </div>
+    </div>
+
+    <div class="confidence-bar-wrap" id="confWrap" style="display:none">
+      <div class="confidence-label">
+        <span>Detection Confidence</span>
+        <span id="confPct">0%</span>
+      </div>
+      <div class="confidence-track">
+        <div class="confidence-fill" id="confFill"></div>
+      </div>
+      <div class="detected-label" id="detectedLabel">No sign detected</div>
+    </div>
+
+    <div class="nav-row" id="navRow">
+      <button class="nav-btn" onclick="prevSign()">Previous</button>
+      <button class="nav-btn primary" onclick="nextSign()">Next Sign</button>
     </div>
   </div>
-
-  <div class="camera-wrap" id="cameraWrap">
-    <video id="video" playsinline autoplay muted></video>
-    <canvas id="overlay"></canvas>
-    <div class="status-pill" id="statusPill"> Show your hand</div>
-    <div class="hold-ring" id="holdRing" style="display:none">
-      <svg width="48" height="48" viewBox="0 0 48 48">
-        <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4"/>
-        <circle id="ringFill" cx="24" cy="24" r="20" fill="none"
-          stroke="#ff2d8a" stroke-width="4" stroke-linecap="round"
-          stroke-dasharray="125.6" stroke-dashoffset="125.6"/>
-      </svg>
-      <div class="ring-label" id="ringLabel">—</div>
-    </div>
-    <div class="cam-prompt" id="camPrompt">
-      <p>Camera needed to detect your signs</p>
-      <button class="cam-start-btn" onclick="startCamera()">Enable Camera</button>
-    </div>
-  </div>
-
-  <div class="confidence-bar-wrap" id="confWrap" style="display:none">
-    <div class="confidence-label">
-      <span>Detection confidence</span>
-      <span id="confPct">0%</span>
-    </div>
-    <div class="confidence-track">
-      <div class="confidence-fill" id="confFill"></div>
-    </div>
-    <div class="detected-label" id="detectedLabel">—</div>
-  </div>
-
-  <div class="fingerspell-wrap" id="fingerspellWrap" style="display:none">
-    <div class="fingerspell-label">✍️ Finger Spelling</div>
-    <div class="fingerspell-sentence" id="fsText"><span class="cursor">|</span></div>
-    <div class="fs-actions">
-      <button class="fs-btn" onclick="fsBackspace()">⌫ Delete</button>
-      <button class="fs-btn" onclick="fsSpace()">␣ Space</button>
-      <button class="fs-btn" onclick="fsClear()">✕ Clear</button>
-    </div>
-  </div>
-
-  <div class="nav-row" id="navRow">
-    <button class="nav-btn" onclick="prevSign()">← Prev</button>
-    <button class="nav-btn primary" onclick="nextSign()">Next →</button>
-  </div>
-
-</div>
+</main>
 
 <script>
 const SIGNS = [
-  { word:'A', emoji:'🅰️', img:'assets/a.png', desc:'Make a fist with thumb resting on the side.',              tip:'Compact and clean — like the letter A' },
-  { word:'B', emoji:'🅱️', img:'assets/b.png', desc:'Hold four fingers up together, thumb tucked across palm.', tip:'Flat fingers — like the straight lines of B' },
-  { word:'C', emoji:'©️',  img:'assets/c.png', desc:'Curve your hand into a C shape.',                         tip:'Your hand literally makes a C!' },
-  { word:'D', emoji:'🔵', img:'assets/d.png', desc:'Index finger points up, other fingers form a circle.',     tip:'The circle is the round belly of D' },
-  { word:'0', emoji:'0️⃣', img:null,           desc:'Curve all fingers and thumb to touch, forming an O.',     tip:'Like the letter O — zero looks the same!' },
-  { word:'1', emoji:'1️⃣', img:null,           desc:'Hold up your index finger, all other fingers closed.',    tip:'Just one finger up!' },
-  { word:'Y', emoji:'🤙', img:null,           desc:'Thumb and pinky extended, other fingers closed.',          tip:'Shaka / hang loose!' },
-  { word:'V', emoji:'✌️', img:null,           desc:'Index and middle fingers up and spread in a V.',           tip:'Peace sign!' },
+  { word:'A', img:'assets/a.png', desc:'Make a fist with thumb resting on the side.', tip:'Keep your thumb flat against the side of your index finger.' },
+  { word:'B', img:'assets/b.png', desc:'Hold four fingers up together, thumb tucked across palm.', tip:'Keep all four fingers straight and flush together.' },
+  { word:'C', img:'assets/c.png', desc:'Curve your hand into a C shape.', tip:'Form an arc with your fingers and thumb.' },
+  { word:'D', img:'assets/d.png', desc:'Index finger points up, other fingers form a circle.', tip:'Touch your thumb to your middle finger to form the loop.' },
+  { word:'0', img:null, desc:'Curve all fingers and thumb to touch, forming an O.', tip:'Align your fingertips to create an open oval.' },
+  { word:'1', img:null, desc:'Hold up your index finger, all other fingers closed.', tip:'Extend only your index finger upwards.' },
+  { word:'Y', img:null, desc:'Thumb and pinky extended, other fingers closed.', tip:'Extend your thumb and pinky outward completely.' },
+  { word:'V', img:null, desc:'Index and middle fingers up and spread in a V.', tip:'Separate index and middle finger while tucking others.' }
 ];
 
-const CIRC           = 125.6;
 const SMOOTH_WINDOW  = 10;
 const CONF_THRESHOLD = 0.68;
 const HOLD_FRAMES    = 18;
-const SPELL_HOLD     = 22;
 
 let current      = 0;
 let holdCount    = 0;
-let mode         = 'practice';
-let fsWord       = '';
-let spellCooldown = 0;
 const recentPreds = [];
 
-// ── Mode switch ──
-function setMode(m) {
-  mode = m;
-  holdCount = 0; recentPreds.length = 0;
-  document.getElementById('btnPractice').classList.toggle('active', m === 'practice');
-  document.getElementById('btnSpell').classList.toggle('active',    m === 'spell');
-  document.getElementById('referenceCard').style.display    = m === 'practice' ? '' : 'none';
-  document.getElementById('navRow').style.display           = m === 'practice' ? '' : 'none';
-  document.getElementById('fingerspellWrap').style.display  = m === 'spell'    ? '' : 'none';
-  document.getElementById('holdRing').style.display         = m === 'spell'    ? '' : 'none';
-  document.getElementById('signCounter').style.display      = m === 'practice' ? '' : 'none';
-}
-
-// ── Finger spell ──
-function renderFs() {
-  document.getElementById('fsText').innerHTML =
-    (fsWord.length ? fsWord : '') + '<span class="cursor">|</span>';
-}
-function fsAppend(ch) { fsWord += ch; renderFs(); }
-function fsBackspace() { fsWord = fsWord.slice(0,-1); renderFs(); }
-function fsSpace()    { fsWord += ' '; renderFs(); }
-function fsClear()    { fsWord = ''; renderFs(); }
-
-// ── Practice render ──
 function render() {
   const s = SIGNS[current];
   document.getElementById('signCounter').textContent = `${current+1} / ${SIGNS.length}`;
   document.getElementById('signWord').textContent    = s.word;
   document.getElementById('signDesc').textContent    = s.desc;
-  document.getElementById('signTip').textContent     = '💡 ' + s.tip;
+  document.getElementById('signTip').textContent     = 'Tip: ' + s.tip;
   document.getElementById('referenceCard').classList.remove('success');
   document.getElementById('cameraWrap').classList.remove('success');
-  holdCount = 0; recentPreds.length = 0;
+  holdCount = 0; 
+  recentPreds.length = 0;
+  
   const preview = document.getElementById('signPreview');
   if (s.img) {
-    preview.innerHTML = `<img src="${s.img}" alt="${s.word}" onerror="this.parentElement.textContent='${s.emoji}'">`;
-  } else { preview.textContent = s.emoji; }
-}
-function nextSign() {
-  if (current < SIGNS.length-1) { current++; render(); }
-  else {
-    const pill = document.getElementById('statusPill');
-    pill.textContent = '🎉 All done!'; pill.classList.add('success');
+    preview.innerHTML = `<img src="${s.img}" alt="${s.word}" onerror="this.parentElement.textContent='${s.word}'">`;
+  } else { 
+    preview.textContent = s.word; 
   }
 }
-function prevSign() { if (current > 0) { current--; render(); } }
+
+function nextSign() {
+  if (current < SIGNS.length - 1) { 
+    current++; 
+    render(); 
+  } else {
+    const pill = document.getElementById('statusPill');
+    pill.textContent = 'Practice Complete'; 
+    pill.classList.add('success');
+  }
+}
+
+function prevSign() { 
+  if (current > 0) { 
+    current--; 
+    render(); 
+  } 
+}
 
 function flashSuccess() {
   const flash = document.getElementById('successFlash');
@@ -362,35 +506,31 @@ function flashSuccess() {
   setTimeout(() => nextSign(), 900);
 }
 
-// ── Majority vote smoothing ──
 function smoothed() {
   if (!recentPreds.length) return null;
   const counts = {};
   let best = null, bestN = 0;
   for (const p of recentPreds) {
-    counts[p] = (counts[p]||0)+1;
+    counts[p] = (counts[p] || 0) + 1;
     if (counts[p] > bestN) { bestN = counts[p]; best = p; }
   }
   return { label: best, votes: bestN, total: recentPreds.length };
 }
 
-// ── Camera ──
 function startCamera() {
-  navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' }, audio: false })
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
     .then(stream => {
       document.getElementById('video').srcObject = stream;
       document.getElementById('camPrompt').style.display = 'none';
       document.getElementById('confWrap').style.display  = 'block';
-      if (mode === 'spell') document.getElementById('holdRing').style.display = '';
       initMediaPipe();
     })
     .catch(() => {
       document.getElementById('camPrompt').querySelector('p').textContent =
-        'Camera access denied. Please allow in browser settings.';
+        'Camera access denied. Please allow access in your browser settings.';
     });
 }
 
-// ── MediaPipe ──
 function initMediaPipe() {
   const video  = document.getElementById('video');
   const canvas = document.getElementById('overlay');
@@ -401,6 +541,7 @@ function initMediaPipe() {
   const hands = new Hands({ locateFile: f =>
     `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
   });
+  
   hands.setOptions({
     maxNumHands: 2,
     modelComplexity: 1,
@@ -412,28 +553,22 @@ function initMediaPipe() {
     canvas.width  = video.videoWidth  || canvas.offsetWidth;
     canvas.height = video.videoHeight || canvas.offsetHeight;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (spellCooldown > 0) spellCooldown--;
 
     if (results.multiHandLandmarks?.length) {
 
-      // ── Draw ALL detected hands ──
       for (const lm of results.multiHandLandmarks) {
-        // Connectors
-        drawConnectors(ctx, lm, HAND_CONNECTIONS, { color:'#ff2d8a', lineWidth: 3 });
-        // Neon joints
+        drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#ff5fa2', lineWidth: 3 });
         for (const pt of lm) {
           const x = pt.x * canvas.width;
           const y = pt.y * canvas.height;
-          // Glow halo
           ctx.beginPath();
-          ctx.arc(x, y, 9, 0, 2*Math.PI);
-          ctx.fillStyle = 'rgba(255,45,138,0.22)';
+          ctx.arc(x, y, 9, 0, 2 * Math.PI);
+          ctx.fillStyle = 'rgba(255,95,162,0.22)';
           ctx.fill();
-          // Bright core
           ctx.beginPath();
-          ctx.arc(x, y, 4.5, 0, 2*Math.PI);
-          ctx.fillStyle = '#ff2d8a';
-          ctx.shadowColor = '#ff2d8a';
+          ctx.arc(x, y, 4.5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ff5fa2';
+          ctx.shadowColor = '#ff5fa2';
           ctx.shadowBlur  = 12;
           ctx.fill();
           ctx.shadowBlur  = 0;
@@ -443,7 +578,6 @@ function initMediaPipe() {
       wrap.classList.add('detecting');
       pill.classList.add('ok');
 
-      // ── Predict on primary hand ──
       const pred = predictSign(results.multiHandLandmarks[0]);
       const conf  = pred.confidence;
       const label = pred.label;
@@ -456,72 +590,41 @@ function initMediaPipe() {
       }
 
       const sm = smoothed();
-      // Only commit to a label if confidence + vote agreement is strong
       const DISPLAY_THRESHOLD = 0.72;
       const strongEnough = sm && sm.votes >= Math.ceil(SMOOTH_WINDOW * 0.7) && conf >= DISPLAY_THRESHOLD;
       const dispLabel = strongEnough ? sm.label : null;
-      const dispConf  = strongEnough ? Math.round((sm.votes/sm.total)*100) : 0;
+      const dispConf  = strongEnough ? Math.round((sm.votes / sm.total) * 100) : 0;
 
       document.getElementById('confFill').style.width      = dispConf + '%';
-      document.getElementById('confPct').textContent       = strongEnough ? dispConf + '%' : '—';
+      document.getElementById('confPct').textContent       = strongEnough ? dispConf + '%' : '0%';
       document.getElementById('detectedLabel').textContent = strongEnough
         ? `Detected: ${dispLabel} (${dispConf}% agreement)`
         : 'No sign detected';
 
-      if (mode === 'practice') {
-        const target = SIGNS[current].word;
-        const locked = strongEnough && dispLabel === target;
-        if (locked) {
-          pill.textContent = `✓ ${target} — hold it!`;
-          pill.classList.add('success');
-          holdCount++;
-          if (holdCount >= HOLD_FRAMES) { holdCount = 0; flashSuccess(); }
-        } else {
-          pill.textContent = strongEnough ? `Seeing: ${dispLabel}` : ' Keep going...';
-          pill.classList.remove('success');
-          holdCount = 0;
+      const target = SIGNS[current].word;
+      const locked = strongEnough && dispLabel === target;
+      
+      if (locked) {
+        pill.textContent = `Correct: ${target} — Hold position`;
+        pill.classList.add('success');
+        holdCount++;
+        if (holdCount >= HOLD_FRAMES) { 
+          holdCount = 0; 
+          flashSuccess(); 
         }
-
       } else {
-        // Spell mode
-        const ringFill  = document.getElementById('ringFill');
-        const ringLabel = document.getElementById('ringLabel');
-        const stable = strongEnough;
-
-        if (stable && spellCooldown === 0) {
-          holdCount++;
-          ringFill.style.strokeDashoffset = CIRC * (1 - holdCount/SPELL_HOLD);
-          ringLabel.textContent = sm.label;
-          pill.textContent = `Signing: ${sm.label} — hold`;
-          pill.classList.add('success');
-
-          if (holdCount >= SPELL_HOLD) {
-            fsAppend(sm.label);
-            holdCount = 0;
-            spellCooldown = 28;
-            ringFill.style.strokeDashoffset = CIRC;
-            const flash = document.getElementById('successFlash');
-            flash.classList.add('show');
-            setTimeout(() => flash.classList.remove('show'), 200);
-          }
-        } else if (spellCooldown === 0) {
-          holdCount = 0;
-          ringFill.style.strokeDashoffset = CIRC;
-          ringLabel.textContent = sm?.label || '—';
-          pill.textContent = '✋ Hold to spell letter';
-          pill.classList.remove('success');
-        }
+        pill.textContent = strongEnough ? `Detected: ${dispLabel}` : 'Position hand clearly';
+        pill.classList.remove('success');
+        holdCount = 0;
       }
 
     } else {
-      pill.textContent = ' Show your hand';
-      pill.classList.remove('ok','success');
-      wrap.classList.remove('detecting','success');
+      pill.textContent = 'Show your hand';
+      pill.classList.remove('ok', 'success');
+      wrap.classList.remove('detecting', 'success');
       document.getElementById('confFill').style.width      = '0%';
       document.getElementById('confPct').textContent       = '0%';
-      document.getElementById('detectedLabel').textContent = '—';
-      document.getElementById('ringFill').style.strokeDashoffset = CIRC;
-      document.getElementById('ringLabel').textContent     = '—';
+      document.getElementById('detectedLabel').textContent = 'No sign detected';
       recentPreds.length = 0;
       holdCount = 0;
     }
@@ -529,7 +632,8 @@ function initMediaPipe() {
 
   const cam = new Camera(video, {
     onFrame: async () => { await hands.send({ image: video }); },
-    width: 640, height: 480
+    width: 640,
+    height: 480
   });
   cam.start();
 }
